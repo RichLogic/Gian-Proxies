@@ -2,7 +2,7 @@
   "schema": 1,
   "product": "Gian-Proxies",
   "sourceRepository": "RichLogic/Gian-Dev",
-  "sourceCommit": "9b39f25c83d60beb377cc91b21b48a42b730d5ec",
+  "sourceCommit": "431f8d2196e61f466ff0454a292a172b6efc17ba",
   "workingTree": false,
   "externalPackages": [
     {
@@ -2165,7 +2165,7 @@
     },
     {
       "source": "scripts/check-node.js",
-      "path": "scripts/check-node.js",
+      "path": "scripts/check-node.cjs",
       "sha256": "804e405dc9fe788c8fe97739256abb3403a10980c20b8ea78dac8de4732182e9"
     },
     {
@@ -2433,7 +2433,7 @@
     {
       "path": "package.json",
       "mode": 420,
-      "sha256": "d25a120213cf7b311a0ec1897da19feee2bdb355fdc7e7a0c78333c76c9ed0cb"
+      "sha256": "8f9960e2462a62ed5d3bb4d70da59b61d0e97d09080b83138e70c4c93984aeea"
     },
     {
       "path": "packages/proxies/cc-proxy/assets/logo-dark.png",
@@ -4311,7 +4311,7 @@
       "sha256": "ffc7826a56f30adc59faf3f30dda33569950ffc469416a8c98a5bb6a013672e1"
     },
     {
-      "path": "scripts/check-node.js",
+      "path": "scripts/check-node.cjs",
       "mode": 420,
       "sha256": "804e405dc9fe788c8fe97739256abb3403a10980c20b8ea78dac8de4732182e9"
     },

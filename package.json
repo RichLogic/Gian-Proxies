@@ -9,7 +9,7 @@
     "node": ">=24 <25"
   },
   "scripts": {
-    "preinstall": "node scripts/check-node.js",
+    "preinstall": "node scripts/check-node.cjs",
     "build": "node scripts/release-product.mjs build",
     "qualify": "node scripts/release-product.mjs qualify",
     "publish": "node scripts/release-product.mjs publish",
