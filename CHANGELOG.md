@@ -1,6 +1,19 @@
 # Gian Proxies Changelog
 
-## Proxy 0.4.0
+## 2026-09-20 - Independent Delivery
+
+Versions follow the individual Proxy packages on GianDev main:
+
+| Proxy | Version |
+| --- | --- |
+| Claude | 0.3.1 |
+| Codex | 0.3.1 |
+| DSH | 0.3.1 |
+| Kimi | 0.3.2 |
+| ZCode | 0.3.2 |
+
+The unified 0.4.0 releases and tags were withdrawn and replaced by the individual
+versions above. Repository separation does not assign a shared Proxy version.
 
 - Publish official Proxy packages and their signed Catalog from Gian-Proxies.
 - Consume the immutable public Gian Proxy Protocol 1.0.0 package.

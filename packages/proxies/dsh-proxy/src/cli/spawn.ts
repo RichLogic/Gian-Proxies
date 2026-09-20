@@ -13,7 +13,7 @@ import { discoverDshRuntimes, probeDshRuntime } from '../runtime/discover.js';
 import { ensureGianProfile } from '../runtime/profile.js';
 import { parseArgs } from './bridge-launch.js';
 
-const PLUGIN_VERSION = '0.4.0';
+const PLUGIN_VERSION = '0.3.1';
 
 async function main(): Promise<void> {
   const argv = process.argv.slice(2);
