@@ -1,0 +1,1443 @@
+import { tmpdir } from 'node:os';
+import {
+  KimiCustomizationScanner,
+  ScanTimeoutError,
+} from './customization.js';
+import { resolve } from 'node:path';
+
+import type {
+  PromptResponse,
+  RequestPermissionRequest,
+  RequestPermissionResponse,
+  SessionConfigOption,
+  SessionNotification,
+} from '@agentclientprotocol/sdk';
+
+import { createAppError, KimiProxyError } from './errors.js';
+import { normalizeInputItems, toPromptBlocks } from './input.js';
+import type {
+  ApprovalResponseParams,
+  CloseSessionParams,
+  CreateSessionParams,
+  GetSessionParams,
+  InitializePayload,
+  InterruptTurnParams,
+  ListNativeSessionsParams,
+  PendingApproval,
+  SessionRecord,
+  SessionSnapshotParams,
+  SetConfigOptionParams,
+  StartTurnParams,
+} from './types.js';
+import { nowIso, randomId } from './utils.js';
+import { KimiAcpClient } from '../runtime/kimi-acp-client.js';
+import { recordSelectedKimiActivation } from '../runtime/discover.js';
+
+type ProxyEventSink = (method: string, params: Record<string, unknown>) => void;
+
+interface ActiveTurn {
+  turnId: string;
+  requestId?: number | string;
+  isCompact: boolean;
+}
+
+interface ServiceOptions {
+  runtime: KimiAcpClient;
+  emitEvent?: ProxyEventSink;
+  /** Test seam: bound on how long an accepted interrupt may take to end the
+   *  native turn before the shared runtime is considered wedged. */
+  interruptSettleMs?: number;
+}
+
+const DEFAULT_INTERRUPT_SETTLE_MS = 10_000;
+
+function nonEmptyString(value: unknown, field: string): string {
+  if (typeof value !== 'string' || !value.trim()) {
+    throw createAppError(400, 'INVALID_REQUEST', `${field} is required.`);
+  }
+  return value.trim();
+}
+
+function runtimeErrorCode(error: unknown): number | string | null {
+  if (!error || typeof error !== 'object' || !('code' in error)) return null;
+  const code = (error as { code?: unknown }).code;
+  return typeof code === 'number' || typeof code === 'string' ? code : null;
+}
+
+function shellQuote(value: string): string {
+  return `'${value.replaceAll("'", "'\\''")}'`;
+}
+
+function mapRuntimeError(error: unknown, binaryPath: string): Error {
+  if (runtimeErrorCode(error) === -32000) {
+    return createAppError(
+      401,
+      'AUTH_REQUIRED',
+      `Kimi Code is not logged in. Run ${shellQuote(binaryPath)} login in a terminal, then retry.`,
+    );
+  }
+  return error instanceof Error ? error : new Error(String(error));
+}
+
+function updateKind(notification: SessionNotification): string {
+  return notification.update.sessionUpdate;
+}
+
+function permissionReason(request: RequestPermissionRequest): string {
+  const title = request.toolCall.title;
+  return typeof title === 'string' && title.trim()
+    ? title.trim()
+    : 'Kimi requested a user decision.';
+}
+
+/** Kimi's ACP adapter sends AskUserQuestion with a bare `title:
+ *  'AskUserQuestion'` and the actual question text inside a toolCall content
+ *  block — surface that text as the approval reason so the card shows the
+ *  question, not just the tool name next to the answer options. */
+function permissionContentText(request: RequestPermissionRequest): string | null {
+  for (const block of request.toolCall.content ?? []) {
+    if (block.type === 'content' && block.content.type === 'text') {
+      const text = block.content.text.trim();
+      if (text) return text;
+    }
+  }
+  return null;
+}
+
+function commandName(value: string): string {
+  return value.trim().replace(/^\/+/, '').toLowerCase();
+}
+
+function advertisedCommand(session: SessionRecord, command: string): boolean {
+  const expected = commandName(command);
+  return session.slashCommands.some(item => commandName(item.name) === expected);
+}
+
+function firstTextCommand(input: Array<{ type: string; text?: string }>): string | null {
+  const text = input.find(item => item.type === 'text')?.text?.trim();
+  if (!text?.startsWith('/')) return null;
+  return text.split(/\s+/, 1)[0]?.toLowerCase() ?? null;
+}
+
+function tokenCount(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0
+    ? value
+    : undefined;
+}
+
+interface ModeCapability {
+  id: string;
+  label: string;
+  description: string;
+  isDefault: boolean;
+}
+
+interface ModelCapability {
+  id: string;
+  model: string;
+  displayName: string;
+  description: string;
+  hidden: boolean;
+  isDefault: boolean;
+  defaultThinking: string | null;
+  supportedThinking: string[];
+}
+
+interface ProbedCapabilities {
+  modes: ModeCapability[];
+  models: ModelCapability[];
+  sessionOptions: SessionConfigOption[];
+}
+
+type SelectConfigOption = Extract<SessionConfigOption, { type: 'select' }>;
+
+function flatChoices(option: SelectConfigOption) {
+  return option.options.flatMap(entry =>
+    'options' in entry ? entry.options : [entry]);
+}
+
+/** Classify a session config option the same way the web composer's
+ *  nativeOptionRole does: category (or id) decides whether the select is the
+ *  model picker, the thinking-level picker, or the approval-mode picker. */
+function configOptionRole(
+  option: SessionConfigOption,
+): 'model' | 'thinking' | 'mode' | null {
+  const category = typeof option.category === 'string'
+    ? option.category.trim().toLowerCase()
+    : '';
+  const id = option.id.trim().toLowerCase();
+  if (category === 'model' || id === 'model') return 'model';
+  if (
+    category === 'thought_level'
+    || category === 'thought'
+    || category === 'thinking'
+    || category === 'effort'
+    || id === 'thought_level'
+    || id === 'thought'
+    || id === 'thinking'
+    || id === 'effort'
+    || id === 'reasoning_effort'
+  ) return 'thinking';
+  if (category === 'mode' || id === 'mode') return 'mode';
+  return null;
+}
+
+function selectOptionByRole(
+  options: SessionConfigOption[],
+  role: 'model' | 'thinking' | 'mode',
+): SelectConfigOption | null {
+  const found = options.find(option =>
+    option.type === 'select' && configOptionRole(option) === role);
+  return found && found.type === 'select' ? found : null;
+}
+
+/** Extract the approval-mode choices from a session's ACP configOptions.
+ *  Select options may be flat or grouped. */
+function modesFromConfigOptions(options: SessionConfigOption[]): ModeCapability[] {
+  const modeOption = selectOptionByRole(options, 'mode');
+  if (!modeOption) return [];
+  return flatChoices(modeOption).map(choice => ({
+    id: String(choice.value),
+    label: choice.name || String(choice.value),
+    description: typeof choice.description === 'string' ? choice.description : '',
+    isDefault: choice.value === modeOption.currentValue,
+  }));
+}
+
+interface ModelThinking {
+  supportedThinking: string[];
+  defaultThinking: string | null;
+}
+
+function thinkingFromConfigOptions(options: SessionConfigOption[]): ModelThinking {
+  const thinkingOption = selectOptionByRole(options, 'thinking');
+  if (!thinkingOption) return { supportedThinking: [], defaultThinking: null };
+  const current = typeof thinkingOption.currentValue === 'string'
+    ? thinkingOption.currentValue
+    : null;
+  return {
+    supportedThinking: flatChoices(thinkingOption).map(choice => String(choice.value)),
+    defaultThinking: current,
+  };
+}
+
+function currentModelId(options: SessionConfigOption[]): string | null {
+  const modelOption = selectOptionByRole(options, 'model');
+  return modelOption && typeof modelOption.currentValue === 'string'
+    ? modelOption.currentValue
+    : null;
+}
+
+function modelIdsFromOptions(options: SessionConfigOption[]): string[] {
+  const modelOption = selectOptionByRole(options, 'model');
+  return modelOption ? flatChoices(modelOption).map(choice => String(choice.value)) : [];
+}
+
+function modelsFromConfigOptions(
+  options: SessionConfigOption[],
+  thinkingByModel: Map<string, ModelThinking>,
+): ModelCapability[] {
+  const modelOption = selectOptionByRole(options, 'model');
+  if (!modelOption) return [];
+  return flatChoices(modelOption).map(choice => {
+    const value = String(choice.value);
+    const thinking = thinkingByModel.get(value) ?? { supportedThinking: [], defaultThinking: null };
+    return {
+      id: `kimi-model-${value}`,
+      model: value,
+      displayName: choice.name || value,
+      description: typeof modelOption.description === 'string' ? modelOption.description : '',
+      hidden: false,
+      isDefault: choice.value === modelOption.currentValue,
+      defaultThinking: thinking.defaultThinking,
+      supportedThinking: thinking.supportedThinking,
+    };
+  });
+}
+
+function capabilitiesFromConfigOptions(
+  options: SessionConfigOption[],
+  thinkingByModel: Map<string, ModelThinking>,
+): ProbedCapabilities {
+  return {
+    modes: modesFromConfigOptions(options),
+    models: modelsFromConfigOptions(options, thinkingByModel),
+    sessionOptions: [...options],
+  };
+}
+
+export function parseKimiConversationUsage(value: unknown) {
+  if (!value || typeof value !== 'object') return null;
+  const usage = value as Record<string, unknown>;
+  const inputTokens = tokenCount(usage.inputTokens);
+  const outputTokens = tokenCount(usage.outputTokens);
+  const totalTokens = tokenCount(usage.totalTokens);
+  // ACP SDK 0.23 marks these three fields as required. Accepting a partial
+  // match as an absolute snapshot would let EventCoordinator replace every
+  // missing counter with zero, so malformed/future shapes must stay unknown.
+  if (inputTokens === undefined || outputTokens === undefined || totalTokens === undefined) {
+    return null;
+  }
+  const rawCachedRead = usage.cachedReadTokens;
+  const rawCachedWrite = usage.cachedWriteTokens;
+  const rawThoughtTokens = usage.thoughtTokens;
+  const cachedReadTokens = tokenCount(rawCachedRead);
+  const cachedWriteTokens = tokenCount(rawCachedWrite);
+  const thoughtTokens = tokenCount(rawThoughtTokens);
+  if (
+    (rawCachedRead !== undefined && rawCachedRead !== null && cachedReadTokens === undefined)
+    || (rawCachedWrite !== undefined && rawCachedWrite !== null && cachedWriteTokens === undefined)
+    || (rawThoughtTokens !== undefined && rawThoughtTokens !== null && thoughtTokens === undefined)
+  ) return null;
+  return {
+    mode: 'absolute' as const,
+    inputTokens,
+    outputTokens,
+    cachedInputTokens: (cachedReadTokens ?? 0) + (cachedWriteTokens ?? 0),
+    totalTokens,
+  };
+}
+
+function conversationUsage(response: PromptResponse) {
+  return parseKimiConversationUsage(response.usage);
+}
+
+export function parseKimiStatusContext(
+  notifications: SessionNotification[],
+): { used: number; window: number } | null {
+  const text = notifications
+    .map(notification => notification.update as unknown as Record<string, unknown>)
+    .filter(update => update.sessionUpdate === 'agent_message_chunk')
+    .map(update => {
+      const content = update.content;
+      if (!content || typeof content !== 'object') return '';
+      const block = content as Record<string, unknown>;
+      return block.type === 'text' && typeof block.text === 'string' ? block.text : '';
+    })
+    .join('');
+  const match = /Context\s*:\s*([\d,_]+)\s*\/\s*([\d,_]+)/i.exec(text);
+  if (!match) return null;
+  const used = Number(match[1]!.replaceAll(/[, _]/g, ''));
+  const window = Number(match[2]!.replaceAll(/[, _]/g, ''));
+  if (!Number.isFinite(used) || used < 0 || !Number.isFinite(window) || window <= 0) {
+    return null;
+  }
+  return { used: Math.floor(used), window: Math.floor(window) };
+}
+
+export function parseKimiUsageUpdate(
+  notifications: SessionNotification[],
+): { used: number; window: number } | null {
+  let latest: { used: number; window: number } | null = null;
+  for (const notification of notifications) {
+    const update = notification.update as unknown as Record<string, unknown>;
+    if (update.sessionUpdate !== 'usage_update') continue;
+    const used = update.used;
+    const size = update.size;
+    if (typeof used !== 'number' || !Number.isFinite(used) || used < 0) continue;
+    if (typeof size !== 'number' || !Number.isFinite(size) || size <= 0) continue;
+    latest = { used: Math.floor(used), window: Math.floor(size) };
+  }
+  return latest;
+}
+
+export class KimiProxyService {
+  private readonly runtime: KimiAcpClient;
+  private readonly customization: KimiCustomizationScanner;
+  private readonly interruptSettleMs: number;
+  private emitEvent: ProxyEventSink;
+  private readonly sessionsById = new Map<string, SessionRecord>();
+  private readonly proxyIdByNativeId = new Map<string, string>();
+  private readonly activeTurns = new Map<string, ActiveTurn>();
+  private readonly approvalsById = new Map<string, PendingApproval>();
+  private readonly resumePromises = new Map<string, Promise<SessionRecord>>();
+  private readonly provisionalUpdates = new Map<string, SessionNotification[]>();
+  private readonly unclaimedUpdates = new Map<string, SessionNotification[]>();
+  private readonly slashReadySessions = new Set<string>();
+  private readonly slashWaiters = new Map<string, Set<() => void>>();
+  private readonly toolCallsByNativeId = new Map<
+    string,
+    Map<string, Record<string, unknown>>
+  >();
+
+  constructor(options: ServiceOptions) {
+    this.runtime = options.runtime;
+    this.emitEvent = options.emitEvent ?? (() => undefined);
+    this.interruptSettleMs = options.interruptSettleMs ?? DEFAULT_INTERRUPT_SETTLE_MS;
+    if (!Number.isFinite(this.interruptSettleMs) || this.interruptSettleMs <= 0) {
+      throw new TypeError('interruptSettleMs must be a positive finite number.');
+    }
+    this.customization = new KimiCustomizationScanner();
+    this.runtime.setPermissionHandler((request) => this.handlePermissionRequest(request));
+    this.runtime.on('sessionUpdate', (notification) => {
+      this.handleSessionUpdate(notification);
+    });
+    this.runtime.on('runtimeStopped', (event) => {
+      this.handleRuntimeStopped(event);
+    });
+    this.runtime.on('debug', (message) => {
+      this.emitEvent('debug', { message });
+    });
+  }
+
+  async initialize(): Promise<void> {
+    await this.runtime.ensureStarted();
+  }
+
+  supportsFork(): boolean {
+    return this.runtime.negotiated?.agentCapabilities?.sessionCapabilities?.fork != null;
+  }
+
+  supportsHttpMcp(): boolean {
+    return this.runtime.negotiated?.agentCapabilities?.mcpCapabilities?.http === true;
+  }
+
+  mcpServers(sessionId: string): SessionRecord['mcpServers'] {
+    return structuredClone(this.requireSession(sessionId).mcpServers);
+  }
+
+  setEventSink(handler: ProxyEventSink): void {
+    this.emitEvent = handler;
+  }
+
+  initializePayload(): InitializePayload {
+    return {
+      mode: 'spawn',
+      protocolVersion: 'acp/1',
+      methods: [
+        'initialize',
+        'capabilities.list',
+        'slash.list',
+        'session.create',
+        'session.get',
+        'session.listNative',
+        'session.config.set',
+        'turn.start',
+        'turn.interrupt',
+        'approval.respond',
+        'session.snapshot',
+        'session.close',
+        'shutdown',
+      ],
+    };
+  }
+
+  async listCapabilities() {
+    const probed = await this.probeCapabilities();
+    return {
+      ...await this.runtime.ensureStarted(),
+      modes: probed.modes,
+      models: probed.models,
+      sessionOptions: probed.sessionOptions,
+    };
+  }
+
+  private probedCapabilities: ProbedCapabilities | null = null;
+
+  /** Kimi reveals thinking choices per current model (`session/set_config_option`
+   *  on `model` rewrites the thought-level select). Learn the baseline snapshot
+   *  once, then probe every other model on a throwaway session — never mutate a
+   *  live user session. Cached for the process lifetime; the proxy is
+   *  respawned on upgrade. On any failure (e.g. not logged in) report no
+   *  modes/models rather than breaking capabilities. */
+  private async probeCapabilities(): Promise<ProbedCapabilities> {
+    if (this.probedCapabilities) return this.probedCapabilities;
+
+    let baseline: SessionConfigOption[] | null = null;
+    let throwawayId: string | null = null;
+    for (const session of this.sessionsById.values()) {
+      if (session.configOptions.length === 0) continue;
+      baseline = session.configOptions;
+      break;
+    }
+    if (!baseline) {
+      try {
+        const response = await this.runtime.newSession({ cwd: tmpdir(), mcpServers: [] });
+        baseline = response.configOptions ?? [];
+        throwawayId = response.sessionId;
+      } catch {
+        return { modes: [], models: [], sessionOptions: [] };
+      }
+    }
+
+    const thinkingByModel = new Map<string, ModelThinking>();
+    const current = currentModelId(baseline);
+    if (current) thinkingByModel.set(current, thinkingFromConfigOptions(baseline));
+
+    const others = modelIdsFromOptions(baseline).filter((modelId) => !thinkingByModel.has(modelId));
+    if (others.length > 0) {
+      if (!throwawayId) {
+        try {
+          const extra = await this.runtime.newSession({ cwd: tmpdir(), mcpServers: [] });
+          throwawayId = extra.sessionId;
+          const extraCurrent = currentModelId(extra.configOptions ?? []);
+          if (extraCurrent && !thinkingByModel.has(extraCurrent)) {
+            thinkingByModel.set(extraCurrent, thinkingFromConfigOptions(extra.configOptions ?? []));
+          }
+        } catch {
+          /* keep unknown models empty rather than rewriting a live session */
+        }
+      }
+      const modelOption = selectOptionByRole(baseline, 'model');
+      if (throwawayId && modelOption) {
+        for (const modelId of others) {
+          if (thinkingByModel.has(modelId)) continue;
+          try {
+            const response = await this.runtime.setSessionConfigOption({
+              sessionId: throwawayId,
+              configId: modelOption.id,
+              value: modelId,
+            });
+            thinkingByModel.set(modelId, thinkingFromConfigOptions(response.configOptions ?? []));
+          } catch {
+            thinkingByModel.set(modelId, { supportedThinking: [], defaultThinking: null });
+          }
+        }
+      }
+    }
+
+    if (throwawayId) {
+      try {
+        await this.runtime.closeSession({ sessionId: throwawayId });
+      } catch { /* close unsupported or failed — the probe session stays detached */ }
+    }
+
+    this.probedCapabilities = capabilitiesFromConfigOptions(baseline, thinkingByModel);
+    return this.probedCapabilities;
+  }
+
+  async listNativeSessions(params: ListNativeSessionsParams) {
+    return this.runtime.listSessions({
+      ...(params.cwd ? { cwd: resolve(params.cwd) } : {}),
+      ...(params.cursor ? { cursor: params.cursor } : {}),
+    });
+  }
+
+  async listSlashCommands(params: GetSessionParams) {
+    const session = this.requireSession(params.sessionId);
+    await this.waitForInitialSlashCommands(session.id);
+    return { commands: [...session.slashCommands] };
+  }
+
+  async createSession(input: CreateSessionParams) {
+    const cwd = resolve(nonEmptyString(input.cwd, 'cwd'));
+    const mcpServers = Array.isArray(input.mcpServers) ? input.mcpServers : [];
+    const nativeSessionId = typeof input.nativeSessionId === 'string'
+      && input.nativeSessionId.trim()
+      ? input.nativeSessionId.trim()
+      : null;
+    const proxySessionId = randomId('sess');
+    const createdAt = nowIso();
+
+    if (!nativeSessionId) {
+      await recordSelectedKimiActivation(this.runtime.binaryPath);
+      try {
+        const response = await this.runtime.newSession({ cwd, mcpServers });
+        const session = this.makeSession({
+          id: proxySessionId,
+          cwd,
+          nativeSessionId: response.sessionId,
+          mcpServers,
+          configOptions: response.configOptions ?? [],
+          createdAt,
+        });
+        this.addSession(session);
+        // Kimi may publish commands before session/new resolves, when the
+        // native ID is not known to the proxy yet.
+        const initialUpdates = this.claimUnownedUpdates(session);
+        return {
+          session: this.serializeSession(session),
+          replayUpdates: initialUpdates,
+        };
+      } catch (error) {
+        throw mapRuntimeError(error, this.runtime.binaryPath);
+      }
+    }
+
+    await recordSelectedKimiActivation(this.runtime.binaryPath);
+    const session = this.makeSession({
+      id: proxySessionId,
+      cwd,
+      nativeSessionId,
+      mcpServers,
+      configOptions: [],
+      createdAt,
+    });
+    try {
+      this.addSession(session);
+    } catch (error) {
+      // Reconnect recovery: a native id left bound to a Proxy session whose
+      // shared runtime already died is provably stale — drop the dead binding
+      // once and retry the attach once. A live binding still fails closed.
+      if (!this.dropStaleNativeBinding(session.nativeSessionId, error)) throw error;
+      this.addSession(session);
+    }
+    // session/load replays history during the RPC. Hold those updates until
+    // load succeeds so the host can persist its row + replay transactionally.
+    this.provisionalUpdates.set(session.id, []);
+
+    try {
+      const response = input.resumeMode === 'resume'
+        ? await this.runtime.resumeSession({
+          sessionId: nativeSessionId,
+          cwd,
+          mcpServers,
+        })
+        : await this.runtime.loadSession({
+          sessionId: nativeSessionId,
+          cwd,
+          mcpServers,
+        });
+      session.configOptions = response.configOptions ?? session.configOptions;
+      session.updatedAt = nowIso();
+      const replayUpdates = this.provisionalUpdates.get(session.id) ?? [];
+      this.provisionalUpdates.delete(session.id);
+      this.toolCallsByNativeId.delete(session.nativeSessionId);
+      return {
+        session: this.serializeSession(session),
+        replayUpdates,
+      };
+    } catch (error) {
+      this.provisionalUpdates.delete(session.id);
+      this.removeSession(session);
+      throw mapRuntimeError(error, this.runtime.binaryPath);
+    }
+  }
+
+  async forkSession(params: { sessionId: string; mcpServers?: SessionRecord['mcpServers'] }) {
+    const source = this.requireSession(params.sessionId);
+    if (source.activeTurnId) {
+      throw createAppError(409, 'SESSION_BUSY', 'Stop the active turn before forking the session.');
+    }
+    if (!this.supportsFork()) {
+      throw createAppError(400, 'CAPABILITY_NOT_SUPPORTED', 'Kimi ACP does not advertise session/fork.');
+    }
+    try {
+      const mcpServers = params.mcpServers ?? source.mcpServers;
+      const response = await this.runtime.forkSession({
+        sessionId: source.nativeSessionId,
+        cwd: source.cwd,
+        mcpServers,
+      });
+      const createdAt = nowIso();
+      const session = this.makeSession({
+        id: randomId('sess'),
+        cwd: source.cwd,
+        nativeSessionId: response.sessionId,
+        mcpServers,
+        configOptions: response.configOptions ?? source.configOptions,
+        createdAt,
+      });
+      this.addSession(session);
+      return { session: this.serializeSession(session) };
+    } catch (error) {
+      throw mapRuntimeError(error, this.runtime.binaryPath);
+    }
+  }
+
+
+  getSession(params: GetSessionParams) {
+    return { session: this.serializeSession(this.requireSession(params.sessionId)) };
+  }
+
+  async startTurn(params: StartTurnParams, requestId?: number | string) {
+    const session = await this.ensureAttached(this.requireSession(params.sessionId));
+    if (session.activeTurnId) {
+      throw createAppError(409, 'SESSION_BUSY', 'This session already has an active turn.');
+    }
+
+    const input = normalizeInputItems(params.input, session.cwd);
+    const prompt = await toPromptBlocks(input);
+    const command = firstTextCommand(input);
+    this.toolCallsByNativeId.delete(session.nativeSessionId);
+    const turnId = randomId('turn');
+    const activeTurn: ActiveTurn = {
+      turnId,
+      ...(requestId === undefined ? {} : { requestId }),
+      isCompact: command === '/compact',
+    };
+    this.activeTurns.set(session.id, activeTurn);
+    this.updateSession(session, {
+      activeTurnId: turnId,
+      status: 'running',
+      lastError: null,
+    });
+    if (activeTurn.isCompact) {
+      this.emitEvent('token_usage.updated', this.eventEnvelope(session, {
+        context: null,
+        reason: 'compact_started',
+      }, turnId));
+    }
+    this.emitEvent('turn.started', this.eventEnvelope(session, {
+      turnId,
+      status: 'running',
+    }));
+
+    // ACP session/prompt resolves only when the turn ends. Keep the proxy RPC
+    // non-blocking and finish the turn through notifications.
+    void this.runPrompt(session.id, turnId, prompt);
+
+    return {
+      session: this.serializeSession(session),
+      turn: { id: turnId, status: 'running' },
+    };
+  }
+
+  async interruptTurn(params: InterruptTurnParams) {
+    const session = this.requireSession(params.sessionId);
+    if (!session.activeTurnId) {
+      throw createAppError(409, 'INVALID_REQUEST', 'This session does not have an active turn.');
+    }
+    // Barrier order (frozen state machine): the session barrier rises
+    // SYNCHRONOUSLY before the cancel RPC, so no create can slip into the
+    // cancel await window. Cancel failure still drains; both failures are
+    // combined; only cancel+drain success lifts the temporary barrier.
+    const lease = this.runtime.beginSessionTerminalDrain(session.nativeSessionId);
+    let cancelError: unknown = null;
+    try {
+      await this.runtime.cancel(session.nativeSessionId);
+      this.cancelApprovalsForSession(session.id);
+    } catch (error) {
+      cancelError = error;
+    }
+    let cleanupError: unknown = null;
+    try {
+      await lease.drain();
+    } catch (error) {
+      cleanupError = error;
+      lease.keepBlocked();
+    }
+    const describe = (error: unknown) => (error instanceof Error ? error.message : String(error));
+    if (cancelError !== null && cleanupError !== null) {
+      throw createAppError(
+        500,
+        'SESSION_ERROR',
+        `Interrupt failed: cancel: ${describe(cancelError)}; terminal cleanup: ${describe(cleanupError)}`,
+      );
+    }
+    if (cleanupError !== null) {
+      throw createAppError(
+        500,
+        'SESSION_ERROR',
+        `Terminal cleanup after interrupt failed: ${describe(cleanupError)}`,
+      );
+    }
+    if (cancelError !== null) {
+      // Cleanup verified; per the frozen machine the barrier only lifts on
+      // cancel+drain success, so the session stays blocked until the next
+      // turn's successful finalizer drain re-enables terminal creation.
+      lease.keepBlocked();
+      throw createAppError(500, 'SESSION_ERROR', `Interrupt cancel failed: ${describe(cancelError)}`);
+    }
+    lease.releaseForNextTurn();
+    this.watchInterruptSettle(session.id);
+    return { ok: true, session: this.serializeSession(session) };
+  }
+
+  /** After an accepted interrupt the runtime must end the turn promptly:
+   *  `session/cancel` is an ACP notification, so its wire success says
+   *  nothing about the turn. If the turn never settles, the shared child is
+   *  wedged — fence it so the runtimeStopped broadcast fails the turn and
+   *  every session lazily rebinds to a fresh runtime. */
+  private watchInterruptSettle(sessionId: string): void {
+    const turnId = this.activeTurns.get(sessionId)?.turnId;
+    if (!turnId) return;
+    const timer = setTimeout(() => {
+      const active = this.activeTurns.get(sessionId);
+      if (!active || active.turnId !== turnId) return;
+      this.runtime.retireWedgedRuntime();
+    }, this.interruptSettleMs);
+    timer.unref();
+  }
+
+  async respondApproval(params: ApprovalResponseParams) {
+    const session = this.requireSession(params.sessionId);
+    const approval = this.approvalsById.get(params.approvalId);
+    if (!approval || approval.sessionId !== session.id) {
+      throw createAppError(404, 'APPROVAL_NOT_FOUND', 'Approval not found.');
+    }
+
+    if (!params.nativeOptionId) {
+      this.resolveApproval(approval, { outcome: { outcome: 'cancelled' } });
+      return { ok: true, session: this.serializeSession(session) };
+    }
+
+    if (!approval.options.some((option) => option.optionId === params.nativeOptionId)) {
+      throw createAppError(
+        409,
+        'INVALID_APPROVAL_OPTION',
+        'The selected native approval option is no longer available.',
+      );
+    }
+
+    this.resolveApproval(approval, {
+      outcome: {
+        outcome: 'selected',
+        optionId: params.nativeOptionId,
+      },
+    });
+    return { ok: true, session: this.serializeSession(session) };
+  }
+
+  async setConfigOption(params: SetConfigOptionParams) {
+    const session = await this.ensureAttached(this.requireSession(params.sessionId));
+    const configId = nonEmptyString(params.configId, 'configId');
+    const request = typeof params.value === 'boolean'
+      ? {
+        sessionId: session.nativeSessionId,
+        configId,
+        type: 'boolean' as const,
+        value: params.value,
+      }
+      : {
+        sessionId: session.nativeSessionId,
+        configId,
+        value: nonEmptyString(params.value, 'value'),
+      };
+    const response = await this.runtime.setSessionConfigOption(request);
+    session.configOptions = response.configOptions;
+    session.updatedAt = nowIso();
+    return {
+      session: this.serializeSession(session),
+      configOptions: response.configOptions,
+    };
+  }
+
+  async sessionSnapshot(params: SessionSnapshotParams) {
+    const session = await this.ensureAttached(this.requireSession(params.sessionId));
+    return {
+      session: this.serializeSession(session),
+      configOptions: session.configOptions,
+      slashCommands: session.slashCommands,
+    };
+  }
+
+  async closeSession(params: CloseSessionParams) {
+    const session = this.requireSession(params.sessionId);
+    if (session.activeTurnId) {
+      await this.runtime.cancel(session.nativeSessionId).catch(() => undefined);
+    }
+    this.cancelApprovalsForSession(session.id);
+    // Frozen close order: the PERMANENT barrier rises synchronously before
+    // any RPC; cancel (active turn) and native close failures never skip the
+    // terminal drain; every error is combined and the close reports failure
+    // instead of a clean teardown. The binding is deleted only by this
+    // drain's successful release — never inside the client RPC wrapper.
+    const lease = this.runtime.beginSessionTerminalDrain(session.nativeSessionId, { permanent: true });
+    const failures: string[] = [];
+    const describe = (error: unknown) => (error instanceof Error ? error.message : String(error));
+    if (session.activeTurnId) {
+      try {
+        await this.runtime.cancel(session.nativeSessionId).catch((error) => {
+          throw error;
+        });
+      } catch (error) {
+        failures.push(`cancel: ${describe(error)}`);
+      }
+    }
+    const nativeCloseSupported = (
+      this.runtime.negotiated?.agentCapabilities?.sessionCapabilities?.close != null
+    );
+    if (nativeCloseSupported && session.attached) {
+      try {
+        await this.runtime.closeSession({ sessionId: session.nativeSessionId });
+      } catch (error) {
+        failures.push(`native close: ${describe(error)}`);
+      }
+    }
+    try {
+      await lease.drain();
+    } catch (error) {
+      failures.push(`terminal cleanup: ${describe(error)}`);
+      lease.keepBlocked();
+    }
+    this.removeSession(session);
+    if (failures.length > 0) {
+      throw createAppError(500, 'SESSION_ERROR', `Session close failed: ${failures.join('; ')}`);
+    }
+    lease.releaseForNextTurn();
+    return {
+      ok: true,
+      nativeClosed: nativeCloseSupported,
+      detached: !nativeCloseSupported,
+    };
+  }
+  async inspectCustomizations(params: {
+    kind: import('@gian/proxy-protocol').CustomizationKind;
+    cwd?: string;
+  }): Promise<import('@gian/proxy-protocol').CustomizationListResult> {
+    try {
+      return await this.customization.list(params.kind, params.cwd ?? null);
+    } catch (error) {
+      if (error instanceof ScanTimeoutError) {
+        return {
+          kind: params.kind,
+          status: 'unavailable',
+          completeness: 'none',
+          observedAt: new Date().toISOString(),
+          items: [],
+          truncated: false,
+          diagnostics: [{
+            code: 'PROVIDER_INSPECTION_FAILED',
+            message: `Kimi ${params.kind} scan exceeded its inspection bound.`,
+          }],
+        };
+      }
+      throw error;
+    }
+  }
+
+  async customizationDetail(params: {
+    kind: import('@gian/proxy-protocol').CustomizationKind;
+    id: string;
+    cwd?: string;
+  }): Promise<import('@gian/proxy-protocol').CustomizationDetailResult> {
+    try {
+      return await this.customization.detail(params.kind, params.id, params.cwd ?? null);
+    } catch (error) {
+      if (error instanceof ScanTimeoutError) {
+        return {
+          kind: params.kind,
+          id: params.id,
+          status: 'unavailable',
+          observedAt: new Date().toISOString(),
+          text: '',
+          truncated: false,
+          diagnostics: [{ code: 'PROVIDER_INSPECTION_FAILED', message: 'Kimi detail scan exceeded its inspection bound.' }],
+        };
+      }
+      throw error;
+    }
+  }
+
+
+  async close(): Promise<void> {
+    for (const approval of [...this.approvalsById.values()]) {
+      this.resolveApproval(approval, { outcome: { outcome: 'cancelled' } }, false);
+    }
+    for (const sessionId of this.slashWaiters.keys()) {
+      this.resolveSlashWaiters(sessionId);
+    }
+    await this.runtime.stop();
+  }
+
+  private async runPrompt(
+    proxySessionId: string,
+    turnId: string,
+    prompt: Parameters<KimiAcpClient['prompt']>[0]['prompt'],
+  ): Promise<void> {
+    const session = this.sessionsById.get(proxySessionId);
+    if (!session) return;
+
+    try {
+      const response = await this.runtime.prompt({
+        sessionId: session.nativeSessionId,
+        prompt,
+      });
+      const current = this.sessionsById.get(proxySessionId);
+      if (!current || current.activeTurnId !== turnId) return;
+
+      const cumulative = conversationUsage(response);
+      if (cumulative) {
+        this.emitEvent('token_usage.updated', this.eventEnvelope(current, {
+          conversation: cumulative,
+        }, turnId));
+      }
+      if (response.stopReason !== 'cancelled') {
+        // Kimi CLI 0.41 moved the Context line from /status to /usage; older
+        // CLIs still print it in /status.
+        const contextCommand = advertisedCommand(current, 'usage')
+          ? '/usage'
+          : advertisedCommand(current, 'status')
+            ? '/status'
+            : null;
+        if (contextCommand) {
+          try {
+            const status = await this.runtime.promptCaptured({
+              sessionId: current.nativeSessionId,
+              prompt: [{ type: 'text', text: contextCommand }],
+            });
+            // The fire-and-forget post-turn usage_update can race into this
+            // capture window; the structured sample is exact, so it wins over
+            // the rendered text line.
+            const context = parseKimiUsageUpdate(status.updates)
+              ?? parseKimiStatusContext(status.updates);
+            if (context && current.activeTurnId === turnId) {
+              this.emitEvent('token_usage.updated', this.eventEnvelope(current, {
+                context,
+              }, turnId));
+            }
+          } catch (error) {
+            this.emitEvent('debug', {
+              message: `[kimi] Could not refresh context usage: ${error instanceof Error ? error.message : String(error)}`,
+            });
+          }
+        }
+      }
+
+      this.activeTurns.delete(proxySessionId);
+      this.toolCallsByNativeId.delete(current.nativeSessionId);
+      // Turn-scoped terminal harvest precedes the terminal turn notification.
+      // A failed harvest must finish the turn as failed: the session keeps
+      // its create barrier, never reporting a clean completion over an
+      // unverified process group.
+      const lease = this.runtime.beginSessionTerminalDrain(current.nativeSessionId);
+      try {
+        await lease.drain();
+      } catch (cleanupError) {
+        const message = cleanupError instanceof Error ? cleanupError.message : String(cleanupError);
+        this.cancelApprovalsForSession(proxySessionId);
+        this.updateSession(current, {
+          activeTurnId: null,
+          status: 'error',
+          lastError: message,
+        });
+        this.emitEvent('turn.failed', this.eventEnvelope(current, {
+          turnId,
+          code: 'TERMINAL_CLEANUP_FAILED',
+          message,
+        }, turnId));
+        lease.keepBlocked();
+        return;
+      }
+      lease.releaseForNextTurn();
+      this.updateSession(current, {
+        activeTurnId: null,
+        status: 'idle',
+        lastError: null,
+      });
+      this.emitEvent('turn.completed', this.eventEnvelope(current, {
+        turnId,
+        status: response.stopReason === 'cancelled' ? 'cancelled' : 'completed',
+        stopReason: response.stopReason,
+        usage: response.usage ?? null,
+      }, turnId));
+    } catch (error) {
+      const current = this.sessionsById.get(proxySessionId);
+      if (!current || current.activeTurnId !== turnId) return;
+      const mappedError = mapRuntimeError(error, this.runtime.binaryPath);
+
+      this.activeTurns.delete(proxySessionId);
+      this.toolCallsByNativeId.delete(current.nativeSessionId);
+      this.cancelApprovalsForSession(proxySessionId);
+      // Turn-scoped terminal harvest precedes the terminal turn notification.
+      // Its failure is appended to the original failure instead of being
+      // swallowed; the turn stays failed either way.
+      const lease = this.runtime.beginSessionTerminalDrain(current.nativeSessionId);
+      let failureMessage = mappedError.message;
+      let cleanupFailed = false;
+      try {
+        await lease.drain();
+      } catch (cleanupError) {
+        cleanupFailed = true;
+        lease.keepBlocked();
+        failureMessage = `${failureMessage}; terminal cleanup also failed: ${
+          cleanupError instanceof Error ? cleanupError.message : String(cleanupError)
+        }`;
+      }
+      if (!cleanupFailed) lease.releaseForNextTurn();
+      this.updateSession(current, {
+        activeTurnId: null,
+        status: 'error',
+        lastError: failureMessage,
+      });
+      this.emitEvent('turn.failed', this.eventEnvelope(current, {
+        turnId,
+        code: runtimeErrorCode(mappedError) ?? 'PROMPT_FAILED',
+        message: failureMessage,
+      }, turnId));
+    }
+  }
+
+  private handleSessionUpdate(notification: SessionNotification): void {
+    const completeNotification = this.completeToolUpdate(notification);
+    const proxySessionId = this.proxyIdByNativeId.get(completeNotification.sessionId);
+    if (!proxySessionId) {
+      const pending = this.unclaimedUpdates.get(completeNotification.sessionId) ?? [];
+      if (pending.length < 200) pending.push(completeNotification);
+      this.unclaimedUpdates.set(completeNotification.sessionId, pending);
+      if (this.unclaimedUpdates.size > 50) {
+        const oldest = this.unclaimedUpdates.keys().next().value;
+        if (typeof oldest === 'string') this.unclaimedUpdates.delete(oldest);
+      }
+      return;
+    }
+
+    const session = this.sessionsById.get(proxySessionId);
+    if (!session) return;
+    this.applySessionUpdate(session, completeNotification);
+
+    const provisional = this.provisionalUpdates.get(proxySessionId);
+    if (provisional) {
+      provisional.push(completeNotification);
+      return;
+    }
+
+    // A compact request may emit a usage sample for the summarization input.
+    // Keep the numerator invalid until the captured post-compact /usage (or
+    // legacy /status) response emits the authoritative replacement.
+    const activeTurn = this.activeTurns.get(proxySessionId);
+    if (activeTurn?.isCompact && updateKind(completeNotification) === 'usage_update') {
+      return;
+    }
+
+    this.emitEvent('acp.sessionUpdate', this.eventEnvelope(session, {
+      update: completeNotification.update,
+    }, session.activeTurnId ?? undefined, {
+      method: 'session/update',
+      params: completeNotification,
+    }));
+  }
+
+  /**
+   * ACP tool_call_update is intentionally sparse. Carry the initial tool
+   * metadata forward so downstream normalizers can keep one stable card type
+   * instead of turning a completed Read/Bash call into a second generic tool.
+   */
+  private completeToolUpdate(notification: SessionNotification): SessionNotification {
+    const update = notification.update as unknown as Record<string, unknown>;
+    const kind = update.sessionUpdate;
+    if (kind !== 'tool_call' && kind !== 'tool_call_update') return notification;
+    if (typeof update.toolCallId !== 'string') return notification;
+
+    let calls = this.toolCallsByNativeId.get(notification.sessionId);
+    if (!calls) {
+      calls = new Map();
+      this.toolCallsByNativeId.set(notification.sessionId, calls);
+    }
+    const previous = calls.get(update.toolCallId);
+    const complete = previous ? { ...previous, ...update } : { ...update };
+    calls.set(update.toolCallId, complete);
+    if (!previous || kind === 'tool_call') return notification;
+
+    return {
+      ...notification,
+      update: {
+        ...complete,
+        sessionUpdate: 'tool_call_update',
+      } as SessionNotification['update'],
+    };
+  }
+
+  private applySessionUpdate(session: SessionRecord, notification: SessionNotification): void {
+    if (updateKind(notification) === 'config_option_update') {
+      session.configOptions = (
+        notification.update as Extract<
+          SessionNotification['update'],
+          { sessionUpdate: 'config_option_update' }
+        >
+      ).configOptions;
+    } else if (updateKind(notification) === 'available_commands_update') {
+      session.slashCommands = (
+        notification.update as Extract<
+          SessionNotification['update'],
+          { sessionUpdate: 'available_commands_update' }
+        >
+      ).availableCommands;
+      this.slashReadySessions.add(session.id);
+      this.resolveSlashWaiters(session.id);
+    }
+    session.updatedAt = nowIso();
+  }
+
+  private async handlePermissionRequest(
+    request: RequestPermissionRequest,
+  ): Promise<RequestPermissionResponse> {
+    const proxySessionId = this.proxyIdByNativeId.get(request.sessionId);
+    const session = proxySessionId ? this.sessionsById.get(proxySessionId) : null;
+    if (!session || this.provisionalUpdates.has(session.id)) {
+      return { outcome: { outcome: 'cancelled' } };
+    }
+    // A permission request without options can never be relayed as a Gian
+    // interaction (the contract requires at least one action). Cancel it
+    // immediately instead of leaving the runtime blocked forever.
+    if (request.options.length === 0) {
+      this.emitEvent('debug', {
+        message: '[kimi] Permission request without options; auto-cancelling.',
+      });
+      return { outcome: { outcome: 'cancelled' } };
+    }
+
+    const approvalId = randomId('approval');
+    return new Promise<RequestPermissionResponse>((resolve) => {
+      const approval: PendingApproval = {
+        approvalId,
+        sessionId: session.id,
+        turnId: session.activeTurnId,
+        options: request.options,
+        resolve,
+      };
+      this.approvalsById.set(approvalId, approval);
+      this.updateSession(session, { status: 'needs-approval' });
+      this.emitEvent('approval.requested', this.eventEnvelope(session, {
+        approvalId,
+        title: permissionReason(request),
+        reason: permissionContentText(request) ?? permissionReason(request),
+        severity: 'medium',
+        nativeOptions: request.options,
+        payload: request,
+      }, session.activeTurnId ?? undefined, {
+        method: 'session/request_permission',
+        params: request,
+      }));
+    });
+  }
+
+  private resolveApproval(
+    approval: PendingApproval,
+    response: RequestPermissionResponse,
+    emit = true,
+  ): void {
+    this.approvalsById.delete(approval.approvalId);
+    approval.resolve(response);
+    const session = this.sessionsById.get(approval.sessionId);
+    if (!session) return;
+
+    this.updateSession(session, {
+      status: session.activeTurnId ? 'running' : 'idle',
+    });
+    if (emit) {
+      this.emitEvent('approval.resolved', this.eventEnvelope(session, {
+        approvalId: approval.approvalId,
+        nativeOptionId: response.outcome.outcome === 'selected'
+          ? response.outcome.optionId
+          : null,
+        cancelled: response.outcome.outcome === 'cancelled',
+      }, approval.turnId ?? undefined));
+    }
+  }
+
+  private cancelApprovalsForSession(sessionId: string): void {
+    for (const approval of [...this.approvalsById.values()]) {
+      if (approval.sessionId === sessionId) {
+        this.resolveApproval(approval, { outcome: { outcome: 'cancelled' } });
+      }
+    }
+  }
+
+  private handleRuntimeStopped(event: {
+    code: number | null;
+    signal: NodeJS.Signals | null;
+    expected: boolean;
+    error?: Error;
+    terminalCleanupError?: string;
+  }): void {
+    this.unclaimedUpdates.clear();
+    this.toolCallsByNativeId.clear();
+    for (const approval of [...this.approvalsById.values()]) {
+      this.resolveApproval(approval, { outcome: { outcome: 'cancelled' } });
+    }
+
+    for (const session of this.sessionsById.values()) {
+      const turn = this.activeTurns.get(session.id);
+      if (turn) {
+        this.emitEvent('turn.failed', this.eventEnvelope(session, {
+          turnId: turn.turnId,
+          code: 'RUNTIME_STOPPED',
+          message: 'Kimi ACP process stopped.',
+        }, turn.turnId));
+      }
+      this.activeTurns.delete(session.id);
+      // A failed terminal harvest is a failed runtime handover even when the
+      // stop itself was expected: keep the reason visible on every session.
+      const lastError = event.terminalCleanupError
+        ? `Terminal cleanup failed: ${event.terminalCleanupError}`
+        : event.expected ? null : 'Kimi ACP process stopped unexpectedly.';
+      this.updateSession(session, {
+        attached: false,
+        activeTurnId: null,
+        status: 'stale',
+        lastError,
+      });
+    }
+
+    this.emitEvent('runtime.stopped', {
+      data: {
+        code: event.code,
+        signal: event.signal,
+        expected: event.expected,
+        error: event.error?.message ?? null,
+        ...(event.terminalCleanupError !== undefined
+          ? { terminalCleanupError: event.terminalCleanupError }
+          : {}),
+      },
+    });
+  }
+
+  private async ensureAttached(session: SessionRecord): Promise<SessionRecord> {
+    if (session.attached) return session;
+    const existing = this.resumePromises.get(session.id);
+    if (existing) return existing;
+
+    // A shared ACP crash invalidates every live adapter map. Rebind lazily to
+    // the same native ID; never fall back to session/new.
+    const resume = this.runtime.resumeSession({
+      sessionId: session.nativeSessionId,
+      cwd: session.cwd,
+      mcpServers: session.mcpServers,
+    }).then((response) => {
+      session.configOptions = response.configOptions ?? session.configOptions;
+      return this.updateSession(session, {
+        attached: true,
+        status: 'idle',
+        lastError: null,
+      });
+    }).catch((error) => {
+      this.updateSession(session, {
+        attached: false,
+        status: 'error',
+        lastError: error instanceof Error ? error.message : String(error),
+      });
+      throw mapRuntimeError(error, this.runtime.binaryPath);
+    }).finally(() => {
+      this.resumePromises.delete(session.id);
+    });
+
+    this.resumePromises.set(session.id, resume);
+    return resume;
+  }
+
+  private claimUnownedUpdates(session: SessionRecord): SessionNotification[] {
+    const updates = this.unclaimedUpdates.get(session.nativeSessionId) ?? [];
+    this.unclaimedUpdates.delete(session.nativeSessionId);
+    for (const notification of updates) {
+      this.applySessionUpdate(session, notification);
+    }
+    return updates;
+  }
+
+  private makeSession(input: {
+    id: string;
+    cwd: string;
+    nativeSessionId: string;
+    mcpServers: SessionRecord['mcpServers'];
+    configOptions: SessionRecord['configOptions'];
+    createdAt: string;
+  }): SessionRecord {
+    return {
+      id: input.id,
+      cwd: input.cwd,
+      nativeSessionId: input.nativeSessionId,
+      mcpServers: input.mcpServers,
+      configOptions: input.configOptions,
+      slashCommands: [],
+      status: 'idle',
+      activeTurnId: null,
+      attached: true,
+      lastError: null,
+      createdAt: input.createdAt,
+      updatedAt: input.createdAt,
+    };
+  }
+
+  private addSession(session: SessionRecord): void {
+    if (this.proxyIdByNativeId.has(session.nativeSessionId)) {
+      throw createAppError(
+        409,
+        'NATIVE_SESSION_ATTACHED',
+        `Native Kimi session ${session.nativeSessionId} is already attached.`,
+      );
+    }
+    this.sessionsById.set(session.id, session);
+    this.proxyIdByNativeId.set(session.nativeSessionId, session.id);
+  }
+
+  /** True only when `error` is the native-attach conflict AND the existing
+   *  binding is provably stale: the owning Proxy session lost its shared
+   *  runtime (attached === false), so the binding points at a dead native
+   *  attachment. The stale record is dropped once for the caller's single
+   *  retry; a live binding (or one mid-turn) fails closed. */
+  private dropStaleNativeBinding(nativeSessionId: string, error: unknown): boolean {
+    if (!(error instanceof KimiProxyError) || error.code !== 'NATIVE_SESSION_ATTACHED') {
+      return false;
+    }
+    const ownerId = this.proxyIdByNativeId.get(nativeSessionId);
+    const owner = ownerId === undefined ? undefined : this.sessionsById.get(ownerId);
+    if (!owner || owner.attached || owner.activeTurnId !== null) return false;
+    this.removeSession(owner);
+    return true;
+  }
+
+  private removeSession(session: SessionRecord): void {
+    this.sessionsById.delete(session.id);
+    if (this.proxyIdByNativeId.get(session.nativeSessionId) === session.id) {
+      this.proxyIdByNativeId.delete(session.nativeSessionId);
+    }
+    this.activeTurns.delete(session.id);
+    this.resumePromises.delete(session.id);
+    this.provisionalUpdates.delete(session.id);
+    this.slashReadySessions.delete(session.id);
+    this.resolveSlashWaiters(session.id);
+    this.toolCallsByNativeId.delete(session.nativeSessionId);
+  }
+
+  private async waitForInitialSlashCommands(sessionId: string): Promise<void> {
+    if (this.slashReadySessions.has(sessionId)) return;
+
+    await new Promise<void>((resolve) => {
+      let timer: ReturnType<typeof setTimeout>;
+      const finish = () => {
+        clearTimeout(timer);
+        const waiters = this.slashWaiters.get(sessionId);
+        waiters?.delete(finish);
+        if (waiters?.size === 0) this.slashWaiters.delete(sessionId);
+        resolve();
+      };
+      const waiters = this.slashWaiters.get(sessionId) ?? new Set<() => void>();
+      waiters.add(finish);
+      this.slashWaiters.set(sessionId, waiters);
+      // Older ACP agents may never publish available_commands_update. Keep
+      // slash.list bounded while giving Kimi's deferred command scan time to
+      // finish after session/new or session/load returns.
+      timer = setTimeout(finish, 1_000);
+    });
+  }
+
+  private resolveSlashWaiters(sessionId: string): void {
+    const waiters = this.slashWaiters.get(sessionId);
+    if (!waiters) return;
+    for (const finish of [...waiters]) finish();
+  }
+
+  private requireSession(sessionId: unknown): SessionRecord {
+    const normalized = nonEmptyString(sessionId, 'sessionId');
+    const session = this.sessionsById.get(normalized);
+    if (!session) {
+      throw createAppError(404, 'SESSION_NOT_FOUND', 'Session not found.');
+    }
+    return session;
+  }
+
+  private updateSession(
+    session: SessionRecord,
+    changes: Partial<SessionRecord>,
+  ): SessionRecord {
+    Object.assign(session, changes, { updatedAt: nowIso() });
+    return session;
+  }
+
+  private serializeSession(session: SessionRecord) {
+    const { mcpServers: _mcpServers, ...publicSession } = session;
+    return {
+      ...publicSession,
+      configOptions: [...session.configOptions],
+      slashCommands: [...session.slashCommands],
+    };
+  }
+
+  private eventEnvelope(
+    session: SessionRecord,
+    data: Record<string, unknown>,
+    turnId = session.activeTurnId ?? undefined,
+    rawRuntimeEvent?: { method: string; params?: unknown },
+  ) {
+    const activeTurn = this.activeTurns.get(session.id);
+    return {
+      ...(activeTurn?.requestId === undefined ? {} : { requestId: activeTurn.requestId }),
+      sessionId: session.id,
+      ...(turnId ? { turnId } : {}),
+      data,
+      ...(rawRuntimeEvent ? { rawRuntimeEvent } : {}),
+    };
+  }
+}

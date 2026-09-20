@@ -1,0 +1,42 @@
+# @gian/dsh-proxy
+
+`ai.deepseek.harness` — shared-scope Gian Proxy speaking `gian.proxy/2.1`
+(JSON-RPC 2.0 / NDJSON / stdio) and supervising one shared DSH Host that runs
+the `gian` profile with `@gian/dsh-bridge`.
+
+## Layout
+
+- `manifest.json` — Manifest v3 (`id: ai.deepseek.harness`, `process.scope:
+  shared`, protocol range `>=2.1 <3.0`).
+- `src/core/service.ts` — session/turn projection, stable `sourceTurnId` /
+  `stepId` / `eventId` identity, terminal-state enforcement.
+- `src/protocol/v2-adapter.ts` — `gian.proxy/2.1` dispatcher and capability
+  narrowing.
+- `src/runtime/bridge-client.ts` — bridge/1.0 JSON-RPC client + DSH child
+  supervisor.
+- `src/cli/spawn.ts` — stdio entry.
+
+## Test
+
+```sh
+pnpm -F @gian/dsh-proxy test
+```
+
+The suite runs the complete `gian.proxy/2.1` contract through
+`@gian/proxy-protocol`'s `HostProtocolValidator` against a fake bridge runtime:
+initialize identity, capabilities (including `event.step`/`event.request`),
+catalog, session create/idempotency, turn lifecycle, step/request/usage
+projection, authenticated Host-owned reattach, foreign native-ID rejection,
+and hostServices fail-closed — zero model calls.
+
+The production Bridge targets `@deepseek-ai/dsh@0.1.1-rc.2`. Catalog Provider,
+model, and reasoning selections are applied through DSH's per-Agent request
+waterfalls. The approval chip projects DSH's real page-level permission
+presets (by default `Workspace Write` and `Full access`), while Agent Presets
+remain Session-bound. Approval-backed modes are advertised only when the
+Bridge can round-trip DSH's native approval request through Gian interaction.
+Typed file/image inputs and user-question routing remain unadvertised until
+the real Bridge owns those native boundaries.
+After a Host restart, an exact persisted Gian Session binding is attested with
+a per-process HMAC and resumed through DSH's persistence API; arbitrary native
+history adoption remains unavailable.
