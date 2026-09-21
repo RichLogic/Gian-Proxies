@@ -203,6 +203,8 @@ async function catalog(directory, sequence, issuedAt) {
   const source = join(root, 'output/catalog-source');
   rmSync(source, { recursive: true, force: true });
   cpSync(join(root, 'catalog/official-source'), source, { recursive: true });
+  const { projectInformation } = await import('../catalog/proxy-information/project.mjs');
+  projectInformation(source, certificate.proxies);
   for (const record of certificate.proxies) {
     const release = JSON.parse(gh('api', `repos/${repository}/releases/tags/${record.tag}`));
     if (release.draft || release.prerelease) throw new Error('Catalog cannot reference a draft Proxy');
@@ -235,7 +237,8 @@ async function catalog(directory, sequence, issuedAt) {
   const { stageOfficialCatalogRelease } = await import('./stage-official-catalog-release.mjs');
   const target = join(root, 'output/catalog-release');
   await stageOfficialCatalogRelease({ bundleDir: join(root, 'output/catalog-bundle'), outputDir: target });
-  publishRelease(tag, readdirSync(target).sort().map(name => join(target, name)), `Signed official Catalog sequence ${sequence}. Proxy and Catalog delivery now share Gian-Proxies.`, true);
+  publishRelease(tag, readdirSync(target).sort().map(name => join(target, name)),
+    `Signed official Catalog sequence ${sequence}. Complete nine-chapter tutorials and evidence-backed Proxy histories use the existing v1 document shape. Tutorials occupy setup/usage/troubleshooting; overview carries history. Proxy and Runtime versions and executable assets are unchanged. Dedicated App history display remains a separate consumer change.`, true);
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

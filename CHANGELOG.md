@@ -1,5 +1,16 @@
 # Gian Proxies Changelog
 
+## Catalog 1.8.0 - 2026-09-21
+
+- Publish complete nine-chapter tutorials for the five shipping Integrations.
+- Publish per-Proxy version histories with immutable release evidence and explicit
+  gaps where historical feature notes cannot be recovered.
+- Preserve Catalog v1 compatibility: tutorials occupy setup/usage/troubleshooting;
+  overview carries the version history. The dedicated App history view remains
+  a separate consumer change. Basic state examples are not installed-state data.
+- Proxy versions, Runtime combinations, signing identity and executable archives
+  are unchanged. No Proxy re-release or App upgrade is included.
+
 ## 2026-09-20 - Independent Delivery
 
 Versions follow the individual Proxy packages on GianDev main:

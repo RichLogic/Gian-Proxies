@@ -57,5 +57,13 @@ snapshot files in this repository or overwrite an existing immutable release.
 Catalog documentation changes can reuse an unexpired qualified release without
 rebuilding Proxy archives; Proxy or Runtime changes require new qualification.
 
+Author tutorials and structured history in `catalog/proxy-information/`. Catalog
+publication validates that source and its certified Runtime snapshot, then
+projects nine chapters into v1 setup/usage/troubleshooting and history Markdown
+into overview in the temporary compilation input. The signed wire schema and
+existing immutable Proxy coordinates stay unchanged. A dedicated App history
+view is a separate consumer change; basic.md contains review examples, not
+installed-state data. Publication runs the focused projection checks in CI.
+
 Old Gian and Gian-Proxy-Catalog releases remain available during migration.
 Publishing here does not change any installed App's trusted source or data.

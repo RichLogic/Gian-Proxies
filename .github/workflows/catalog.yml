@@ -38,6 +38,8 @@ jobs:
           node-version: 24
       - run: pnpm install --frozen-lockfile
       - run: node scripts/verify-source.mjs
+      - name: Validate and check documentation projection
+        run: node --test catalog/proxy-information/project.test.mjs
       - name: Authenticate and download the qualification
         id: source
         env:
