@@ -8,6 +8,7 @@ import { isDeepStrictEqual } from 'node:util';
 import { proxyDefinitions, assertProxySelfTest, main as buildArtifacts } from './build-proxy-artifacts.mjs';
 import { proxyReleaseMetadata, reviewedExternalRuntimeCandidates } from './proxy-release-metadata.mjs';
 import { verifySource } from './verify-source.mjs';
+import { assertSameCatalogExecutables } from './catalog-docs-policy.mjs';
 
 const repository = 'RichLogic/Gian-Proxies';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -187,8 +188,7 @@ async function publish(directory) {
   }
 }
 
-async function catalog(directory, sequence, issuedAt) {
-  const certificate = readCertified(directory);
+function authorizeCatalogPublication(sequence, issuedAt) {
   if (!Number.isSafeInteger(sequence) || sequence <= 6 || !Number.isFinite(Date.parse(issuedAt))) throw new Error('Catalog sequence must exceed the legacy sequence 6 and have an explicit issue time');
   for (const repo of [repository]) {
     const releases = JSON.parse(gh('api', '--paginate', '--slurp', `repos/${repo}/releases?per_page=100`)).flat();
@@ -197,6 +197,12 @@ async function catalog(directory, sequence, issuedAt) {
   }
   const tag = `catalog-v1.${sequence}.0`;
   if (git('rev-parse', `refs/tags/${tag}^{commit}`) !== git('rev-parse', 'HEAD')) throw new Error('Maintainer must authorize the exact Catalog source tag');
+  return tag;
+}
+
+async function catalog(directory, sequence, issuedAt) {
+  const certificate = readCertified(directory);
+  const tag = authorizeCatalogPublication(sequence, issuedAt);
   command('pnpm', ['--filter', '@gian/shared', 'build']);
   command('pnpm', ['--filter', '@gian/proxy-catalog-contract', 'build']);
   const { compileOfficialCatalogSource, writeCompiledCatalogBundle } = await import('../packages/proxy-catalog-contract/dist/src/index.js');
@@ -204,7 +210,7 @@ async function catalog(directory, sequence, issuedAt) {
   rmSync(source, { recursive: true, force: true });
   cpSync(join(root, 'catalog/official-source'), source, { recursive: true });
   const { projectInformation } = await import('../catalog/proxy-information/project.mjs');
-  projectInformation(source, certificate.proxies);
+  const { localizations } = projectInformation(source, certificate.proxies);
   for (const record of certificate.proxies) {
     const release = JSON.parse(gh('api', `repos/${repository}/releases/tags/${record.tag}`));
     if (release.draft || release.prerelease) throw new Error('Catalog cannot reference a draft Proxy');
@@ -228,7 +234,7 @@ async function catalog(directory, sequence, issuedAt) {
   if (!process.env.GIAN_CATALOG_SIGNING_KEY_PEM) throw new Error('Configure the existing GIAN_CATALOG_SIGNING_KEY_PEM in Gian-Proxies; never generate a replacement');
   const { officialCatalogSourcePolicy } = await import('../packages/shared/dist/index.js');
   const policy = officialCatalogSourcePolicy();
-  const bundle = await compileOfficialCatalogSource({ sourceRoot: source, sequence, issuedAt,
+  const bundle = await compileOfficialCatalogSource({ sourceRoot: source, sequence, issuedAt, localizations,
     signingKey: { keyId: 'gian-official-catalog-2026-09', privateKey: process.env.GIAN_CATALOG_SIGNING_KEY_PEM },
     allowedArtifactRepositories: [repository],
     allowedRuntimeAssetPrefixes: [...policy.runtimeAssetPrefixes, `https://github.com/${repository}/releases/download/`],
@@ -241,11 +247,82 @@ async function catalog(directory, sequence, issuedAt) {
     `Signed official Catalog sequence ${sequence}. Complete nine-chapter tutorials and evidence-backed Proxy histories use the existing v1 document shape. Tutorials occupy setup/usage/troubleshooting; overview carries history. Proxy and Runtime versions and executable assets are unchanged. Dedicated App history display remains a separate consumer change.`, true);
 }
 
+async function catalogDocs(directory, sequence, issuedAt) {
+  const tag = authorizeCatalogPublication(sequence, issuedAt);
+  if (process.env.GITHUB_REPOSITORY !== repository) throw new Error('Wrong publication repository');
+  const { compileOfficialCatalogSource, writeCompiledCatalogBundle, verifyCatalogBundleFiles,
+    parseGitHubReleaseAssetUrl } = await import('../packages/proxy-catalog-contract/dist/src/index.js');
+  const { officialCatalogSourcePolicy } = await import('../packages/shared/dist/index.js');
+  const policy = officialCatalogSourcePolicy();
+  const files = new Map(readdirSync(directory).map(name => [name.replaceAll('__', '/'), readFileSync(join(directory, name))]));
+  if (files.size !== readdirSync(directory).length) throw new Error('Duplicate Catalog asset path');
+  const previous = verifyCatalogBundleFiles({ files, pinnedPublicKeys: policy.pinnedPublicKeys, expectedSourceId: policy.sourceId });
+  if (`catalog-v1.${previous.sequence}.0` !== process.env.BASE_CATALOG_TAG || previous.sequence >= sequence) {
+    throw new Error('Documentation base does not match the selected signed Catalog');
+  }
+  const source = join(root, 'output/catalog-docs-source');
+  rmSync(source, { recursive: true, force: true });
+  cpSync(join(root, 'catalog/official-source'), source, { recursive: true });
+  const repositories = [...new Set([...policy.artifactRepositories, repository])];
+  const releases = new Map();
+  const checkPublished = ref => {
+    const coordinate = parseGitHubReleaseAssetUrl(ref.url, repositories);
+    if (!coordinate) throw new Error('Unapproved inherited Proxy coordinate');
+    const key = `${coordinate.repository}/${coordinate.tag}`;
+    if (!releases.has(key)) releases.set(key, JSON.parse(gh('api', `repos/${coordinate.repository}/releases/tags/${coordinate.tag}`)));
+    const release = releases.get(key);
+    const remote = release.assets.find(item => item.name === coordinate.asset);
+    if (release.draft || release.prerelease || release.tag_name !== coordinate.tag
+      || !remote || remote.size !== ref.size || remote.digest !== `sha256:${ref.sha256}`) {
+      throw new Error(`Inherited published artifact differs: ${ref.url}`);
+    }
+    return { coordinate, release };
+  };
+  for (const plugin of previous.plugins) {
+    const stable = plugin.stable;
+    if (!stable.manifest || !stable.combination || !Object.keys(stable.artifacts).length) {
+      throw new Error('Documentation refresh requires an already certified installable combination');
+    }
+    const { coordinate, release } = checkPublished(stable.manifest);
+    for (const ref of Object.values(stable.artifacts)) if (ref) checkPublished(ref);
+    const proof = release.assets.find(item => item.name === 'certificate.json');
+    if (proof?.digest !== `sha256:${stable.combination.certificate.sha256}`) throw new Error('Inherited publication proof differs');
+    const sidecarPath = join(source, 'plugins', plugin.pluginId, 'sidecar.json');
+    command('gh', ['release', 'download', coordinate.tag, '--repo', coordinate.repository,
+      '--pattern', coordinate.asset, '--output', sidecarPath, '--clobber']);
+    const sidecar = readFileSync(sidecarPath);
+    if (sidecar.length !== stable.manifest.size || hash(sidecar) !== stable.manifest.sha256) throw new Error('Inherited Manifest digest mismatch');
+    const entryPath = join(source, 'plugins', plugin.pluginId, 'entry.json');
+    const entry = json(entryPath);
+    entry.channels.stable = { pluginVersion: stable.pluginVersion, manifest: stable.manifest,
+      artifacts: stable.artifacts, combination: stable.combination };
+    put(entryPath, entry);
+  }
+  const { projectInformation } = await import('../catalog/proxy-information/project.mjs');
+  const { localizations } = projectInformation(source, previous.plugins.map(plugin => ({
+    pluginId: plugin.pluginId, version: plugin.stable.pluginVersion, runtime: plugin.stable.combination.runtime,
+  })));
+  if (!process.env.GIAN_CATALOG_SIGNING_KEY_PEM) throw new Error('Existing Catalog signing key is required');
+  const bundle = await compileOfficialCatalogSource({ sourceRoot: source, sequence, issuedAt, localizations,
+    signingKey: { keyId: 'gian-official-catalog-2026-09', privateKey: process.env.GIAN_CATALOG_SIGNING_KEY_PEM },
+    allowedArtifactRepositories: repositories,
+    allowedRuntimeAssetPrefixes: [...policy.runtimeAssetPrefixes, `https://github.com/${repository}/releases/download/`],
+  });
+  assertSameCatalogExecutables(previous, bundle.index);
+  await writeCompiledCatalogBundle(join(root, 'output/catalog-bundle'), bundle.files);
+  const { stageOfficialCatalogRelease } = await import('./stage-official-catalog-release.mjs');
+  const target = join(root, 'output/catalog-release');
+  await stageOfficialCatalogRelease({ bundleDir: join(root, 'output/catalog-bundle'), outputDir: target });
+  publishRelease(tag, readdirSync(target).sort().map(name => join(target, name)),
+    `Signed Catalog sequence ${sequence}: Chinese and English Proxy descriptions, tutorials and version histories. Compatible clients follow their UI language. Executable and certification coordinates are unchanged from ${process.env.BASE_CATALOG_TAG}; no Proxy or App release. Older clients retain the original v1 documents.`, true);
+}
+
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const [mode, directory = 'certification', sequence, issuedAt] = process.argv.slice(2);
   if (mode === 'build') await build();
   else if (mode === 'qualify') await qualify();
   else if (mode === 'publish') await publish(resolve(directory));
   else if (mode === 'catalog') await catalog(resolve(directory), Number(sequence), issuedAt);
-  else throw new Error('Expected build, qualify, publish or catalog');
+  else if (mode === 'catalog-docs') await catalogDocs(resolve(directory), Number(sequence), issuedAt);
+  else throw new Error('Expected build, qualify, publish, catalog or catalog-docs');
 }

@@ -54,8 +54,14 @@ Change source in GianDev and export an integrated commit with
 The exporter uses the platform Ruby YAML parser to retain locked dependency
 versions and writes standard YAML-compatible JSON. Never hand-edit generated
 snapshot files in this repository or overwrite an existing immutable release.
-Catalog documentation changes can reuse an unexpired qualified release without
-rebuilding Proxy archives; Proxy or Runtime changes require new qualification.
+Catalog publication that introduces executable changes requires fresh Proxy
+qualification. A documentation-only refresh instead uses **Publish Catalog
+Documentation** with an already published signed Catalog: verify the pinned
+signature, recheck public artifact and certificate digests, recompile, require
+every complete stable/executable tuple to remain identical, and sign a higher
+sequence. This path cannot add/remove a Proxy or change Runtime, Manifest,
+artifact or certificate coordinates. It does not renew or rewrite the old
+certificate; the normal Proxy publication freshness checks remain unchanged.
 
 Author tutorials and structured history in `catalog/proxy-information/`. Catalog
 publication validates that source and its certified Runtime snapshot, then

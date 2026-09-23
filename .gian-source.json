@@ -2,7 +2,7 @@
   "schema": 1,
   "product": "Gian-Proxies",
   "sourceRepository": "RichLogic/Gian-Dev",
-  "sourceCommit": "50ac5862c81366bd4c2558acfec8457fde581c0e",
+  "sourceCommit": "979b0bdda27fda844777269bf0206b6211234d32",
   "workingTree": false,
   "externalPackages": [
     {
@@ -241,12 +241,12 @@
     {
       "source": "catalog/proxy-information/CONTRACT.md",
       "path": "catalog/proxy-information/CONTRACT.md",
-      "sha256": "c05793448df158baa41c4698a5431527bda6ed130ddfd45bf9b09864b8262e0d"
+      "sha256": "90766d3fbbaf6b05b63f4af1dc87fc8c764dfc5c35549b314a8ea7a3cd1df00f"
     },
     {
       "source": "catalog/proxy-information/README.md",
       "path": "catalog/proxy-information/README.md",
-      "sha256": "1f8700414ecd5a4f3ee8c7ce267493d848167712a93c46f904c528ad32f80974"
+      "sha256": "2cd29047495686fdf8c5e21e97f2ecc9aaf7b13c94303976afbb82479a944dd9"
     },
     {
       "source": "catalog/proxy-information/ai.deepseek.harness/basic.md",
@@ -262,6 +262,11 @@
       "source": "catalog/proxy-information/ai.deepseek.harness/changelog.md",
       "path": "catalog/proxy-information/ai.deepseek.harness/changelog.md",
       "sha256": "dc727184b0d6ceabcb256f465d1442d1c95d5778d91cec6251b9578947760cec"
+    },
+    {
+      "source": "catalog/proxy-information/ai.deepseek.harness/tutorial.en.md",
+      "path": "catalog/proxy-information/ai.deepseek.harness/tutorial.en.md",
+      "sha256": "bcabd05b437d80ca79cf98b2723096916aa1d38ddb101fe6474e74e7dcacaa9f"
     },
     {
       "source": "catalog/proxy-information/ai.deepseek.harness/tutorial.md",
@@ -284,6 +289,11 @@
       "sha256": "8417968c3865e18ef4df0af84d3355f675e5ee81655eb93c9103f252aa69028d"
     },
     {
+      "source": "catalog/proxy-information/claude/tutorial.en.md",
+      "path": "catalog/proxy-information/claude/tutorial.en.md",
+      "sha256": "7e36d876c5d128223aa80855eed62909589a96c8c2d6cff74bd78ea57ca4c8fa"
+    },
+    {
       "source": "catalog/proxy-information/claude/tutorial.md",
       "path": "catalog/proxy-information/claude/tutorial.md",
       "sha256": "81bf612aa41033e76457586dbce7d8b4ae0d8d9777ab7250cb4799ded7e94238"
@@ -304,6 +314,11 @@
       "sha256": "b75d7407d80413373a87a6d5809bacc43bc8ff1363b69f7cab736456f7fe7889"
     },
     {
+      "source": "catalog/proxy-information/codex/tutorial.en.md",
+      "path": "catalog/proxy-information/codex/tutorial.en.md",
+      "sha256": "ccc9e5299e50df39807747c68df79105031c26892d4dfc1defcc101016720b72"
+    },
+    {
       "source": "catalog/proxy-information/codex/tutorial.md",
       "path": "catalog/proxy-information/codex/tutorial.md",
       "sha256": "31bf57394c046174a013b7d36c5e26e6237cd50a9f84e14a4c7b6e146148aab5"
@@ -322,6 +337,11 @@
       "source": "catalog/proxy-information/com.zhipu.zcode/changelog.md",
       "path": "catalog/proxy-information/com.zhipu.zcode/changelog.md",
       "sha256": "17bad0f9d004ef99a653bba7d92ba63ce31285491e2bf44c8fcb720e054d6dcb"
+    },
+    {
+      "source": "catalog/proxy-information/com.zhipu.zcode/tutorial.en.md",
+      "path": "catalog/proxy-information/com.zhipu.zcode/tutorial.en.md",
+      "sha256": "e882ff6191500093e34c84b0820b6a297e34e84daf1dd765b70df79c0bb0ed06"
     },
     {
       "source": "catalog/proxy-information/com.zhipu.zcode/tutorial.md",
@@ -354,6 +374,11 @@
       "sha256": "f0602ada1b63ce80c4893346682c60325a8fff7aa84ac0de3807e88ebbe081b1"
     },
     {
+      "source": "catalog/proxy-information/history-copy.en.json",
+      "path": "catalog/proxy-information/history-copy.en.json",
+      "sha256": "3d239b606ae40ccc8fc4ffb06a832ce3b28151ee4ea16e0cb7a583abd8d9e5e1"
+    },
+    {
       "source": "catalog/proxy-information/kimi/basic.md",
       "path": "catalog/proxy-information/kimi/basic.md",
       "sha256": "cc3663608a593010c7b522f12ccdeedc49d5ce152e4f224166ba4ef75ef18f68"
@@ -369,24 +394,39 @@
       "sha256": "8cfee32e935a17b7fc2f9a3f2b445a290333624fb5dda2ed70766102849d9228"
     },
     {
+      "source": "catalog/proxy-information/kimi/tutorial.en.md",
+      "path": "catalog/proxy-information/kimi/tutorial.en.md",
+      "sha256": "b55f2b1c2ec0c3ffe756abfb0e86c86cb2c482fd3a007211738f861032db3820"
+    },
+    {
       "source": "catalog/proxy-information/kimi/tutorial.md",
       "path": "catalog/proxy-information/kimi/tutorial.md",
       "sha256": "849e7d4d999ba06d19d9747fa0ed88b37a70364780c327c6f434b6e23d4b2f71"
     },
     {
+      "source": "catalog/proxy-information/localizations.json",
+      "path": "catalog/proxy-information/localizations.json",
+      "sha256": "1a276354527dc6af585c0e4c14c52351b4df098c519db5cc43e93df517f2ed4a"
+    },
+    {
       "source": "catalog/proxy-information/project.mjs",
       "path": "catalog/proxy-information/project.mjs",
-      "sha256": "e8dbe47fff0c2705605051120e31ab18885a24309915f7cc06cdbadf6d005bf2"
+      "sha256": "7abc4c308580cea05bf0ad084193b9260716faa5992b0f685adcba01bdc87759"
     },
     {
       "source": "catalog/proxy-information/project.test.mjs",
       "path": "catalog/proxy-information/project.test.mjs",
-      "sha256": "cab7c3b270e43c28677f41c971b994a28c4fea5cac96b43e6e62f922e9e60831"
+      "sha256": "eecf862a773f68885e5983637239abde82ce98eef0a88ac2f6a9c8583b4e469e"
     },
     {
       "source": "catalog/proxy-information/validate.mjs",
       "path": "catalog/proxy-information/validate.mjs",
-      "sha256": "539c69519828511f088a2a5aa372df6892be9412944561673645e0037e762ee5"
+      "sha256": "84c7387eb0319066147457741298698824d2c89a6215d90d3a836b2e94a85717"
+    },
+    {
+      "source": "delivery/proxies/.github/workflows/catalog-docs.yml",
+      "path": ".github/workflows/catalog-docs.yml",
+      "sha256": "2a2bb969f962732bb093e2b6fd253e422b9cd98adc0e30f6c2a64026b8721db9"
     },
     {
       "source": "delivery/proxies/.github/workflows/catalog.yml",
@@ -411,17 +451,27 @@
     {
       "source": "delivery/proxies/CHANGELOG.md",
       "path": "CHANGELOG.md",
-      "sha256": "5ef5f73e1b9f9889172431c30e08e1897adcb2b377507c3536452b8ae3cfcbbb"
+      "sha256": "a9ca551a0b249c209986fb0fad9615b6c8c75a9285e7b653b448d089d1512038"
     },
     {
       "source": "delivery/proxies/README.md",
       "path": "README.md",
-      "sha256": "149fd95f517ab75a02e8aab5c90412c70e3d52a072d5556177ef41bcc03274b1"
+      "sha256": "a880619261d43845b103c1bb9d467d58860143dfe83c321a80822a67cede24f3"
     },
     {
       "source": "delivery/proxies/protocol-package.json",
       "path": "protocol-package.json",
       "sha256": "dd1a709e206ff5d118de9e36a0081ad904362c5ca7a611b4e76082a8264c0370"
+    },
+    {
+      "source": "delivery/proxies/scripts/catalog-docs-policy.mjs",
+      "path": "scripts/catalog-docs-policy.mjs",
+      "sha256": "5fa18d03fc03e9fdfbc9a05a302d41edcc4cb7ee7a14dfd4620d4f64e9d3f3f6"
+    },
+    {
+      "source": "delivery/proxies/scripts/catalog-docs-policy.test.mjs",
+      "path": "scripts/catalog-docs-policy.test.mjs",
+      "sha256": "ad8e31c32015b4ecc50021b9b62d00fd642b8c0f2abda448acfbac0da298ec76"
     },
     {
       "source": "delivery/proxies/scripts/protocol-dependency.mjs",
@@ -431,7 +481,7 @@
     {
       "source": "delivery/proxies/scripts/release-product.mjs",
       "path": "scripts/release-product.mjs",
-      "sha256": "f1fe4be393e36b95c1b7010d523b888dc78311e1bafd59c186e999c36cdd20ee"
+      "sha256": "49270307dc8c2c75591bb61486264a1541ab99c4c6261221f02349aa09e1a716"
     },
     {
       "source": "delivery/proxies/scripts/verify-source.mjs",
@@ -2036,7 +2086,7 @@
     {
       "source": "packages/proxy-catalog-contract/src/bundle.ts",
       "path": "packages/proxy-catalog-contract/src/bundle.ts",
-      "sha256": "59c5d2e7c00d02d40d59abca81393cfa2b9debef92385a1de0ba344c6339a82f"
+      "sha256": "f24f1897239054ec8951fac27a2b8704a7eb6036707e502ea55b6fc1998cb5fd"
     },
     {
       "source": "packages/proxy-catalog-contract/src/catalog-markdown.ts",
@@ -2046,7 +2096,7 @@
     {
       "source": "packages/proxy-catalog-contract/src/compiler.ts",
       "path": "packages/proxy-catalog-contract/src/compiler.ts",
-      "sha256": "d24e7e21cc9e593cdab48e795b467beb21c02a67ab774ea8c7f247202e15c828"
+      "sha256": "e9cbe9f3aa3d26eae25ef96bc3909eabfa2e7515795cb7b337ac05ca633cbc30"
     },
     {
       "source": "packages/proxy-catalog-contract/src/constants.ts",
@@ -2056,7 +2106,12 @@
     {
       "source": "packages/proxy-catalog-contract/src/index.ts",
       "path": "packages/proxy-catalog-contract/src/index.ts",
-      "sha256": "8eb6819aab941e83c1d28537d165e711e02b4caee173984a0bb5178b1543c56f"
+      "sha256": "79cee132802fc33ea843c38c9dc3193229295ffb90bb8fa4b8553e4fafdb02e4"
+    },
+    {
+      "source": "packages/proxy-catalog-contract/src/localization.ts",
+      "path": "packages/proxy-catalog-contract/src/localization.ts",
+      "sha256": "60f8cde9108af70ebfee9e1150a390d10c2ab273aaee4b916c8771b73eb995c8"
     },
     {
       "source": "packages/proxy-catalog-contract/src/media.ts",
@@ -2066,7 +2121,7 @@
     {
       "source": "packages/proxy-catalog-contract/src/official-source.ts",
       "path": "packages/proxy-catalog-contract/src/official-source.ts",
-      "sha256": "649abe91bbdd8f1289687721140c9de4890d57db09e63ebd1fa07be71989c9da"
+      "sha256": "c86e9e1ce13353617db135f39de004765137b8ac354276414f9cb7f54b228f9f"
     },
     {
       "source": "packages/proxy-catalog-contract/src/schemas.ts",
@@ -2096,7 +2151,7 @@
     {
       "source": "packages/proxy-catalog-contract/test/compiler.test.ts",
       "path": "packages/proxy-catalog-contract/test/compiler.test.ts",
-      "sha256": "c4cd3d0bdbbf12474c21bd42561061c0ae3127a27c932da8e4f68f97840e9fe9"
+      "sha256": "5d47bde7b428f089be6f23fd66a89f807c90530dcf782adbd112ab1888236f9e"
     },
     {
       "source": "packages/proxy-catalog-contract/test/fixtures.ts",
@@ -2340,6 +2395,11 @@
     }
   ],
   "files": [
+    {
+      "path": ".github/workflows/catalog-docs.yml",
+      "mode": 420,
+      "sha256": "2a2bb969f962732bb093e2b6fd253e422b9cd98adc0e30f6c2a64026b8721db9"
+    },
     {
       "path": ".github/workflows/catalog.yml",
       "mode": 420,
@@ -2586,6 +2646,11 @@
       "sha256": "dc727184b0d6ceabcb256f465d1442d1c95d5778d91cec6251b9578947760cec"
     },
     {
+      "path": "catalog/proxy-information/ai.deepseek.harness/tutorial.en.md",
+      "mode": 420,
+      "sha256": "bcabd05b437d80ca79cf98b2723096916aa1d38ddb101fe6474e74e7dcacaa9f"
+    },
+    {
       "path": "catalog/proxy-information/ai.deepseek.harness/tutorial.md",
       "mode": 420,
       "sha256": "42bc2a52a16a6a008b6313a7f069f53281f308ed39f4bea44ec15df80798b440"
@@ -2604,6 +2669,11 @@
       "path": "catalog/proxy-information/claude/changelog.md",
       "mode": 420,
       "sha256": "8417968c3865e18ef4df0af84d3355f675e5ee81655eb93c9103f252aa69028d"
+    },
+    {
+      "path": "catalog/proxy-information/claude/tutorial.en.md",
+      "mode": 420,
+      "sha256": "7e36d876c5d128223aa80855eed62909589a96c8c2d6cff74bd78ea57ca4c8fa"
     },
     {
       "path": "catalog/proxy-information/claude/tutorial.md",
@@ -2626,6 +2696,11 @@
       "sha256": "b75d7407d80413373a87a6d5809bacc43bc8ff1363b69f7cab736456f7fe7889"
     },
     {
+      "path": "catalog/proxy-information/codex/tutorial.en.md",
+      "mode": 420,
+      "sha256": "ccc9e5299e50df39807747c68df79105031c26892d4dfc1defcc101016720b72"
+    },
+    {
       "path": "catalog/proxy-information/codex/tutorial.md",
       "mode": 420,
       "sha256": "31bf57394c046174a013b7d36c5e26e6237cd50a9f84e14a4c7b6e146148aab5"
@@ -2646,6 +2721,11 @@
       "sha256": "17bad0f9d004ef99a653bba7d92ba63ce31285491e2bf44c8fcb720e054d6dcb"
     },
     {
+      "path": "catalog/proxy-information/com.zhipu.zcode/tutorial.en.md",
+      "mode": 420,
+      "sha256": "e882ff6191500093e34c84b0820b6a297e34e84daf1dd765b70df79c0bb0ed06"
+    },
+    {
       "path": "catalog/proxy-information/com.zhipu.zcode/tutorial.md",
       "mode": 420,
       "sha256": "3dda40016ff93ccfbb433b81f298697d9fe2aea92ad092ef26a40004c878aacf"
@@ -2653,7 +2733,7 @@
     {
       "path": "catalog/proxy-information/CONTRACT.md",
       "mode": 420,
-      "sha256": "c05793448df158baa41c4698a5431527bda6ed130ddfd45bf9b09864b8262e0d"
+      "sha256": "90766d3fbbaf6b05b63f4af1dc87fc8c764dfc5c35549b314a8ea7a3cd1df00f"
     },
     {
       "path": "catalog/proxy-information/evidence/current-combinations.json",
@@ -2681,6 +2761,11 @@
       "sha256": "f0602ada1b63ce80c4893346682c60325a8fff7aa84ac0de3807e88ebbe081b1"
     },
     {
+      "path": "catalog/proxy-information/history-copy.en.json",
+      "mode": 420,
+      "sha256": "3d239b606ae40ccc8fc4ffb06a832ce3b28151ee4ea16e0cb7a583abd8d9e5e1"
+    },
+    {
       "path": "catalog/proxy-information/kimi/basic.md",
       "mode": 420,
       "sha256": "cc3663608a593010c7b522f12ccdeedc49d5ce152e4f224166ba4ef75ef18f68"
@@ -2696,34 +2781,44 @@
       "sha256": "8cfee32e935a17b7fc2f9a3f2b445a290333624fb5dda2ed70766102849d9228"
     },
     {
+      "path": "catalog/proxy-information/kimi/tutorial.en.md",
+      "mode": 420,
+      "sha256": "b55f2b1c2ec0c3ffe756abfb0e86c86cb2c482fd3a007211738f861032db3820"
+    },
+    {
       "path": "catalog/proxy-information/kimi/tutorial.md",
       "mode": 420,
       "sha256": "849e7d4d999ba06d19d9747fa0ed88b37a70364780c327c6f434b6e23d4b2f71"
     },
     {
+      "path": "catalog/proxy-information/localizations.json",
+      "mode": 420,
+      "sha256": "1a276354527dc6af585c0e4c14c52351b4df098c519db5cc43e93df517f2ed4a"
+    },
+    {
       "path": "catalog/proxy-information/project.mjs",
       "mode": 420,
-      "sha256": "e8dbe47fff0c2705605051120e31ab18885a24309915f7cc06cdbadf6d005bf2"
+      "sha256": "7abc4c308580cea05bf0ad084193b9260716faa5992b0f685adcba01bdc87759"
     },
     {
       "path": "catalog/proxy-information/project.test.mjs",
       "mode": 420,
-      "sha256": "cab7c3b270e43c28677f41c971b994a28c4fea5cac96b43e6e62f922e9e60831"
+      "sha256": "eecf862a773f68885e5983637239abde82ce98eef0a88ac2f6a9c8583b4e469e"
     },
     {
       "path": "catalog/proxy-information/README.md",
       "mode": 420,
-      "sha256": "1f8700414ecd5a4f3ee8c7ce267493d848167712a93c46f904c528ad32f80974"
+      "sha256": "2cd29047495686fdf8c5e21e97f2ecc9aaf7b13c94303976afbb82479a944dd9"
     },
     {
       "path": "catalog/proxy-information/validate.mjs",
       "mode": 420,
-      "sha256": "539c69519828511f088a2a5aa372df6892be9412944561673645e0037e762ee5"
+      "sha256": "84c7387eb0319066147457741298698824d2c89a6215d90d3a836b2e94a85717"
     },
     {
       "path": "CHANGELOG.md",
       "mode": 420,
-      "sha256": "5ef5f73e1b9f9889172431c30e08e1897adcb2b377507c3536452b8ae3cfcbbb"
+      "sha256": "a9ca551a0b249c209986fb0fad9615b6c8c75a9285e7b653b448d089d1512038"
     },
     {
       "path": "LICENSE",
@@ -4323,7 +4418,7 @@
     {
       "path": "packages/proxy-catalog-contract/src/bundle.ts",
       "mode": 420,
-      "sha256": "59c5d2e7c00d02d40d59abca81393cfa2b9debef92385a1de0ba344c6339a82f"
+      "sha256": "f24f1897239054ec8951fac27a2b8704a7eb6036707e502ea55b6fc1998cb5fd"
     },
     {
       "path": "packages/proxy-catalog-contract/src/catalog-markdown.ts",
@@ -4333,7 +4428,7 @@
     {
       "path": "packages/proxy-catalog-contract/src/compiler.ts",
       "mode": 420,
-      "sha256": "d24e7e21cc9e593cdab48e795b467beb21c02a67ab774ea8c7f247202e15c828"
+      "sha256": "e9cbe9f3aa3d26eae25ef96bc3909eabfa2e7515795cb7b337ac05ca633cbc30"
     },
     {
       "path": "packages/proxy-catalog-contract/src/constants.ts",
@@ -4343,7 +4438,12 @@
     {
       "path": "packages/proxy-catalog-contract/src/index.ts",
       "mode": 420,
-      "sha256": "8eb6819aab941e83c1d28537d165e711e02b4caee173984a0bb5178b1543c56f"
+      "sha256": "79cee132802fc33ea843c38c9dc3193229295ffb90bb8fa4b8553e4fafdb02e4"
+    },
+    {
+      "path": "packages/proxy-catalog-contract/src/localization.ts",
+      "mode": 420,
+      "sha256": "60f8cde9108af70ebfee9e1150a390d10c2ab273aaee4b916c8771b73eb995c8"
     },
     {
       "path": "packages/proxy-catalog-contract/src/media.ts",
@@ -4353,7 +4453,7 @@
     {
       "path": "packages/proxy-catalog-contract/src/official-source.ts",
       "mode": 420,
-      "sha256": "649abe91bbdd8f1289687721140c9de4890d57db09e63ebd1fa07be71989c9da"
+      "sha256": "c86e9e1ce13353617db135f39de004765137b8ac354276414f9cb7f54b228f9f"
     },
     {
       "path": "packages/proxy-catalog-contract/src/schemas.ts",
@@ -4383,7 +4483,7 @@
     {
       "path": "packages/proxy-catalog-contract/test/compiler.test.ts",
       "mode": 420,
-      "sha256": "c4cd3d0bdbbf12474c21bd42561061c0ae3127a27c932da8e4f68f97840e9fe9"
+      "sha256": "5d47bde7b428f089be6f23fd66a89f807c90530dcf782adbd112ab1888236f9e"
     },
     {
       "path": "packages/proxy-catalog-contract/test/fixtures.ts",
@@ -4588,7 +4688,7 @@
     {
       "path": "README.md",
       "mode": 420,
-      "sha256": "149fd95f517ab75a02e8aab5c90412c70e3d52a072d5556177ef41bcc03274b1"
+      "sha256": "a880619261d43845b103c1bb9d467d58860143dfe83c321a80822a67cede24f3"
     },
     {
       "path": "runtimes/deepseek-harness/package-lock.json",
@@ -4611,6 +4711,16 @@
       "sha256": "ffc7826a56f30adc59faf3f30dda33569950ffc469416a8c98a5bb6a013672e1"
     },
     {
+      "path": "scripts/catalog-docs-policy.mjs",
+      "mode": 420,
+      "sha256": "5fa18d03fc03e9fdfbc9a05a302d41edcc4cb7ee7a14dfd4620d4f64e9d3f3f6"
+    },
+    {
+      "path": "scripts/catalog-docs-policy.test.mjs",
+      "mode": 420,
+      "sha256": "ad8e31c32015b4ecc50021b9b62d00fd642b8c0f2abda448acfbac0da298ec76"
+    },
+    {
       "path": "scripts/check-node.cjs",
       "mode": 420,
       "sha256": "804e405dc9fe788c8fe97739256abb3403a10980c20b8ea78dac8de4732182e9"
@@ -4628,7 +4738,7 @@
     {
       "path": "scripts/release-product.mjs",
       "mode": 420,
-      "sha256": "f1fe4be393e36b95c1b7010d523b888dc78311e1bafd59c186e999c36cdd20ee"
+      "sha256": "49270307dc8c2c75591bb61486264a1541ab99c4c6261221f02349aa09e1a716"
     },
     {
       "path": "scripts/stage-official-catalog-release.mjs",

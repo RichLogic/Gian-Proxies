@@ -6,11 +6,11 @@
 
 | Proxy | 基本信息与状态样例 | 产品教程 | 版本历史 |
 | --- | --- | --- | --- |
-| Claude Code | [基本信息](claude/basic.md) | [完整教程](claude/tutorial.md) | [版本更新](claude/changelog.md) |
-| Codex | [基本信息](codex/basic.md) | [完整教程](codex/tutorial.md) | [版本更新](codex/changelog.md) |
-| Kimi Code | [基本信息](kimi/basic.md) | [完整教程](kimi/tutorial.md) | [版本更新](kimi/changelog.md) |
-| DeepSeek Harness | [基本信息](ai.deepseek.harness/basic.md) | [完整教程](ai.deepseek.harness/tutorial.md) | [版本更新](ai.deepseek.harness/changelog.md) |
-| ZCode | [基本信息](com.zhipu.zcode/basic.md) | [完整教程](com.zhipu.zcode/tutorial.md) | [版本更新](com.zhipu.zcode/changelog.md) |
+| Claude Code | [基本信息](claude/basic.md) | [中文](claude/tutorial.md) / [English](claude/tutorial.en.md) | [版本更新](claude/changelog.md) |
+| Codex | [基本信息](codex/basic.md) | [中文](codex/tutorial.md) / [English](codex/tutorial.en.md) | [版本更新](codex/changelog.md) |
+| Kimi Code | [基本信息](kimi/basic.md) | [中文](kimi/tutorial.md) / [English](kimi/tutorial.en.md) | [版本更新](kimi/changelog.md) |
+| DeepSeek Harness | [基本信息](ai.deepseek.harness/basic.md) | [中文](ai.deepseek.harness/tutorial.md) / [English](ai.deepseek.harness/tutorial.en.md) | [版本更新](ai.deepseek.harness/changelog.md) |
+| ZCode | [基本信息](com.zhipu.zcode/basic.md) | [中文](com.zhipu.zcode/tutorial.md) / [English](com.zhipu.zcode/tutorial.en.md) | [版本更新](com.zhipu.zcode/changelog.md) |
 
 先读 Claude 的完整流程，再看 DSH 的依赖关系和 ZCode 的外部 App 例外。五份教程均按同样的九个章节组织，但能力、运行方式和限制按各自实现撰写，不套同一份能力说明。
 
@@ -33,6 +33,8 @@
 
 ## 给实现与发布使用的文件
 
+- `localizations.json`：五个 Proxy 的中英文名称与简介。`tutorial.md` 是中文，`tutorial.en.md` 是英文；`history-copy.en.json` 维护历史说明的英文翻译，日期、版本、摘要与证据仍只来自原 `changelog.json`。
+- 双语编译输出增加签名资产 `catalog-localizations-v1.json` 和 `docs/<pluginId>/<locale>/*.md`，不改变旧 v1 索引字段。Gian 根据界面语言选 `en` 或 `zh-CN`，文档 URL 和缓存按语言隔离；旧 Catalog 没有双语资产时保留其原始内容，不伪造翻译。
 - [信息与发布合同](CONTRACT.md)：字段来源、三段展示、校验规则、旧数据迁移和验收要求。
 - 每个 Proxy 的 changelog.json：唯一的结构化历史内容源；changelog.md 是便于审阅的投影，不应独立维护两份历史。
 - [内容校验器](validate.mjs)：核对当前版本唯一性、历史顺序、真实发行日期/摘要、九章结构及 Markdown 投影一致性。Catalog 发布工作流执行，失败阻止发布。

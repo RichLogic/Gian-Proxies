@@ -1,5 +1,15 @@
 # Gian Proxies Changelog
 
+## Catalog 1.9.0 - 2026-09-23
+
+- Add Chinese and English descriptions, nine-chapter tutorials and version
+  histories for all five shipping Proxies. Compatible Gian clients follow
+  their selected UI language; older clients retain the original documents.
+- Bind localized metadata and documents to the signed asset manifest without
+  changing the strict Catalog v1 index.
+- Retain every Proxy, Runtime and certification coordinate from Catalog 1.8.0.
+  No executable rebuild, Proxy version bump or App package is included.
+
 ## Catalog 1.8.0 - 2026-09-21
 
 - Publish complete nine-chapter tutorials for the five shipping Integrations.
