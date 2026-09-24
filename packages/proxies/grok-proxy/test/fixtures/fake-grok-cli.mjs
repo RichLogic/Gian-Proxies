@@ -13,6 +13,8 @@ if (process.env.GROK_TEST_SPAWN_RECORD) {
   }));
 }
 
+const FORKED_SESSION_ID = 'native-forked-child';
+
 const stream = ndJsonStream(
   Writable.toWeb(process.stdout),
   Readable.toWeb(process.stdin),
@@ -27,8 +29,10 @@ new AgentSideConnection((agentConn) => ({
         promptCapabilities: { image: false, audio: false, embeddedContext: true },
         sessionCapabilities: { list: {}, resume: {}, close: {} },
       },
-      agentInfo: { name: 'fake-grok', version: '1.0.3-test' },
+      agentInfo: { name: 'fake-grok', version: '1.0.41-test' },
       _meta: {
+        grokShell: true,
+        agentVersion: '1.0.41',
         modelState: {
           currentModelId: 'grok-4.6',
           availableModels: [{
@@ -67,11 +71,43 @@ new AgentSideConnection((agentConn) => ({
   async closeSession() {
     return {};
   },
-  extMethod: async (method) => {
-    if (method === 'x.ai/session/delete' || method === '_x.ai/session/delete') {
+  extMethod: async (method, params) => {
+    const record = params && typeof params === 'object' ? params : {};
+    if (method === 'x.ai/session/delete') {
+      return { success: true };
+    }
+    if (method === 'x.ai/session/rename') {
+      return { success: true, title: record.title ?? '' };
+    }
+    if (method === 'x.ai/session/fork') {
+      return {
+        newSessionId: FORKED_SESSION_ID,
+        chatMessagesCopied: 3,
+        updatesCopied: 5,
+        planStateCopied: false,
+        newCwd: process.cwd(),
+        parentSessionId: record.sourceSessionId ?? 'native-new',
+      };
+    }
+    if (method === 'x.ai/interject') {
+      return { status: 'queued' };
+    }
+    if (method === 'x.ai/mcp/list') {
+      return { servers: [] };
+    }
+    if (method === 'x.ai/skills/list') {
+      return { skills: [] };
+    }
+    if (method === 'x.ai/hooks/list') {
+      return { hooks: [] };
+    }
+    if (method === 'x.ai/session/usage') {
+      return { usage: {} };
+    }
+    if (method === 'x.ai/session/update_mcp_servers') {
       return { ok: true };
     }
-    return {};
+    throw new Error(`Method not found: ${method}`);
   },
   async prompt() {
     await agentConn.sessionUpdate({

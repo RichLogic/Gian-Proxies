@@ -15,6 +15,7 @@ import {
   type ListSessionsResponse,
   type LoadSessionRequest,
   type LoadSessionResponse,
+  type McpServer,
   type NewSessionRequest,
   type NewSessionResponse,
   type PromptRequest,
@@ -26,16 +27,53 @@ import {
   type SessionNotification,
 } from '@agentclientprotocol/sdk';
 
+import {
+  extensionSupportFromInitialize,
+  type GrokExtensionSupport,
+  NO_EXTENSION_SUPPORT,
+} from './grok-extensions.js';
+
 const ACP_PROTOCOL_VERSION = 1;
 const DEFAULT_STARTUP_TIMEOUT_MS = 15_000;
 const DEFAULT_GRACEFUL_STOP_MS = 3_000;
 
+export const GROK_DEFAULT_DENY_RULES = ['MCPTool(*)'] as const;
+
+/** Legacy alias: spawn prefix with the default MCP isolation boundary. */
 export const GROK_SPAWN_PREFIX = [
   '--deny',
-  'MCPTool(*)',
+  GROK_DEFAULT_DENY_RULES[0],
   '--disallowed-tools',
   'search_tool,use_tool',
 ] as const;
+
+export class GrokExtMethodUnsupportedError extends Error {
+  constructor(readonly method: string, reason: string) {
+    super(reason);
+    this.name = 'GrokExtMethodUnsupportedError';
+  }
+}
+
+/** Wire shape of the native `x.ai/session/fork` extension request. */
+export interface GrokNativeForkRequest {
+  sourceSessionId: string;
+  sourceCwd: string;
+  newCwd: string;
+  newSessionId?: string;
+  newModelId?: string;
+  /** 0-based inclusive user-prompt index the fork keeps. Omit to fork the head. */
+  targetPromptIndex?: number;
+}
+
+export interface GrokNativeForkResponse {
+  newSessionId: string;
+  chatMessagesCopied?: number;
+  updatesCopied?: number;
+  planStateCopied?: boolean;
+  newCwd?: string;
+  parentSessionId?: string;
+  newModelId?: string | null;
+}
 
 export type GrokAcpPermissionHandler = (
   request: RequestPermissionRequest,
@@ -63,11 +101,19 @@ export interface GrokAcpClientOptions {
   startupTimeoutMs?: number;
   gracefulStopMs?: number;
   transportFactory?: GrokAcpTransportFactory;
+  /** MCP permission deny rules for the spawn boundary; defaults to MCPTool(*). */
+  spawnDenyRules?: readonly string[];
 }
 
 export interface GrokAcpRuntimeStoppedEvent extends GrokAcpExit {
   expected: boolean;
 }
+
+/** Reverse `x.ai/*` request routed to the Proxy (ask_user_question etc.). */
+export type GrokExtMethodHandler = (
+  method: string,
+  params: unknown,
+) => Promise<unknown>;
 
 interface GrokAcpClientEvents {
   debug: [message: string];
@@ -99,7 +145,7 @@ function validateAbsolutePath(value: string, field: string): void {
   if (!isAbsolute(value)) throw new Error(`${field} must be an absolute path.`);
 }
 
-function isMethodNotFound(error: unknown): boolean {
+export function isMethodNotFound(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error);
   return /method not found/i.test(message);
 }
@@ -126,12 +172,17 @@ function innerConnection(connection: ClientSideConnection): ExtCapable {
 }
 
 function processTransportFactory(
-  options: Pick<GrokAcpClientOptions, 'binaryPath' | 'cwd' | 'env' | 'gracefulStopMs'>,
+  options: Pick<GrokAcpClientOptions, 'binaryPath' | 'cwd' | 'env' | 'gracefulStopMs' | 'spawnDenyRules'>,
   emitDebug: (message: string) => void,
 ): GrokAcpTransportFactory {
   return async (client) => {
+    const args: string[] = [];
+    for (const rule of options.spawnDenyRules ?? GROK_DEFAULT_DENY_RULES) {
+      args.push('--deny', rule);
+    }
+    args.push('--disallowed-tools', 'search_tool,use_tool');
     const child = spawn(options.binaryPath, [
-      ...GROK_SPAWN_PREFIX,
+      ...args,
       'agent',
       '--no-leader',
       'stdio',
@@ -180,6 +231,8 @@ export class GrokAcpClient extends EventEmitter<GrokAcpClientEvents> {
     extMethod?(method: string, params: unknown): Promise<unknown>;
   };
   private permissionHandler: GrokAcpPermissionHandler | null;
+  private extMethodHandler: GrokExtMethodHandler | null = null;
+  private extSupport: GrokExtensionSupport = NO_EXTENSION_SUPPORT;
   private transport: GrokAcpTransport | null = null;
   private initializeResponse: InitializeResponse | null = null;
   private startPromise: Promise<InitializeResponse> | null = null;
@@ -206,7 +259,15 @@ export class GrokAcpClient extends EventEmitter<GrokAcpClientEvents> {
       extNotification: async (method, params) => {
         this.emit('extensionNotification', method, params);
       },
-      extMethod: async () => ({}),
+      extMethod: async (method: string, params: unknown) => {
+        // Reverse requests from the agent must be answered honestly: the old
+        // blanket `{}` return silently mis-answered structured questions.
+        if (!this.extMethodHandler) {
+          throw new Error(`Method not found: ${method}`);
+        }
+        const result = await this.extMethodHandler(method, params);
+        return result as Record<string, unknown>;
+      },
     };
   }
 
@@ -222,8 +283,17 @@ export class GrokAcpClient extends EventEmitter<GrokAcpClientEvents> {
     return this.initializeResponse;
   }
 
+  /** Version-gated native x.ai/* extension method support for this runtime. */
+  get extensions(): GrokExtensionSupport {
+    return this.extSupport;
+  }
+
   setPermissionHandler(handler: GrokAcpPermissionHandler | null): void {
     this.permissionHandler = handler;
+  }
+
+  setExtMethodHandler(handler: GrokExtMethodHandler | null): void {
+    this.extMethodHandler = handler;
   }
 
   async ensureStarted(): Promise<InitializeResponse> {
@@ -286,6 +356,7 @@ export class GrokAcpClient extends EventEmitter<GrokAcpClientEvents> {
     }
 
     this.initializeResponse = response;
+    this.extSupport = extensionSupportFromInitialize(response);
     return response;
   }
 
@@ -314,6 +385,26 @@ export class GrokAcpClient extends EventEmitter<GrokAcpClientEvents> {
 
   async forkSession(params: ForkSessionRequest): Promise<ForkSessionResponse> {
     return (await this.connection()).unstable_forkSession(params);
+  }
+
+  /** Native `x.ai/session/fork` — supports head forks and exact-turn forks
+   *  via `targetPromptIndex` (0-based, inclusive). Does not start the forked
+   *  session; attach it afterwards with `resumeSession`. */
+  async nativeForkSession(params: GrokNativeForkRequest): Promise<GrokNativeForkResponse> {
+    if (!this.extSupport.supports('x.ai/session/fork')) {
+      throw new GrokExtMethodUnsupportedError(
+        'x.ai/session/fork',
+        this.extSupport.unsupportedReason('x.ai/session/fork'),
+      );
+    }
+    const ext = await this.ext();
+    const response = (await ext.sendRequest('x.ai/session/fork', params)) as Record<string, unknown>;
+    if (!response || typeof response !== 'object'
+      || typeof (response as { newSessionId?: unknown }).newSessionId !== 'string'
+      || !(response as { newSessionId: string }).newSessionId) {
+      throw new Error('x.ai/session/fork did not return a newSessionId.');
+    }
+    return response as unknown as GrokNativeForkResponse;
   }
 
   async resumeSession(params: ResumeSessionRequest): Promise<ResumeSessionResponse> {
@@ -354,24 +445,81 @@ export class GrokAcpClient extends EventEmitter<GrokAcpClientEvents> {
     return (await this.connection()).unstable_setSessionModel(params);
   }
 
-  async renameSession(sessionId: string, title: string): Promise<unknown> {
-    const ext = await this.ext();
-    const params = { sessionId, title };
-    // Grok's TUI knows x.ai/session/rename; the stdio `grok agent` used by
-    // Gian does not register that ext method. Try both wire names, then
-    // succeed locally so Host bring-up does not fail a new conversation.
-    for (const method of ['x.ai/session/rename', '_x.ai/session/rename'] as const) {
-      try {
-        return await ext.sendRequest(method, params);
-      } catch (error) {
-        if (!isMethodNotFound(error)) throw error;
-      }
+  async renameSession(sessionId: string, title: string, cwd?: string): Promise<unknown> {
+    if (!this.extSupport.supports('x.ai/session/rename')) {
+      throw new GrokExtMethodUnsupportedError(
+        'x.ai/session/rename',
+        this.extSupport.unsupportedReason('x.ai/session/rename'),
+      );
     }
-    return { ok: true };
+    // The stdio grok agent registers x.ai/session/rename (session_admin.rs);
+    // method-not-found is surfaced honestly instead of being swallowed into a
+    // local fake success.
+    return (await this.ext()).sendRequest('x.ai/session/rename', {
+      sessionId,
+      title,
+      ...(cwd ? { cwd } : {}),
+    });
   }
 
-  async deleteSession(sessionId: string): Promise<unknown> {
-    return (await this.ext()).sendRequest('x.ai/session/delete', { sessionId });
+  async deleteSession(sessionId: string, cwd?: string): Promise<unknown> {
+    if (!this.extSupport.supports('x.ai/session/delete')) {
+      throw new GrokExtMethodUnsupportedError(
+        'x.ai/session/delete',
+        this.extSupport.unsupportedReason('x.ai/session/delete'),
+      );
+    }
+    return (await this.ext()).sendRequest('x.ai/session/delete', {
+      sessionId,
+      ...(cwd ? { cwd } : {}),
+    });
+  }
+
+  /** Mid-session MCP server swap; the agent admits and merges client servers. */
+  async updateSessionMcpServers(sessionId: string, mcpServers: McpServer[]): Promise<unknown> {
+    if (!this.extSupport.supports('x.ai/session/update_mcp_servers')) {
+      throw new GrokExtMethodUnsupportedError(
+        'x.ai/session/update_mcp_servers',
+        this.extSupport.unsupportedReason('x.ai/session/update_mcp_servers'),
+      );
+    }
+    return (await this.ext()).sendRequest('x.ai/session/update_mcp_servers', {
+      sessionId,
+      mcpServers,
+    });
+  }
+
+  /** Read-only effective MCP server catalog (no server is contacted). */
+  async mcpList(): Promise<unknown> {
+    if (!this.extSupport.supports('x.ai/mcp/list')) {
+      throw new GrokExtMethodUnsupportedError(
+        'x.ai/mcp/list',
+        this.extSupport.unsupportedReason('x.ai/mcp/list'),
+      );
+    }
+    return (await this.ext()).sendRequest('x.ai/mcp/list', {});
+  }
+
+  /** Read-only skill listing reloaded from disk (no hooks run, no MCP dialed). */
+  async skillsList(cwd: string): Promise<unknown> {
+    if (!this.extSupport.supports('x.ai/skills/list')) {
+      throw new GrokExtMethodUnsupportedError(
+        'x.ai/skills/list',
+        this.extSupport.unsupportedReason('x.ai/skills/list'),
+      );
+    }
+    return (await this.ext()).sendRequest('x.ai/skills/list', { cwd });
+  }
+
+  /** Read-only hook listing for an attached session. */
+  async hooksList(sessionId: string): Promise<unknown> {
+    if (!this.extSupport.supports('x.ai/hooks/list')) {
+      throw new GrokExtMethodUnsupportedError(
+        'x.ai/hooks/list',
+        this.extSupport.unsupportedReason('x.ai/hooks/list'),
+      );
+    }
+    return (await this.ext()).sendRequest('x.ai/hooks/list', { sessionId });
   }
 
   async sessionUsage(sessionId: string): Promise<unknown> {
