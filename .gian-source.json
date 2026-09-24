@@ -2,7 +2,7 @@
   "schema": 1,
   "product": "Gian-Proxies",
   "sourceRepository": "RichLogic/Gian-Dev",
-  "sourceCommit": "17fe6cd54830085f07167900fe9445e76af055c8",
+  "sourceCommit": "e014cc05205fafeb9acdb6a538916aacba94be06",
   "workingTree": false,
   "externalPackages": [
     {
@@ -1261,7 +1261,7 @@
     {
       "source": "packages/proxies/dsh-proxy/src/cli/spawn.ts",
       "path": "packages/proxies/dsh-proxy/src/cli/spawn.ts",
-      "sha256": "560ff36a8741e68c90d846887094cfccea547ea830ba9b0303ec96452a033e0e"
+      "sha256": "022792ae4e5ff318455fae5fd1e9af6bfb99fbf8304146817ede62e32c69a9db"
     },
     {
       "source": "packages/proxies/dsh-proxy/src/core/service.ts",
@@ -1331,7 +1331,7 @@
     {
       "source": "packages/proxies/dsh-proxy/test/protocol-v2-cli.test.ts",
       "path": "packages/proxies/dsh-proxy/test/protocol-v2-cli.test.ts",
-      "sha256": "34dcb910dbdba07c9fad37436b67b0b4b14fee37454b2ac1d0427eebf5460d61"
+      "sha256": "3fd9293f28106c5cad76eae63bf3bf236986ce8b3e8c51e1887f0aa2b3710848"
     },
     {
       "source": "packages/proxies/dsh-proxy/tsconfig.json",
@@ -2401,7 +2401,7 @@
     {
       "source": "scripts/build-proxy-artifacts.mjs",
       "path": "scripts/build-proxy-artifacts.mjs",
-      "sha256": "ffc7826a56f30adc59faf3f30dda33569950ffc469416a8c98a5bb6a013672e1"
+      "sha256": "52f39e160ef7273982455930cf1dfd9fdf9435191211c1b303990cb9df938fdc"
     },
     {
       "source": "scripts/check-node.js",
@@ -3623,7 +3623,7 @@
     {
       "path": "packages/proxies/dsh-proxy/src/cli/spawn.ts",
       "mode": 420,
-      "sha256": "560ff36a8741e68c90d846887094cfccea547ea830ba9b0303ec96452a033e0e"
+      "sha256": "022792ae4e5ff318455fae5fd1e9af6bfb99fbf8304146817ede62e32c69a9db"
     },
     {
       "path": "packages/proxies/dsh-proxy/src/core/service.ts",
@@ -3693,7 +3693,7 @@
     {
       "path": "packages/proxies/dsh-proxy/test/protocol-v2-cli.test.ts",
       "mode": 420,
-      "sha256": "34dcb910dbdba07c9fad37436b67b0b4b14fee37454b2ac1d0427eebf5460d61"
+      "sha256": "3fd9293f28106c5cad76eae63bf3bf236986ce8b3e8c51e1887f0aa2b3710848"
     },
     {
       "path": "packages/proxies/dsh-proxy/tsconfig.json",
@@ -4778,7 +4778,7 @@
     {
       "path": "scripts/build-proxy-artifacts.mjs",
       "mode": 420,
-      "sha256": "ffc7826a56f30adc59faf3f30dda33569950ffc469416a8c98a5bb6a013672e1"
+      "sha256": "52f39e160ef7273982455930cf1dfd9fdf9435191211c1b303990cb9df938fdc"
     },
     {
       "path": "scripts/catalog-docs-policy.mjs",
