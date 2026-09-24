@@ -1,5 +1,13 @@
 # Gian Proxies Changelog
 
+## Catalog 1.10.0 - 2026-09-24
+
+- Select the certified Claude 0.3.2, Codex 0.3.2, Kimi 0.3.3 and DeepSeek 0.3.2
+  releases with their verified Runtime combinations; DeepSeek includes Bridge 0.1.4.
+- Refresh Chinese and English version histories from the actual published assets.
+- Retain ZCode 0.3.2 and its complete executable/certificate coordinates unchanged.
+  Grok remains excluded. Existing Proxy archives are not rebuilt.
+
 ## 2026-09-24 - CLI compatibility update
 
 - Claude Proxy 0.3.2 targets Claude Code 2.1.280 and preserves inherited Fork

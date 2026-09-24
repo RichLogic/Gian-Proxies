@@ -26,5 +26,9 @@
   "更新 DSH Provider 路由适配，声明对应 Runtime 0.1.1-rc.2。": "Update DSH Provider routing and declare Runtime 0.1.1-rc.2.",
   "缺少独立启动所需的内置 Provider 配置时，提前给出明确 readiness 诊断，而不是只暴露循环退出。": "Report explicit readiness diagnostics when built-in Provider configuration required for standalone startup is missing, rather than exposing only repeated exits.",
   "不代表 ZCode.app 3.12.3 的原生方法与独立 Provider 初始化问题已修复，也不保证恢复缺失模型。": "This does not fix ZCode.app 3.12.3 native-method or standalone Provider initialization problems, or guarantee restoration of missing models.",
-  "恢复官方 Z.ai 标识并同步资源摘要；外部 Runtime 仍要求对应的 App 构建。": "Restore official Z.ai branding and synchronize asset digests; the external Runtime still requires the corresponding App build."
+  "恢复官方 Z.ai 标识并同步资源摘要；外部 Runtime 仍要求对应的 App 构建。": "Restore official Z.ai branding and synchronize asset digests; the external Runtime still requires the corresponding App build.",
+  "适配 Claude Code 2.1.280，保留 Fork 的继承轮次身份并修复 Side Chat 重复恢复。": "Support Claude Code 2.1.280, preserve inherited Fork turn identities, and make Side Chat resume idempotent.",
+  "适配 Codex CLI 0.156.1 的历史与 Fork 格式，修复运行进程清理；独立翻译对话关闭时不再读取临时历史。": "Support Codex CLI 0.156.1 history and Fork formats, clean up Runtime descendants, and close isolated translation threads without reading ephemeral history.",
+  "适配 DeepSeek Harness 0.1.5-rc.3，内置 Bridge 0.1.4，恢复流式文本与思考输出，并保持握手版本与发布包一致。": "Support DeepSeek Harness 0.1.5-rc.3 with bundled Bridge 0.1.4, restore streaming text and reasoning, and keep handshake identity aligned with the released package.",
+  "适配 Kimi Code 2.1.0，修复模型切换后的 thinking 选项和历史轮次身份；不再宣告上游未支持的原生重命名。": "Support Kimi Code 2.1.0, correct model-dependent thinking choices and replay turn identities, and stop advertising unsupported native rename."
 }

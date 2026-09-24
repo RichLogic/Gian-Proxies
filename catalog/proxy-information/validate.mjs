@@ -55,7 +55,7 @@ export function tutorialChapters(markdown, locale = 'zh-CN') {
 }
 
 function renderHistory(history, current) {
-  let md = `# ${current.displayName}：版本更新\n\n本文件由 changelog.json 的结构化记录投影，按 Proxy 版本倒序。首次发布日期与新仓库分发日期分别记录；未知历史不会用当前版本说明回填。\n\n当前 Catalog 1.7.0 选择：Proxy **${current.version}**，Runtime **${current.combination.runtime.version}**。这是发布目标，不表示当前机器已安装。\n\n`;
+  let md = `# ${current.displayName}：版本更新\n\n本文件由 changelog.json 的结构化记录投影，按 Proxy 版本倒序。首次发布日期与新仓库分发日期分别记录；未知历史不会用当前版本说明回填。\n\n本次发布组合快照：Proxy **${current.version}**，Runtime **${current.combination.runtime.version}**。这是发布目标，不表示当前机器已安装。\n\n`;
   for (const entry of history.entries) {
     md += `## ${entry.version}\n\n首次公开发布：${entry.firstPublishedAt}（UTC）。\n\n`;
     for (const d of entry.distributions) {
@@ -177,7 +177,7 @@ export function renderEnglishHistory(history, current) {
     return copy[source];
   };
   const headings = { added: 'Added', changed: 'Changed', fixed: 'Fixed', attention: 'Notes' };
-  let md = `# ${current.displayName}: Version history\n\nGenerated from the structured changelog, newest Proxy version first. Original publication and later repository distributions are recorded separately; missing historical details are not invented.\n\nCatalog 1.7.0 reference snapshot: Proxy **${current.version}**, Runtime **${current.combination.runtime.version}**. These are distribution targets, not this machine's installed state.\n\n`;
+  let md = `# ${current.displayName}: Version history\n\nGenerated from the structured changelog, newest Proxy version first. Original publication and later repository distributions are recorded separately; missing historical details are not invented.\n\nRelease combination snapshot: Proxy **${current.version}**, Runtime **${current.combination.runtime.version}**. These are distribution targets, not this machine's installed state.\n\n`;
   for (const entry of history.entries) {
     md += `## ${entry.version}\n\nFirst published: ${entry.firstPublishedAt} (UTC).\n\n`;
     for (const d of entry.distributions) {
