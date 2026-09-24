@@ -21,6 +21,13 @@ source export, not a copy of private Git history.
 Use Node 24 and the pinned pnpm version. `pnpm install --frozen-lockfile` followed
 by `pnpm build` builds the standalone product. No Provider credentials are needed.
 
+`release-selection.json` explicitly selects the Proxies to build, qualify and
+publish. Its signed base Catalog is verified against the existing pinned key;
+unselected Proxies retain their complete immutable executable and certificate
+coordinates. A subset release never rebuilds, retags or republishes an excluded
+Proxy. The final Catalog must preserve the plugin set and every excluded stable
+tuple exactly. Update the selection in GianDev before exporting source.
+
 1. Dispatch **Qualify Proxy Artifacts** on main. The hosted macOS ARM64 workflow
    verifies source provenance, compiles, exercises Proxy contracts with fake
    Runtimes, verifies exact managed Runtime candidates with the production

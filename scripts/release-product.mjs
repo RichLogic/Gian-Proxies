@@ -8,11 +8,12 @@ import { isDeepStrictEqual } from 'node:util';
 import { proxyDefinitions, assertProxySelfTest, main as buildArtifacts } from './build-proxy-artifacts.mjs';
 import { proxyReleaseMetadata, reviewedExternalRuntimeCandidates } from './proxy-release-metadata.mjs';
 import { verifySource } from './verify-source.mjs';
-import { assertSameCatalogExecutables } from './catalog-docs-policy.mjs';
+import { assertSameCatalogExecutables, assertSelectedCatalogExecutables, selectReleaseDefinitions } from './catalog-docs-policy.mjs';
 
 const repository = 'RichLogic/Gian-Proxies';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const shipping = proxyDefinitions.filter(p => p.shipping);
+const releaseSelection = JSON.parse(readFileSync(join(root, 'release-selection.json')));
+const shipping = selectReleaseDefinitions(proxyDefinitions, releaseSelection);
 const output = join(root, 'artifacts/release');
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const json = path => JSON.parse(readFileSync(path));
@@ -70,7 +71,8 @@ function validateBytes(certificate, directory) {
 async function build() {
   command('pnpm', ['--filter', '@gian/shared', 'build']);
   command('pnpm', ['--filter', '@gian/proxy-catalog-contract', 'build']);
-  command('pnpm', ['--filter', './packages/proxies/**', 'build']);
+  command('pnpm', ['--filter', '@gian/dsh-bridge', 'build']);
+  for (const definition of shipping) command('pnpm', ['--filter', definition.packageName, 'build']);
   command('pnpm', ['exec', 'tsc', '-p', 'support/runtime-extractor/tsconfig.json']);
 }
 
@@ -98,7 +100,7 @@ async function qualify() {
   const runtimes = json(join(root, 'artifacts/runtimes/runtime-candidates.json'));
   const proxies = [];
   await step('archive-self-tests', async () => {
-    await buildArtifacts(['--output', 'artifacts/proxies']);
+    for (const definition of shipping) await buildArtifacts(['--plugin', definition.id, '--output', 'artifacts/proxies']);
     const { extractManagedRuntimeArchive } = await import('../support/runtime-extractor/dist/safe-extract.js');
     for (const definition of shipping) {
       const metadata = proxyReleaseMetadata(definition.id);
@@ -209,8 +211,11 @@ async function catalog(directory, sequence, issuedAt) {
   const source = join(root, 'output/catalog-source');
   rmSync(source, { recursive: true, force: true });
   cpSync(join(root, 'catalog/official-source'), source, { recursive: true });
+  const inherited = await inheritCatalogExecutables(source, sequence);
   const { projectInformation } = await import('../catalog/proxy-information/project.mjs');
-  const { localizations } = projectInformation(source, certificate.proxies);
+  const catalogRecords = inherited.previous.plugins.map(plugin => certificate.proxies.find(record => record.pluginId === plugin.pluginId)
+    ?? { pluginId: plugin.pluginId, version: plugin.stable.pluginVersion, runtime: plugin.stable.combination.runtime });
+  const { localizations } = projectInformation(source, catalogRecords);
   for (const record of certificate.proxies) {
     const release = JSON.parse(gh('api', `repos/${repository}/releases/tags/${record.tag}`));
     if (release.draft || release.prerelease) throw new Error('Catalog cannot reference a draft Proxy');
@@ -236,15 +241,57 @@ async function catalog(directory, sequence, issuedAt) {
   const policy = officialCatalogSourcePolicy();
   const bundle = await compileOfficialCatalogSource({ sourceRoot: source, sequence, issuedAt, localizations,
     signingKey: { keyId: 'gian-official-catalog-2026-09', privateKey: process.env.GIAN_CATALOG_SIGNING_KEY_PEM },
-    allowedArtifactRepositories: [repository],
+    allowedArtifactRepositories: inherited.repositories,
     allowedRuntimeAssetPrefixes: [...policy.runtimeAssetPrefixes, `https://github.com/${repository}/releases/download/`],
   });
+  assertSelectedCatalogExecutables(inherited.previous, bundle.index, certificate.proxies.map(record => record.pluginId));
   await writeCompiledCatalogBundle(join(root, 'output/catalog-bundle'), bundle.files);
   const { stageOfficialCatalogRelease } = await import('./stage-official-catalog-release.mjs');
   const target = join(root, 'output/catalog-release');
   await stageOfficialCatalogRelease({ bundleDir: join(root, 'output/catalog-bundle'), outputDir: target });
   publishRelease(tag, readdirSync(target).sort().map(name => join(target, name)),
-    `Signed official Catalog sequence ${sequence}. Complete nine-chapter tutorials and evidence-backed Proxy histories use the existing v1 document shape. Tutorials occupy setup/usage/troubleshooting; overview carries history. Proxy and Runtime versions and executable assets are unchanged. Dedicated App history display remains a separate consumer change.`, true);
+    `Signed official Catalog sequence ${sequence}. Updated selected Proxy/Runtime combinations from ${certificate.certificateId}; excluded Proxies retain exact signed coordinates from ${releaseSelection.baseCatalogTag}. No App release.`, true);
+}
+
+async function inheritCatalogExecutables(source, sequence) {
+  const { verifyCatalogBundleFiles, parseGitHubReleaseAssetUrl } = await import('../packages/proxy-catalog-contract/dist/src/index.js');
+  const { officialCatalogSourcePolicy } = await import('../packages/shared/dist/index.js');
+  const policy = officialCatalogSourcePolicy();
+  const temporary = mkdtempSync(join(tmpdir(), 'gian-catalog-base-'));
+  try {
+    const base = JSON.parse(gh('api', `repos/${repository}/releases/tags/${releaseSelection.baseCatalogTag}`));
+    if (base.draft || base.prerelease) throw new Error('Base Catalog must be a stable public release');
+    command('gh', ['release', 'download', releaseSelection.baseCatalogTag, '--repo', repository, '--dir', temporary]);
+    const files = new Map(readdirSync(temporary).map(name => [name.replaceAll('__', '/'), readFileSync(join(temporary, name))]));
+    if (files.size !== readdirSync(temporary).length) throw new Error('Duplicate base Catalog asset path');
+    const previous = verifyCatalogBundleFiles({ files, pinnedPublicKeys: policy.pinnedPublicKeys, expectedSourceId: policy.sourceId });
+    if (`catalog-v1.${previous.sequence}.0` !== releaseSelection.baseCatalogTag || previous.sequence >= sequence) throw new Error('Signed base Catalog identity mismatch');
+    const repositories = [...new Set([...policy.artifactRepositories, repository])];
+    for (const plugin of previous.plugins) {
+      const stable = plugin.stable;
+      if (!stable.manifest || !stable.combination || !Object.keys(stable.artifacts).length) throw new Error('Base combination is not installable');
+      let manifestRelease;
+      for (const ref of [stable.manifest, ...Object.values(stable.artifacts)]) {
+        const coordinate = parseGitHubReleaseAssetUrl(ref.url, repositories);
+        if (!coordinate) throw new Error('Unapproved base artifact coordinate');
+        const release = JSON.parse(gh('api', `repos/${coordinate.repository}/releases/tags/${coordinate.tag}`));
+        const remote = release.assets.find(asset => asset.name === coordinate.asset);
+        if (release.draft || release.prerelease || !remote || remote.size !== ref.size || remote.digest !== `sha256:${ref.sha256}`) throw new Error('Base published artifact changed');
+        if (ref === stable.manifest) manifestRelease = { release, coordinate };
+      }
+      if (manifestRelease.release.assets.find(asset => asset.name === 'certificate.json')?.digest !== `sha256:${stable.combination.certificate.sha256}`) throw new Error('Base certificate digest mismatch');
+      const entryPath = join(source, 'plugins', plugin.pluginId, 'entry.json');
+      const entry = json(entryPath);
+      entry.channels.stable = { pluginVersion: stable.pluginVersion, manifest: stable.manifest, artifacts: stable.artifacts, combination: stable.combination };
+      put(entryPath, entry);
+      const sidecarPath = join(source, 'plugins', plugin.pluginId, 'sidecar.json');
+      command('gh', ['release', 'download', manifestRelease.coordinate.tag, '--repo', manifestRelease.coordinate.repository,
+        '--pattern', manifestRelease.coordinate.asset, '--output', sidecarPath, '--clobber']);
+      const bytes = readFileSync(sidecarPath);
+      if (bytes.length !== stable.manifest.size || hash(bytes) !== stable.manifest.sha256) throw new Error('Base Manifest bytes changed');
+    }
+    return { previous, repositories };
+  } finally { rmSync(temporary, { recursive: true, force: true }); }
 }
 
 async function catalogDocs(directory, sequence, issuedAt) {
