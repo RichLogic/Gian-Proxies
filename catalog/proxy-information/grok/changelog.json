@@ -1,8 +1,49 @@
 {
   "schemaVersion": 1,
   "pluginId": "grok",
-  "currentVersion": "0.3.5",
+  "currentVersion": "0.3.6",
   "entries": [
+    {
+      "version": "0.3.6",
+      "firstPublishedAt": "2026-09-25T11:45:02Z",
+      "evidenceCoverage": "detailed",
+      "distributions": [
+        {
+          "repository": "RichLogic/Gian-Proxies",
+          "tag": "proxy-grok-v0.3.6",
+          "publishedAt": "2026-09-25T11:45:02Z",
+          "releaseUrl": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-grok-v0.3.6",
+          "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.6/gian-proxy-grok-0.3.6-darwin-arm64.tar.gz.manifest.json",
+          "manifestSha256": "5d5c44bd06be7e905454e6e175354d42a520a307217b4c95577c2b06f42da422",
+          "archive": {
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.6/gian-proxy-grok-0.3.6-darwin-arm64.tar.gz",
+            "sha256": "5ca12d259980b023aeabcaf9be8a762e2b8a34f4127bb9d985acf5693615e74b",
+            "size": 156867
+          },
+          "runtimeDeclaration": {
+            "id": "grok",
+            "versions": [
+              "1.0.41"
+            ],
+            "basis": "verified-declaration"
+          },
+          "companionDeclarations": [],
+          "protocolRange": ">=2.2 <3.0",
+          "manifestSchema": 4,
+          "processScope": "session"
+        }
+      ],
+      "changes": [
+        {
+          "category": "fixed",
+          "text": "将受管 Grok Runtime 与 Proxy 发布到同一受信任的 GitHub Release，使已发布 Gian 能通过 Catalog 下载和验证。",
+          "evidence": [
+            "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-grok-v0.3.6"
+          ]
+        }
+      ],
+      "unknowns": []
+    },
     {
       "version": "0.3.5",
       "firstPublishedAt": "2026-09-25T11:27:45Z",

@@ -12,7 +12,7 @@ the currently visible official Proxies:
 | `kimi` | Kimi Code | 0.2.10 |
 | `ai.deepseek.harness` | DeepSeek Harness | 0.1.6 |
 | `com.zhipu.zcode` | ZCode | 0.1.1 |
-| `grok` | Grok Build | 0.3.5 |
+| `grok` | Grok Build | 0.3.6 |
 
 `io.gian.fixture` is not an official Catalog source entry.
 

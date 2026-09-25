@@ -135,22 +135,22 @@
     {
       "id": "grok",
       "displayName": "Grok Build",
-      "version": "0.3.5",
+      "version": "0.3.6",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "session",
       "combination": {
         "certificate": {
-          "id": "proxies-36d40ca32fe32901bfbe72669c159cfb4f6c5ec7-36129121727-1",
-          "sha256": "4afe81585dac60d2f57df3a846dcee334770924ee17f75c1519ed782860c2604"
+          "id": "proxies-f95e24516d8778f6f5b3afb3d8b294ab2881af21-36130726741-1",
+          "sha256": "28dd05bed679790540d578bd699c3e2fd2d43acf65dc346fab6a23ae132da21d"
         },
         "companions": [],
-        "generationId": "grok-0.3.5-runtime-1.0.41",
+        "generationId": "grok-0.3.6-runtime-1.0.41",
         "runtime": {
           "kind": "native-binary",
           "runtimeId": "grok",
           "version": "1.0.41",
           "asset": {
-            "url": "https://x.ai/cli/grok-1.0.41-macos-aarch64",
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.6/grok-1.0.41-darwin-arm64",
             "sha256": "9c844eb13365180787d9ad22b2b3748a024be8e1ed845253cc114781b31c591d",
             "size": 145657952
           },
@@ -160,7 +160,7 @@
       }
     }
   ],
-  "targetSequence": 11,
-  "basis": "Published Grok Proxy 0.3.5 qualification 36129121727 plus exact combinations inherited from signed Catalog 1.10.0; pending Catalog 1.11.0 publication.",
-  "capturedAt": "2026-09-25T11:27:45.000Z"
+  "targetSequence": 12,
+  "basis": "Published Grok Proxy 0.3.6 qualification 36130726741 plus exact combinations inherited from signed Catalog 1.10.0; pending Catalog 1.12.0 publication.",
+  "capturedAt": "2026-09-25T11:45:02.000Z"
 }

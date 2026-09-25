@@ -46,6 +46,6 @@
 
 发布时复制 official-source 到临时目录，再由本目录生成四份正文，覆盖旧占位内容；不在旧 strict schema 中加入新字段。完整历史的维护索引仍为 changelog.json，当前签名资产只承载其 Markdown 投影，不冒充已经支持新的 wire-level release index。basic.md、CONTRACT.md 和 evidence 是维护与审阅材料，不作为用户机器的基本信息发布。
 
-历史编号有空缺时不补造未发布版本。本稿列出 51 个唯一版本、54 次公开分发；其中 28 个旧版本尚不足以恢复完整的功能变更说明，均显式保留证据边界。
+历史编号有空缺时不补造未发布版本。本稿列出 52 个唯一版本、55 次公开分发；其中 28 个旧版本尚不足以恢复完整的功能变更说明，均显式保留证据边界。
 
 校验器默认只读；显式传 --render 才从 changelog.json 重新生成 changelog.md。依赖复用仓库已锁定的 SemVer 与 Markdown parser，不需要新增一套依赖版本。

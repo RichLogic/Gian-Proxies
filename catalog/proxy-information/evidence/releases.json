@@ -1,11 +1,49 @@
 {
-  "capturedAt": "2026-09-25T11:27:45.000Z",
+  "capturedAt": "2026-09-25T11:45:02.000Z",
   "repositories": [
     "RichLogic/Gian",
     "RichLogic/Gian-Proxies"
   ],
   "selection": "All publicly listed non-draft, non-prerelease releases matching proxy-(claude|codex|kimi|dsh|zcode)-v, across all release-list pages.",
   "releases": [
+    {
+      "tag": "proxy-grok-v0.3.6",
+      "date": "2026-09-25T11:45:02Z",
+      "url": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-grok-v0.3.6",
+      "body": "Independent Proxy 0.3.6. Exact hosted artifacts from proxies-f95e24516d8778f6f5b3afb3d8b294ab2881af21-36130726741-1. DSH includes its Bridge. ZCode remains an external-App integration with upstream standalone limitations. No App or real-provider acceptance is claimed.",
+      "assets": [
+        {
+          "name": "certificate.json",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.6/certificate.json",
+          "size": 4093,
+          "digest": "sha256:28dd05bed679790540d578bd699c3e2fd2d43acf65dc346fab6a23ae132da21d"
+        },
+        {
+          "name": "gian-proxy-grok-0.3.6-darwin-arm64.tar.gz",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.6/gian-proxy-grok-0.3.6-darwin-arm64.tar.gz",
+          "size": 156867,
+          "digest": "sha256:5ca12d259980b023aeabcaf9be8a762e2b8a34f4127bb9d985acf5693615e74b"
+        },
+        {
+          "name": "gian-proxy-grok-0.3.6-darwin-arm64.tar.gz.manifest.json",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.6/gian-proxy-grok-0.3.6-darwin-arm64.tar.gz.manifest.json",
+          "size": 790,
+          "digest": "sha256:5d5c44bd06be7e905454e6e175354d42a520a307217b4c95577c2b06f42da422"
+        },
+        {
+          "name": "gian-proxy-grok-0.3.6-darwin-arm64.tar.gz.sha256",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.6/gian-proxy-grok-0.3.6-darwin-arm64.tar.gz.sha256",
+          "size": 108,
+          "digest": "sha256:91acb9840fb728bb9d7fabaf7b26c77aefe2f47926b87e9360e72e00d60f0be0"
+        },
+        {
+          "name": "grok-1.0.41-darwin-arm64",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.6/grok-1.0.41-darwin-arm64",
+          "size": 145657952,
+          "digest": "sha256:9c844eb13365180787d9ad22b2b3748a024be8e1ed845253cc114781b31c591d"
+        }
+      ]
+    },
     {
       "tag": "proxy-grok-v0.3.5",
       "date": "2026-09-25T11:27:45Z",

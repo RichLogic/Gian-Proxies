@@ -2,7 +2,18 @@
 
 本文件由 changelog.json 的结构化记录投影，按 Proxy 版本倒序。首次发布日期与新仓库分发日期分别记录；未知历史不会用当前版本说明回填。
 
-本次发布组合快照：Proxy **0.3.5**，Runtime **1.0.41**。这是发布目标，不表示当前机器已安装。
+本次发布组合快照：Proxy **0.3.6**，Runtime **1.0.41**。这是发布目标，不表示当前机器已安装。
+
+## 0.3.6
+
+首次公开发布：2026-09-25T11:45:02Z（UTC）。
+
+- [RichLogic/Gian-Proxies 分发](https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-grok-v0.3.6)：2026-09-25T11:45:02Z。
+- 对应 CLI：1.0.41（Manifest 兼容声明，不是本机状态）。
+
+### 修复
+
+- 将受管 Grok Runtime 与 Proxy 发布到同一受信任的 GitHub Release，使已发布 Gian 能通过 Catalog 下载和验证。 [依据](https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-grok-v0.3.6)
 
 ## 0.3.5
 
