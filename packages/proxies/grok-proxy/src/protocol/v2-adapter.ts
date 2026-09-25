@@ -20,6 +20,7 @@ import { filterAdvertisedCommands } from '../core/slash-policy.js';
 import { GrokProxyService } from '../core/service.js';
 import { NativeTurnIdentityStore } from './replay-identity.js';
 import { discoverGrokRuntimes, probeGrokRuntime } from '../runtime/discover.js';
+import { GrokExtMethodUnsupportedError } from '../runtime/grok-acp-client.js';
 import { GrokJsonRpcError, GrokProtocolError, type DomainCode } from '../transport/protocol.js';
 
 type ConfigValue = string | boolean | number | null;
@@ -264,6 +265,11 @@ function isConfigValue(value: unknown): value is ConfigValue {
 
 export function standardError(error: unknown): GrokProtocolError | GrokJsonRpcError {
   if (error instanceof GrokProtocolError || error instanceof GrokJsonRpcError) return error;
+  if (error instanceof GrokExtMethodUnsupportedError) {
+    // A live-refuted x.ai/* method is an honest capability refusal, never an
+    // internal fault (the E2E steer path surfaced exactly that).
+    return new GrokProtocolError('CAPABILITY_NOT_SUPPORTED', error.message, false);
+  }
   if (error instanceof GrokProxyError) {
     if (error.code === 'INVALID_REQUEST') {
       return new GrokJsonRpcError(-32602, error.message);
