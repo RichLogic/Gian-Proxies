@@ -54,6 +54,7 @@ export const upstreamRuntimeCandidates = Object.freeze({
     url: 'https://x.ai/cli/grok-1.0.41-macos-aarch64',
     sha256: '9c844eb13365180787d9ad22b2b3748a024be8e1ed845253cc114781b31c591d',
     size: 145657952,
+    publish: true,
   }),
 });
 
@@ -116,6 +117,10 @@ async function buildUpstream(provider, candidate, outputDir, workDir) {
   };
   await mkdir(environment.HOME, { recursive: true, mode: 0o700 });
   const entry = await inspectEntry(provider, entryPath, candidate.version, environment);
+  const publish = candidate.publish === true;
+  const catalogUrl = publish
+    ? `https://github.com/RichLogic/Gian-Proxies/releases/download/${proxyReleaseMetadata(provider).tag}/${assetName}`
+    : candidate.url;
   return {
     provider,
     version: candidate.version,
@@ -125,10 +130,10 @@ async function buildUpstream(provider, candidate, outputDir, workDir) {
     asset: {
       name: basename(assetPath),
       path: assetPath,
-      url: candidate.url,
+      url: catalogUrl,
       sha256: candidate.sha256,
       size: candidate.size,
-      publish: false,
+      publish,
     },
     candidateBin: entryPath,
   };

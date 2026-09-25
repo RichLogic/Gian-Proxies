@@ -1371,12 +1371,12 @@
     {
       "source": "packages/proxies/grok-proxy/manifest.json",
       "path": "packages/proxies/grok-proxy/manifest.json",
-      "sha256": "91fcff2528bcdb4dcfa7d11144234c9047e5852ce15ed9436184d92485d6f946"
+      "sha256": "5d5c44bd06be7e905454e6e175354d42a520a307217b4c95577c2b06f42da422"
     },
     {
       "source": "packages/proxies/grok-proxy/package.json",
       "path": "packages/proxies/grok-proxy/package.json",
-      "sha256": "1a4b9648caa353215fa36923bce6d8bd22a12d32ad40d0ab9f42170262c97ee4"
+      "sha256": "6d266fa79aff70d7939ca700c69858490f3ed06e4ee751a8fa5a1e01b256a619"
     },
     {
       "source": "packages/proxies/grok-proxy/README.md",
@@ -1391,7 +1391,7 @@
     {
       "source": "packages/proxies/grok-proxy/src/cli/spawn.ts",
       "path": "packages/proxies/grok-proxy/src/cli/spawn.ts",
-      "sha256": "c7b0a709dd0ddda429287016aef23efdce8e89439ee9fffad0af9ffaaa5a3091"
+      "sha256": "16cca88fe1e46dc0003c98056071a1edaadb46b2a2332099149ad6fccea4dca4"
     },
     {
       "source": "packages/proxies/grok-proxy/src/core/catalog.ts",
@@ -1551,7 +1551,7 @@
     {
       "source": "packages/proxies/grok-proxy/test/protocol-v2-cli.test.ts",
       "path": "packages/proxies/grok-proxy/test/protocol-v2-cli.test.ts",
-      "sha256": "cdcbd0296be730ab79223c0b317579e3af997ea995cd14b1a94fa299238cfb20"
+      "sha256": "3ea3cbf4e6763445695ead125ed4cbfb3f0340d9cd655d85387281dc1b2c9c53"
     },
     {
       "source": "packages/proxies/grok-proxy/test/service.test.ts",
@@ -2471,7 +2471,7 @@
     {
       "source": "scripts/build-managed-runtime-candidates.mjs",
       "path": "scripts/build-managed-runtime-candidates.mjs",
-      "sha256": "d1d145be59c451f65afe4f84dfb7cedfbce46510d4d6b44686321ed25e65069c"
+      "sha256": "b23207efe9b317a82828be7ef28ab374847bc0fe47a6815a4c077f37d98c5f00"
     },
     {
       "source": "scripts/build-proxy-artifacts.mjs",
@@ -3893,12 +3893,12 @@
     {
       "path": "packages/proxies/grok-proxy/manifest.json",
       "mode": 420,
-      "sha256": "91fcff2528bcdb4dcfa7d11144234c9047e5852ce15ed9436184d92485d6f946"
+      "sha256": "5d5c44bd06be7e905454e6e175354d42a520a307217b4c95577c2b06f42da422"
     },
     {
       "path": "packages/proxies/grok-proxy/package.json",
       "mode": 420,
-      "sha256": "1a4b9648caa353215fa36923bce6d8bd22a12d32ad40d0ab9f42170262c97ee4"
+      "sha256": "6d266fa79aff70d7939ca700c69858490f3ed06e4ee751a8fa5a1e01b256a619"
     },
     {
       "path": "packages/proxies/grok-proxy/README.md",
@@ -3913,7 +3913,7 @@
     {
       "path": "packages/proxies/grok-proxy/src/cli/spawn.ts",
       "mode": 420,
-      "sha256": "c7b0a709dd0ddda429287016aef23efdce8e89439ee9fffad0af9ffaaa5a3091"
+      "sha256": "16cca88fe1e46dc0003c98056071a1edaadb46b2a2332099149ad6fccea4dca4"
     },
     {
       "path": "packages/proxies/grok-proxy/src/core/catalog.ts",
@@ -4073,7 +4073,7 @@
     {
       "path": "packages/proxies/grok-proxy/test/protocol-v2-cli.test.ts",
       "mode": 420,
-      "sha256": "cdcbd0296be730ab79223c0b317579e3af997ea995cd14b1a94fa299238cfb20"
+      "sha256": "3ea3cbf4e6763445695ead125ed4cbfb3f0340d9cd655d85387281dc1b2c9c53"
     },
     {
       "path": "packages/proxies/grok-proxy/test/service.test.ts",
@@ -4993,7 +4993,7 @@
     {
       "path": "scripts/build-managed-runtime-candidates.mjs",
       "mode": 420,
-      "sha256": "d1d145be59c451f65afe4f84dfb7cedfbce46510d4d6b44686321ed25e65069c"
+      "sha256": "b23207efe9b317a82828be7ef28ab374847bc0fe47a6815a4c077f37d98c5f00"
     },
     {
       "path": "scripts/build-proxy-artifacts.mjs",
