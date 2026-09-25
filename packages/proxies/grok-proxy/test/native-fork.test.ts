@@ -5,6 +5,7 @@ import {
   AgentSideConnection,
   ClientSideConnection,
   ndJsonStream,
+  RequestError,
   type Agent,
   type Client,
   type InitializeResponse,
@@ -32,7 +33,12 @@ class ExtRecordingAgent {
   readonly extRequests: Array<{ method: string; params: unknown }> = [];
   private clientRef: Client | null = null;
 
-  constructor(private readonly meta: Record<string, unknown> = {}) {}
+  constructor(
+    private readonly meta: Record<string, unknown> = {},
+    /** Methods the fake runtime does NOT register — they answer with the
+     *  real binary's "Method not found" wire error. */
+    private readonly unregistered: readonly string[] = [],
+  ) {}
 
   /** Bind the live client so tests can fire reverse requests at it. */
   bind(client: Client): void {
@@ -65,6 +71,9 @@ class ExtRecordingAgent {
       prompt: async () => ({ stopReason: 'end_turn' }),
       extMethod: async (method: string, params: unknown) => {
         this.extRequests.push({ method, params });
+        if (this.unregistered.includes(method)) {
+          throw RequestError.methodNotFound(method);
+        }
         if (method === 'x.ai/session/fork') {
           return {
             newSessionId: 'native-forked',
@@ -82,17 +91,17 @@ class ExtRecordingAgent {
         if (method === 'x.ai/hooks/list') return { hooks: [] };
         if (method === 'x.ai/session/usage') return { usage: {} };
         if (method === 'x.ai/session/update_mcp_servers') return { ok: true };
-        throw new Error(`Method not found: ${method}`);
+        throw RequestError.methodNotFound(method);
       },
     } as unknown as Agent;
   }
 }
 
 async function withExtClient(
-  options: { meta?: Record<string, unknown> },
+  options: { meta?: Record<string, unknown>; unregistered?: readonly string[] },
   run: (client: GrokAcpClient, agent: ExtRecordingAgent) => Promise<void>,
 ): Promise<void> {
-  const agent = new ExtRecordingAgent(options.meta ?? {});
+  const agent = new ExtRecordingAgent(options.meta ?? {}, options.unregistered ?? []);
   const grokClient = new GrokAcpClient({
     binaryPath: '/usr/bin/true',
     cwd: '/repo',
@@ -142,7 +151,7 @@ test('native fork sends the x.ai/session/fork wire shape', async () => {
   });
 });
 
-test('rename sends {sessionId,title,cwd}; unsupported runtimes fail honestly', async () => {
+test('rename sends {sessionId,title,cwd}; an unregistered method refutes the attach honestly', async () => {
   await withExtClient({}, async (client, agent) => {
     await client.renameSession('native-new', 'New title', '/repo');
     const request = agent.extRequests.find((item) => item.method === 'x.ai/session/rename');
@@ -152,10 +161,23 @@ test('rename sends {sessionId,title,cwd}; unsupported runtimes fail honestly', a
       cwd: '/repo',
     });
   });
-  await withExtClient({ meta: { agentVersion: '0.2.90' } }, async (client) => {
+  // Live 1.0.41 boundary: the fake's version is satisfied but the method is
+  // NOT registered. The first real attempt surfaces an honest unsupported
+  // error, and the refutation is remembered — a retry fails fast without
+  // touching the runtime again.
+  await withExtClient({ unregistered: ['x.ai/session/rename'] }, async (client, agent) => {
     await assert.rejects(
       () => client.renameSession('native-new', 't'),
       (error: unknown) => error instanceof GrokExtMethodUnsupportedError,
+    );
+    await assert.rejects(
+      () => client.renameSession('native-new', 't2'),
+      (error: unknown) => error instanceof GrokExtMethodUnsupportedError,
+    );
+    assert.equal(
+      agent.extRequests.filter((item) => item.method === 'x.ai/session/rename').length,
+      1,
+      'a refuted method must fail fast instead of repeating the live misreport',
     );
   });
 });

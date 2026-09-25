@@ -2,7 +2,20 @@
 
 import { Readable, Writable } from 'node:stream';
 import { writeFile } from 'node:fs/promises';
-import { AgentSideConnection, ndJsonStream } from '@agentclientprotocol/sdk';
+import { AgentSideConnection, ndJsonStream, RequestError } from '@agentclientprotocol/sdk';
+
+// GROK_TEST_EXT_METHODS=none simulates the published 1.0.41 stdio binary: the
+// _meta advertises grokShell and a modern agentVersion, but NO x.ai/* request
+// method is registered (every one answers -32601 "Method not found"). The
+// default registers the full extension surface.
+const EXT_METHODS_REGISTERED = process.env.GROK_TEST_EXT_METHODS !== 'none';
+
+function extDispatch(method, handle) {
+  if (!EXT_METHODS_REGISTERED) {
+    throw RequestError.methodNotFound(method);
+  }
+  return handle();
+}
 
 if (process.env.GROK_TEST_SPAWN_RECORD) {
   await writeFile(process.env.GROK_TEST_SPAWN_RECORD, JSON.stringify({
@@ -73,41 +86,43 @@ new AgentSideConnection((agentConn) => ({
   },
   extMethod: async (method, params) => {
     const record = params && typeof params === 'object' ? params : {};
-    if (method === 'x.ai/session/delete') {
-      return { success: true };
-    }
-    if (method === 'x.ai/session/rename') {
-      return { success: true, title: record.title ?? '' };
-    }
-    if (method === 'x.ai/session/fork') {
-      return {
-        newSessionId: FORKED_SESSION_ID,
-        chatMessagesCopied: 3,
-        updatesCopied: 5,
-        planStateCopied: false,
-        newCwd: process.cwd(),
-        parentSessionId: record.sourceSessionId ?? 'native-new',
-      };
-    }
-    if (method === 'x.ai/interject') {
-      return { status: 'queued' };
-    }
-    if (method === 'x.ai/mcp/list') {
-      return { servers: [] };
-    }
-    if (method === 'x.ai/skills/list') {
-      return { skills: [] };
-    }
-    if (method === 'x.ai/hooks/list') {
-      return { hooks: [] };
-    }
-    if (method === 'x.ai/session/usage') {
-      return { usage: {} };
-    }
-    if (method === 'x.ai/session/update_mcp_servers') {
-      return { ok: true };
-    }
-    throw new Error(`Method not found: ${method}`);
+    return extDispatch(method, () => {
+      if (method === 'x.ai/session/delete') {
+        return { success: true };
+      }
+      if (method === 'x.ai/session/rename') {
+        return { success: true, title: record.title ?? '' };
+      }
+      if (method === 'x.ai/session/fork') {
+        return {
+          newSessionId: FORKED_SESSION_ID,
+          chatMessagesCopied: 3,
+          updatesCopied: 5,
+          planStateCopied: false,
+          newCwd: process.cwd(),
+          parentSessionId: record.sourceSessionId ?? 'native-new',
+        };
+      }
+      if (method === 'x.ai/interject') {
+        return { status: 'queued' };
+      }
+      if (method === 'x.ai/mcp/list') {
+        return { servers: [] };
+      }
+      if (method === 'x.ai/skills/list') {
+        return { skills: [] };
+      }
+      if (method === 'x.ai/hooks/list') {
+        return { hooks: [] };
+      }
+      if (method === 'x.ai/session/usage') {
+        return { usage: {} };
+      }
+      if (method === 'x.ai/session/update_mcp_servers') {
+        return { ok: true };
+      }
+      throw RequestError.methodNotFound(method);
+    });
   },
   async prompt() {
     await agentConn.sessionUpdate({

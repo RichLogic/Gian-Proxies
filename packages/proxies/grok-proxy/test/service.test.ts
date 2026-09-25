@@ -1037,8 +1037,11 @@ test('Grok gian.proxy/2 maps ACP session/fork to durable Side Chat and head Fork
     protocol: { name: 'gian.proxy', versions: ['2.1'] },
     host: { name: 'Gian', version: '0.0.0' },
   })));
-  assert.equal(initialized.capabilities.sidechat, 1);
-  assert.equal(initialized.capabilities['session.fork'], 1);
+  // x.ai/*-independent capabilities are never claimed at initialize: the
+  // runtime does not exist yet and 1.0.41 registers none of the methods.
+  // ACP-fork fallback runtimes surface through catalog actions + dispatch.
+  assert.equal(initialized.capabilities.sidechat, undefined);
+  assert.equal(initialized.capabilities['session.fork'], undefined);
   assert.equal(initialized.capabilities['session.fork.atTurn'], undefined);
   const catalog = resultSchemas['catalog.list'].parse(await adapter.handle(v2Request('2', 'catalog.list', {})));
   assert.equal(catalog.actions?.find((action) => action.id === 'sidechat.create')?.supported, true);

@@ -210,13 +210,8 @@ const REPLAYABLE = new Set([
 const CAPABILITIES = {
   'input.localFile': 1,
   'input.localImage': 1,
-  'session.rename': 1,
   'session.native.list': 1,
-  'session.native.delete': 1,
   'session.replay': 1,
-  sidechat: 1,
-  'session.fork': 1,
-  'turn.steer': 1,
   'catalog.resolve': 1,
   'integration.mcp.streamableHttp': 1,
   interaction: 1,
@@ -224,6 +219,13 @@ const CAPABILITIES = {
   'event.plan': 1,
   'event.diff': 1,
   'event.usage': 1,
+  // NOT declared (honest by default): 'session.rename', 'session.fork',
+  // 'sidechat', 'turn.steer', and 'session.native.delete' all ride on native
+  // x.ai/* stdio extension methods. The published 1.0.41 stdio agent answers
+  // -32601 "Method not found" for every one of them (live-verified before and
+  // after session/new), and initialize metadata carries no per-method
+  // surface, so the Proxy declares nothing and dispatch answers with an
+  // explicit CAPABILITY_NOT_SUPPORTED instead of a runtime failure.
 } as const;
 
 const CONFIG_APPLY_ORDER = ['permission_mode', 'model', 'reasoning_effort'] as const;

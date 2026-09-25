@@ -29,6 +29,7 @@ import {
 
 import {
   extensionSupportFromInitialize,
+  type GrokExtMethod,
   type GrokExtensionSupport,
   NO_EXTENSION_SUPPORT,
 } from './grok-extensions.js';
@@ -146,6 +147,8 @@ function validateAbsolutePath(value: string, field: string): void {
 }
 
 export function isMethodNotFound(error: unknown): boolean {
+  const code = (error as { code?: unknown } | null | undefined)?.code;
+  if (code === -32601) return true;
   const message = error instanceof Error ? error.message : String(error);
   return /method not found/i.test(message);
 }
@@ -387,18 +390,33 @@ export class GrokAcpClient extends EventEmitter<GrokAcpClientEvents> {
     return (await this.connection()).unstable_forkSession(params);
   }
 
+  /** One live extension-request round trip with honest per-attach learning.
+   *  Unknown methods are allowed a first real attempt: a -32601 "Method not
+   *  found" refutes the method for the rest of this attach (later calls fail
+   *  fast instead of repeating the live misreport), any other outcome
+   *  confirms it. Refuted methods never touch the runtime again. */
+  private async extRequest(method: GrokExtMethod, params: unknown): Promise<unknown> {
+    if (!this.extSupport.mayAttempt(method)) {
+      throw new GrokExtMethodUnsupportedError(method, this.extSupport.unsupportedReason(method));
+    }
+    try {
+      const result = await (await this.ext()).sendRequest(method, params);
+      this.extSupport.confirm(method);
+      return result;
+    } catch (error) {
+      if (isMethodNotFound(error)) {
+        this.extSupport.refute(method);
+        throw new GrokExtMethodUnsupportedError(method, this.extSupport.unsupportedReason(method));
+      }
+      throw error;
+    }
+  }
+
   /** Native `x.ai/session/fork` — supports head forks and exact-turn forks
    *  via `targetPromptIndex` (0-based, inclusive). Does not start the forked
    *  session; attach it afterwards with `resumeSession`. */
   async nativeForkSession(params: GrokNativeForkRequest): Promise<GrokNativeForkResponse> {
-    if (!this.extSupport.supports('x.ai/session/fork')) {
-      throw new GrokExtMethodUnsupportedError(
-        'x.ai/session/fork',
-        this.extSupport.unsupportedReason('x.ai/session/fork'),
-      );
-    }
-    const ext = await this.ext();
-    const response = (await ext.sendRequest('x.ai/session/fork', params)) as Record<string, unknown>;
+    const response = (await this.extRequest('x.ai/session/fork', params)) as Record<string, unknown>;
     if (!response || typeof response !== 'object'
       || typeof (response as { newSessionId?: unknown }).newSessionId !== 'string'
       || !(response as { newSessionId: string }).newSessionId) {
@@ -446,16 +464,9 @@ export class GrokAcpClient extends EventEmitter<GrokAcpClientEvents> {
   }
 
   async renameSession(sessionId: string, title: string, cwd?: string): Promise<unknown> {
-    if (!this.extSupport.supports('x.ai/session/rename')) {
-      throw new GrokExtMethodUnsupportedError(
-        'x.ai/session/rename',
-        this.extSupport.unsupportedReason('x.ai/session/rename'),
-      );
-    }
-    // The stdio grok agent registers x.ai/session/rename (session_admin.rs);
-    // method-not-found is surfaced honestly instead of being swallowed into a
-    // local fake success.
-    return (await this.ext()).sendRequest('x.ai/session/rename', {
+    // Method-not-found is refuted and surfaced honestly by extRequest instead
+    // of being swallowed into a local fake success.
+    return this.extRequest('x.ai/session/rename', {
       sessionId,
       title,
       ...(cwd ? { cwd } : {}),
@@ -463,13 +474,7 @@ export class GrokAcpClient extends EventEmitter<GrokAcpClientEvents> {
   }
 
   async deleteSession(sessionId: string, cwd?: string): Promise<unknown> {
-    if (!this.extSupport.supports('x.ai/session/delete')) {
-      throw new GrokExtMethodUnsupportedError(
-        'x.ai/session/delete',
-        this.extSupport.unsupportedReason('x.ai/session/delete'),
-      );
-    }
-    return (await this.ext()).sendRequest('x.ai/session/delete', {
+    return this.extRequest('x.ai/session/delete', {
       sessionId,
       ...(cwd ? { cwd } : {}),
     });
@@ -477,13 +482,7 @@ export class GrokAcpClient extends EventEmitter<GrokAcpClientEvents> {
 
   /** Mid-session MCP server swap; the agent admits and merges client servers. */
   async updateSessionMcpServers(sessionId: string, mcpServers: McpServer[]): Promise<unknown> {
-    if (!this.extSupport.supports('x.ai/session/update_mcp_servers')) {
-      throw new GrokExtMethodUnsupportedError(
-        'x.ai/session/update_mcp_servers',
-        this.extSupport.unsupportedReason('x.ai/session/update_mcp_servers'),
-      );
-    }
-    return (await this.ext()).sendRequest('x.ai/session/update_mcp_servers', {
+    return this.extRequest('x.ai/session/update_mcp_servers', {
       sessionId,
       mcpServers,
     });
@@ -491,39 +490,21 @@ export class GrokAcpClient extends EventEmitter<GrokAcpClientEvents> {
 
   /** Read-only effective MCP server catalog (no server is contacted). */
   async mcpList(): Promise<unknown> {
-    if (!this.extSupport.supports('x.ai/mcp/list')) {
-      throw new GrokExtMethodUnsupportedError(
-        'x.ai/mcp/list',
-        this.extSupport.unsupportedReason('x.ai/mcp/list'),
-      );
-    }
-    return (await this.ext()).sendRequest('x.ai/mcp/list', {});
+    return this.extRequest('x.ai/mcp/list', {});
   }
 
   /** Read-only skill listing reloaded from disk (no hooks run, no MCP dialed). */
   async skillsList(cwd: string): Promise<unknown> {
-    if (!this.extSupport.supports('x.ai/skills/list')) {
-      throw new GrokExtMethodUnsupportedError(
-        'x.ai/skills/list',
-        this.extSupport.unsupportedReason('x.ai/skills/list'),
-      );
-    }
-    return (await this.ext()).sendRequest('x.ai/skills/list', { cwd });
+    return this.extRequest('x.ai/skills/list', { cwd });
   }
 
   /** Read-only hook listing for an attached session. */
   async hooksList(sessionId: string): Promise<unknown> {
-    if (!this.extSupport.supports('x.ai/hooks/list')) {
-      throw new GrokExtMethodUnsupportedError(
-        'x.ai/hooks/list',
-        this.extSupport.unsupportedReason('x.ai/hooks/list'),
-      );
-    }
-    return (await this.ext()).sendRequest('x.ai/hooks/list', { sessionId });
+    return this.extRequest('x.ai/hooks/list', { sessionId });
   }
 
   async sessionUsage(sessionId: string): Promise<unknown> {
-    return (await this.ext()).sendRequest('x.ai/session/usage', { sessionId });
+    return this.extRequest('x.ai/session/usage', { sessionId });
   }
 
   async interject(params: {
@@ -531,7 +512,7 @@ export class GrokAcpClient extends EventEmitter<GrokAcpClientEvents> {
     text: string;
     interjectionId: string;
   }): Promise<unknown> {
-    return (await this.ext()).sendRequest('x.ai/interject', params);
+    return this.extRequest('x.ai/interject', params);
   }
 
   async notifyPermissionMode(params: {

@@ -69,8 +69,10 @@ test('Grok CLI negotiates gian.proxy/2.1 independently from its ACP runtime vers
   assert.equal(result.plugin.version, '0.3.4');
   assert.equal(result.process.scope, 'session');
   assert.equal(result.capabilities.interaction, 1);
-  assert.equal(result.capabilities['session.native.delete'], 1);
-  assert.equal(result.capabilities['turn.steer'], 1);
+  // Live 1.0.41 stdio registers no x.ai/* methods and initialize cannot
+  // probe them, so the Proxy honestly declares nothing here.
+  assert.equal(result.capabilities['session.native.delete'], undefined);
+  assert.equal(result.capabilities['turn.steer'], undefined);
   assert.equal(result.capabilities['slash.list'], undefined);
   // Host Streamable HTTP MCP injection is supported as of this Proxy version.
   assert.equal(result.capabilities['integration.mcp.streamableHttp'], 1);

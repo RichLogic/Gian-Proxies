@@ -2,26 +2,24 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
-  compareGrokVersions,
   extensionSupportFromInitialize,
-  GROK_EXT_METHOD_FLOORS,
+  GROK_EXT_METHODS,
 } from '../src/runtime/grok-extensions.js';
 
-test('compareGrokVersions orders semver triplets numerically', () => {
-  assert.equal(compareGrokVersions('1.0.4', '1.0.41'), -1);
-  assert.equal(compareGrokVersions('1.0.41', '1.0.4'), 1);
-  assert.equal(compareGrokVersions('1.0.41', '1.0.41'), 0);
-  assert.equal(compareGrokVersions('0.2.99', '1.0.0'), -1);
-  assert.equal(compareGrokVersions('1.10.0', '1.9.0'), 1);
-});
-
-test('extension support requires the stdio grok agent identity', () => {
+test('no x.ai method is claimed from initialize metadata alone', () => {
+  // Live verification of the published 1.0.41 stdio binary showed it answers
+  // -32601 "Method not found" for every x.ai/* request method even though
+  // _meta advertises grokShell and a modern agentVersion. Version floors are
+  // therefore proof of nothing: nothing may be claimed before a live
+  // confirmation.
   const support = extensionSupportFromInitialize({ _meta: { grokShell: true, agentVersion: '1.0.41' } });
   assert.equal(support.grokShell, true);
   assert.equal(support.agentVersion, '1.0.41');
-  assert.equal(support.supports('x.ai/session/fork'), true);
-  assert.equal(support.supports('x.ai/interject'), true);
-  assert.equal(support.supports('x.ai/mcp/list'), true);
+  for (const method of GROK_EXT_METHODS) {
+    assert.equal(support.supports(method), false, method);
+    assert.equal(support.state(method), 'unknown', method);
+    assert.match(support.unsupportedReason(method), /never confirmed on this Grok runtime/);
+  }
 });
 
 test('extension support is absent without grokShell even with a version', () => {
@@ -30,24 +28,34 @@ test('extension support is absent without grokShell even with a version', () => 
   assert.match(support.unsupportedReason('x.ai/session/fork'), /stdio grok agent/);
 });
 
-test('0.2.x runtimes are honestly below every extension floor', () => {
-  const support = extensionSupportFromInitialize({ _meta: { grokShell: true, agentVersion: '0.2.118' } });
-  for (const method of Object.keys(GROK_EXT_METHOD_FLOORS)) {
-    assert.equal(support.supports(method as keyof typeof GROK_EXT_METHOD_FLOORS), false, method);
-  }
-  assert.match(
-    support.unsupportedReason('x.ai/session/rename'),
-    /0\.2\.118 predates x\.ai\/session\/rename \(requires 1\.0\.0\+\)/,
-  );
+test('a successful live call confirms a method for the attach', () => {
+  const support = extensionSupportFromInitialize({ _meta: { grokShell: true, agentVersion: '1.0.41' } });
+  assert.equal(support.mayAttempt('x.ai/session/rename'), true, 'an unknown method may be probed by its first real call');
+  support.confirm('x.ai/session/rename');
+  assert.equal(support.supports('x.ai/session/rename'), true);
+  assert.equal(support.state('x.ai/session/rename'), 'confirmed');
 });
 
-test('missing agentVersion cannot be assumed extension-capable', () => {
-  const support = extensionSupportFromInitialize({ _meta: { grokShell: true } });
-  assert.equal(support.supports('x.ai/session/delete'), false);
-  assert.match(support.unsupportedReason('x.ai/session/delete'), /did not report agentVersion/);
+test('a Method-not-found response refutes a method for the rest of the attach', () => {
+  const support = extensionSupportFromInitialize({ _meta: { grokShell: true, agentVersion: '1.0.41' } });
+  support.refute('x.ai/interject');
+  assert.equal(support.supports('x.ai/interject'), false);
+  assert.equal(support.mayAttempt('x.ai/interject'), false, 'a refuted method must fail fast instead of repeating the live misreport');
+  assert.match(support.unsupportedReason('x.ai/interject'), /Method not found/);
+  assert.equal(support.mayAttempt('x.ai/session/fork'), true, 'refutation is per method');
+});
+
+test('an explicit upstream per-method advertisement pre-confirms those methods', () => {
+  const support = extensionSupportFromInitialize({
+    _meta: { grokShell: true, agentVersion: '9.9.9', 'x.ai/extMethods': ['x.ai/session/fork', 'not-a-method'] },
+  });
+  assert.equal(support.supports('x.ai/session/fork'), true);
+  assert.equal(support.supports('x.ai/interject'), false, 'unadvertised methods stay unknown');
 });
 
 test('missing _meta degrades to no extension support', () => {
   const support = extensionSupportFromInitialize(null);
   assert.equal(support.supports('x.ai/session/fork'), false);
+  assert.equal(support.mayAttempt('x.ai/session/fork'), false, 'no grokShell identity means no probing at all');
+  assert.match(support.unsupportedReason('x.ai/session/fork'), /stdio grok agent/);
 });

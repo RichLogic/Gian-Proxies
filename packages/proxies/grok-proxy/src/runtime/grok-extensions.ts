@@ -2,87 +2,120 @@
  * Native `x.ai/*` extension-method support detection for the stdio
  * `grok agent` runtime.
  *
- * The stdio agent (identified by `InitializeResponse._meta.grokShell === true`)
- * registers its administrative surface as ACP extension requests rather than
- * standard ACP methods; notably it does NOT advertise the standard
- * `session/fork` capability even though `x.ai/session/fork` exists. Support is
- * therefore decided from the reported `_meta.agentVersion` against the floors
- * below, which were verified against the xai-org/grok-build source shipped in
- * the 1.0 line (manifest-verified runtime floor: 1.0.4; wire contract
- * re-verified against the 1.0.41-era tree).
+ * Live verification against the published 1.0.41 binary (2026-09-25) showed
+ * that its stdio surface registers NONE of the `x.ai/*` extension request
+ * methods the source tree carries handlers for: `x.ai/interject`,
+ * `x.ai/session/rename`, `x.ai/session/fork`, `x.ai/session/usage`,
+ * `x.ai/skills/list`, and `x.ai/mcp/list` all answer JSON-RPC -32601
+ * "Method not found" — before and after `session/new`. The initialize
+ * metadata (`_meta.grokShell`, `_meta.agentVersion`, `agentCapabilities`)
+ * advertises no per-method extension surface either, so a version floor
+ * proves nothing: `agentVersion >= 1.0.0` was sufficient for the source but
+ * not for the shipped binary.
  *
- * 0.2.x CLI versions are intentionally treated as not extension-capable: the
- * per-release registration of these methods in the 0.2 line cannot be
- * verified from source, so the Proxy reports the capability as unsupported
- * instead of guessing.
+ * Policy (honest by default):
+ *  - Every method starts `unknown` and `supports()` reports false until the
+ *    runtime POSITIVELY confirms it on this attach.
+ *  - A method is confirmed by a successful call and refuted by a -32601
+ *    "Method not found" response. A refuted method fails fast for the rest
+ *    of the attach instead of repeating the live misreport.
+ *  - A future upstream contract that advertises per-method support in
+ *    initialize metadata can pre-confirm through `advertise()`.
  */
 
-/** Minimum stdio-agent version that registers each extension method. */
-export const GROK_EXT_METHOD_FLOORS = {
-  'x.ai/interject': '1.0.0',
-  'x.ai/session/fork': '1.0.0',
-  'x.ai/session/rename': '1.0.0',
-  'x.ai/session/delete': '1.0.0',
-  'x.ai/session/update_mcp_servers': '1.0.0',
-  'x.ai/session/usage': '1.0.0',
-  'x.ai/mcp/list': '1.0.0',
-  'x.ai/skills/list': '1.0.0',
-  'x.ai/hooks/list': '1.0.0',
-} as const;
+export type GrokExtMethodState = 'unknown' | 'confirmed' | 'refuted';
 
-export type GrokExtMethod = keyof typeof GROK_EXT_METHOD_FLOORS;
+export const GROK_EXT_METHODS = [
+  'x.ai/interject',
+  'x.ai/session/fork',
+  'x.ai/session/rename',
+  'x.ai/session/delete',
+  'x.ai/session/update_mcp_servers',
+  'x.ai/session/usage',
+  'x.ai/mcp/list',
+  'x.ai/skills/list',
+  'x.ai/hooks/list',
+] as const;
 
-export function compareGrokVersions(left: string, right: string): -1 | 0 | 1 {
-  const parse = (value: string) => value
-    .split(/[-+]/, 1)[0]!
-    .split('.')
-    .map((part) => Number.parseInt(part, 10));
-  const [leftParts, rightParts] = [parse(left), parse(right)];
-  const length = Math.max(leftParts.length, rightParts.length);
-  for (let index = 0; index < length; index += 1) {
-    const delta = (leftParts[index] ?? 0) - (rightParts[index] ?? 0);
-    if (delta !== 0) return delta < 0 ? -1 : 1;
-  }
-  return 0;
+export type GrokExtMethod = (typeof GROK_EXT_METHODS)[number];
+
+export function isGrokExtMethod(value: string): value is GrokExtMethod {
+  return (GROK_EXT_METHODS as readonly string[]).includes(value);
 }
 
 export interface GrokExtensionSupport {
-  /** True when the runtime is the stdio `grok agent` that registers x.ai/* methods. */
+  /** True when the runtime identifies itself as the stdio grok agent. */
   readonly grokShell: boolean;
   readonly agentVersion: string | null;
+  /** True only for methods positively confirmed on this attach. */
   supports(method: GrokExtMethod): boolean;
+  state(method: GrokExtMethod): GrokExtMethodState;
+  /** True while the first real call may still probe an unknown method. */
+  mayAttempt(method: GrokExtMethod): boolean;
+  confirm(method: GrokExtMethod): void;
+  refute(method: GrokExtMethod): void;
+  /** Pre-confirm from upstream initialize metadata (future contract). */
+  advertise(methods: readonly string[]): void;
   /** Human-readable reason a method is unavailable, for honest CAPABILITY_NOT_SUPPORTED errors. */
   unsupportedReason(method: GrokExtMethod): string;
 }
 
-class VersionedExtensionSupport implements GrokExtensionSupport {
+class LiveExtensionSupport implements GrokExtensionSupport {
+  private readonly states = new Map<GrokExtMethod, GrokExtMethodState>();
+
   constructor(
     readonly grokShell: boolean,
     readonly agentVersion: string | null,
   ) {}
 
+  private check(method: GrokExtMethod): GrokExtMethodState {
+    return this.states.get(method) ?? 'unknown';
+  }
+
   supports(method: GrokExtMethod): boolean {
-    if (!this.grokShell || !this.agentVersion) return false;
-    const floor = GROK_EXT_METHOD_FLOORS[method];
-    return compareGrokVersions(this.agentVersion, floor) >= 0;
+    return this.check(method) === 'confirmed';
+  }
+
+  state(method: GrokExtMethod): GrokExtMethodState {
+    return this.check(method);
+  }
+
+  mayAttempt(method: GrokExtMethod): boolean {
+    // Without the stdio-agent identity there is nothing to probe: the x.ai/*
+    // surface is a grok-shell feature.
+    return this.grokShell && this.check(method) !== 'refuted';
+  }
+
+  confirm(method: GrokExtMethod): void {
+    this.states.set(method, 'confirmed');
+  }
+
+  refute(method: GrokExtMethod): void {
+    this.states.set(method, 'refuted');
+  }
+
+  advertise(methods: readonly string[]): void {
+    for (const value of methods) {
+      if (isGrokExtMethod(value)) this.states.set(value, 'confirmed');
+    }
   }
 
   unsupportedReason(method: GrokExtMethod): string {
     if (!this.grokShell) {
       return `Grok runtime does not identify itself as the stdio grok agent; ${method} is unavailable.`;
     }
-    const floor = GROK_EXT_METHOD_FLOORS[method];
-    if (!this.agentVersion) {
-      return `Grok runtime did not report agentVersion; ${method} (requires ${floor}+) cannot be assumed.`;
+    const state = this.check(method);
+    if (state === 'refuted') {
+      return `The Grok runtime's stdio surface answered "Method not found" for ${method}; it is not registered on this attach.`;
     }
-    if (compareGrokVersions(this.agentVersion, floor) < 0) {
-      return `Grok runtime ${this.agentVersion} predates ${method} (requires ${floor}+).`;
+    if (state === 'unknown') {
+      return `${method} was never confirmed on this Grok runtime (the stdio agent publishes no per-method capability metadata), so it is treated as unsupported until a live call proves otherwise.`;
     }
     return `${method} is not available in this Grok runtime.`;
   }
 }
 
-export const NO_EXTENSION_SUPPORT: GrokExtensionSupport = new VersionedExtensionSupport(false, null);
+export const NO_EXTENSION_SUPPORT: GrokExtensionSupport = new LiveExtensionSupport(false, null);
 
 export function extensionSupportFromInitialize(
   initialized: { _meta?: unknown } | null | undefined,
@@ -96,5 +129,13 @@ export function extensionSupportFromInitialize(
   const agentVersion = typeof record.agentVersion === 'string' && record.agentVersion.trim()
     ? record.agentVersion.trim()
     : null;
-  return new VersionedExtensionSupport(grokShell, agentVersion);
+  const support = new LiveExtensionSupport(grokShell, agentVersion);
+  // Future upstream contract: an explicit per-method surface advertisement in
+  // initialize _meta pre-confirms those methods. 1.0.41 publishes none, so
+  // this stays silent for it.
+  const advertised = record['x.ai/extMethods'];
+  if (Array.isArray(advertised)) {
+    support.advertise(advertised.map((value) => String(value)));
+  }
+  return support;
 }
