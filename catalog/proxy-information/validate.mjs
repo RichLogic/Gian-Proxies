@@ -13,7 +13,7 @@ const json = path => JSON.parse(readFileSync(path, 'utf8'));
 const categories = ['added', 'changed', 'fixed', 'attention'];
 const labels = { added: '新增', changed: '变更', fixed: '修复', attention: '注意事项' };
 const folders = { claude: 'cc-proxy', codex: 'codex-proxy', kimi: 'kimi-proxy',
-  'ai.deepseek.harness': 'dsh-proxy', 'com.zhipu.zcode': 'zcode-proxy' };
+  'ai.deepseek.harness': 'dsh-proxy', 'com.zhipu.zcode': 'zcode-proxy', grok: 'grok-proxy' };
 
 function containedFile(path, max = 256 * 1024) {
   const resolved = realpathSync(path);

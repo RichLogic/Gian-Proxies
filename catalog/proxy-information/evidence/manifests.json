@@ -1,5 +1,30 @@
 [
   {
+    "tag": "proxy-grok-v0.3.5",
+    "url": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-grok-v0.3.5",
+    "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.5/gian-proxy-grok-0.3.5-darwin-arm64.tar.gz.manifest.json",
+    "digest": "sha256:91fcff2528bcdb4dcfa7d11144234c9047e5852ce15ed9436184d92485d6f946",
+    "assetDigestVerified": true,
+    "schemaVersion": 4,
+    "pluginId": "grok",
+    "pluginVersion": "0.3.5",
+    "protocol": {
+      "name": "gian.proxy",
+      "range": ">=2.2 <3.0"
+    },
+    "runtime": {
+      "kind": "external",
+      "id": "grok",
+      "displayName": "Grok CLI",
+      "verifiedVersions": [
+        "1.0.41"
+      ]
+    },
+    "process": {
+      "scope": "session"
+    }
+  },
+  {
     "tag": "proxy-zcode-v0.3.1",
     "url": "https://github.com/RichLogic/Gian/releases/tag/proxy-zcode-v0.3.1",
     "manifestUrl": "https://github.com/RichLogic/Gian/releases/download/proxy-zcode-v0.3.1/gian-proxy-zcode-0.3.1-darwin-arm64.tar.gz.manifest.json",

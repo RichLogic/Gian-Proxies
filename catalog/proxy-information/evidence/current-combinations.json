@@ -1,6 +1,6 @@
 {
-  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.9.0",
-  "sequence": 9,
+  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.10.0",
+  "sequence": 10,
   "sourceId": "gian-official",
   "plugins": [
     {
@@ -131,9 +131,36 @@
           "version": "0.16.5"
         }
       }
+    },
+    {
+      "id": "grok",
+      "displayName": "Grok Build",
+      "version": "0.3.5",
+      "protocolRange": ">=2.2 <3.0",
+      "processScope": "session",
+      "combination": {
+        "certificate": {
+          "id": "proxies-36d40ca32fe32901bfbe72669c159cfb4f6c5ec7-36129121727-1",
+          "sha256": "4afe81585dac60d2f57df3a846dcee334770924ee17f75c1519ed782860c2604"
+        },
+        "companions": [],
+        "generationId": "grok-0.3.5-runtime-1.0.41",
+        "runtime": {
+          "kind": "native-binary",
+          "runtimeId": "grok",
+          "version": "1.0.41",
+          "asset": {
+            "url": "https://x.ai/cli/grok-1.0.41-macos-aarch64",
+            "sha256": "9c844eb13365180787d9ad22b2b3748a024be8e1ed845253cc114781b31c591d",
+            "size": 145657952
+          },
+          "format": "raw",
+          "entryRelativePath": "bin/grok"
+        }
+      }
     }
   ],
-  "targetSequence": 10,
-  "basis": "Published Proxy releases qualified by run 35981492220 plus unchanged ZCode combination from the previous signed Catalog; pending Catalog 1.10.0 publication.",
-  "capturedAt": "2026-09-24T09:50:22.592Z"
+  "targetSequence": 11,
+  "basis": "Published Grok Proxy 0.3.5 qualification 36129121727 plus exact combinations inherited from signed Catalog 1.10.0; pending Catalog 1.11.0 publication.",
+  "capturedAt": "2026-09-25T11:27:45.000Z"
 }

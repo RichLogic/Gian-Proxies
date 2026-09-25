@@ -1,11 +1,43 @@
 {
-  "capturedAt": "2026-09-24T09:49:45.638Z",
+  "capturedAt": "2026-09-25T11:27:45.000Z",
   "repositories": [
     "RichLogic/Gian",
     "RichLogic/Gian-Proxies"
   ],
   "selection": "All publicly listed non-draft, non-prerelease releases matching proxy-(claude|codex|kimi|dsh|zcode)-v, across all release-list pages.",
   "releases": [
+    {
+      "tag": "proxy-grok-v0.3.5",
+      "date": "2026-09-25T11:27:45Z",
+      "url": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-grok-v0.3.5",
+      "body": "Independent Proxy 0.3.5. Exact hosted artifacts from proxies-36d40ca32fe32901bfbe72669c159cfb4f6c5ec7-36129121727-1. DSH includes its Bridge. ZCode remains an external-App integration with upstream standalone limitations. No App or real-provider acceptance is claimed.",
+      "assets": [
+        {
+          "name": "certificate.json",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.5/certificate.json",
+          "size": 4034,
+          "digest": "sha256:4afe81585dac60d2f57df3a846dcee334770924ee17f75c1519ed782860c2604"
+        },
+        {
+          "name": "gian-proxy-grok-0.3.5-darwin-arm64.tar.gz",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.5/gian-proxy-grok-0.3.5-darwin-arm64.tar.gz",
+          "size": 156867,
+          "digest": "sha256:90eeeec3c00c3ddfa4760075b69e81cb95495253b608ce9d84a9346a1b153d11"
+        },
+        {
+          "name": "gian-proxy-grok-0.3.5-darwin-arm64.tar.gz.manifest.json",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.5/gian-proxy-grok-0.3.5-darwin-arm64.tar.gz.manifest.json",
+          "size": 790,
+          "digest": "sha256:91fcff2528bcdb4dcfa7d11144234c9047e5852ce15ed9436184d92485d6f946"
+        },
+        {
+          "name": "gian-proxy-grok-0.3.5-darwin-arm64.tar.gz.sha256",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.5/gian-proxy-grok-0.3.5-darwin-arm64.tar.gz.sha256",
+          "size": 108,
+          "digest": "sha256:11e819b111c181a43af6b5c9d541fbbdf0a081331b6aee7bfe54d6063e4c7ee0"
+        }
+      ]
+    },
     {
       "tag": "proxy-zcode-v0.3.1",
       "date": "2026-09-17T00:57:02Z",

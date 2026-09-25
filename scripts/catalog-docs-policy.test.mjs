@@ -24,6 +24,15 @@ test('selected releases preserve excluded executable and certificate coordinates
   next.plugins[1].stable.combination.certificate.sha256 = 'changed';
   assert.throws(() => assertSelectedCatalogExecutables(previous, next, ['fixture']), /Excluded/);
   assert.throws(() => assertSelectedCatalogExecutables(previous, { ...next, plugins: [next.plugins[0]] }, ['fixture']), /remove/);
+
+  const withSelectedAddition = structuredClone(previous);
+  withSelectedAddition.sequence++;
+  withSelectedAddition.plugins.push({ ...structuredClone(base.plugins[0]), pluginId: 'grok' });
+  assert.doesNotThrow(() => assertSelectedCatalogExecutables(previous, withSelectedAddition, ['grok']));
+  assert.throws(
+    () => assertSelectedCatalogExecutables(previous, withSelectedAddition, ['fixture']),
+    /unselected/,
+  );
 });
 
 test('documentation refresh preserves exact executable and proof identities', () => {

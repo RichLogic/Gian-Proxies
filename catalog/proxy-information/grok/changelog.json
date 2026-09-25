@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "pluginId": "grok",
+  "currentVersion": "0.3.5",
+  "entries": [
+    {
+      "version": "0.3.5",
+      "firstPublishedAt": "2026-09-25T11:27:45Z",
+      "evidenceCoverage": "detailed",
+      "distributions": [
+        {
+          "repository": "RichLogic/Gian-Proxies",
+          "tag": "proxy-grok-v0.3.5",
+          "publishedAt": "2026-09-25T11:27:45Z",
+          "releaseUrl": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-grok-v0.3.5",
+          "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.5/gian-proxy-grok-0.3.5-darwin-arm64.tar.gz.manifest.json",
+          "manifestSha256": "91fcff2528bcdb4dcfa7d11144234c9047e5852ce15ed9436184d92485d6f946",
+          "archive": {
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.5/gian-proxy-grok-0.3.5-darwin-arm64.tar.gz",
+            "sha256": "90eeeec3c00c3ddfa4760075b69e81cb95495253b608ce9d84a9346a1b153d11",
+            "size": 156867
+          },
+          "runtimeDeclaration": {
+            "id": "grok",
+            "versions": [
+              "1.0.41"
+            ],
+            "basis": "verified-declaration"
+          },
+          "companionDeclarations": [],
+          "protocolRange": ">=2.2 <3.0",
+          "manifestSchema": 4,
+          "processScope": "session"
+        }
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "text": "Grok 4.7 真实会话支持本地文件、工具审批、历史回放和结构化事件。",
+          "evidence": [
+            "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-grok-v0.3.5"
+          ]
+        },
+        {
+          "category": "changed",
+          "text": "对 Grok CLI 1.0.41 的 x.ai 扩展按真实方法能力收窄；未注册的 Steer、Rename、Fork、Side Chat 和原生删除不会在 Catalog 中宣告。",
+          "evidence": [
+            "https://github.com/RichLogic/Gian-Proxies/commit/c458424b5030bb93dd7d127fa5d091ec127e6bbd"
+          ]
+        },
+        {
+          "category": "fixed",
+          "text": "交互响应可在活动 Turn 期间并发处理，避免工具审批阻塞请求循环。",
+          "evidence": [
+            "https://github.com/RichLogic/Gian-Proxies/commit/10d4d7c0b60632c5cd53c8da6661020052f5a177"
+          ]
+        }
+      ],
+      "unknowns": []
+    }
+  ],
+  "withdrawnVersions": []
+}

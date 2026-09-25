@@ -30,5 +30,8 @@
   "适配 Claude Code 2.1.280，保留 Fork 的继承轮次身份并修复 Side Chat 重复恢复。": "Support Claude Code 2.1.280, preserve inherited Fork turn identities, and make Side Chat resume idempotent.",
   "适配 Codex CLI 0.156.1 的历史与 Fork 格式，修复运行进程清理；独立翻译对话关闭时不再读取临时历史。": "Support Codex CLI 0.156.1 history and Fork formats, clean up Runtime descendants, and close isolated translation threads without reading ephemeral history.",
   "适配 DeepSeek Harness 0.1.5-rc.3，内置 Bridge 0.1.4，恢复流式文本与思考输出，并保持握手版本与发布包一致。": "Support DeepSeek Harness 0.1.5-rc.3 with bundled Bridge 0.1.4, restore streaming text and reasoning, and keep handshake identity aligned with the released package.",
-  "适配 Kimi Code 2.1.0，修复模型切换后的 thinking 选项和历史轮次身份；不再宣告上游未支持的原生重命名。": "Support Kimi Code 2.1.0, correct model-dependent thinking choices and replay turn identities, and stop advertising unsupported native rename."
+  "适配 Kimi Code 2.1.0，修复模型切换后的 thinking 选项和历史轮次身份；不再宣告上游未支持的原生重命名。": "Support Kimi Code 2.1.0, correct model-dependent thinking choices and replay turn identities, and stop advertising unsupported native rename.",
+  "Grok 4.7 真实会话支持本地文件、工具审批、历史回放和结构化事件。": "Real Grok 4.7 sessions support local files, tool approval, history replay and structured events.",
+  "对 Grok CLI 1.0.41 的 x.ai 扩展按真实方法能力收窄；未注册的 Steer、Rename、Fork、Side Chat 和原生删除不会在 Catalog 中宣告。": "Narrow x.ai extensions to methods actually exposed by Grok CLI 1.0.41; unregistered Steer, Rename, Fork, Side Chat and native delete are not advertised in Catalog.",
+  "交互响应可在活动 Turn 期间并发处理，避免工具审批阻塞请求循环。": "Allow interaction responses to overtake an active Turn so tool approval cannot deadlock the request loop."
 }

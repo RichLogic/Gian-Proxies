@@ -213,8 +213,12 @@ async function catalog(directory, sequence, issuedAt) {
   cpSync(join(root, 'catalog/official-source'), source, { recursive: true });
   const inherited = await inheritCatalogExecutables(source, sequence);
   const { projectInformation } = await import('../catalog/proxy-information/project.mjs');
-  const catalogRecords = inherited.previous.plugins.map(plugin => certificate.proxies.find(record => record.pluginId === plugin.pluginId)
-    ?? { pluginId: plugin.pluginId, version: plugin.stable.pluginVersion, runtime: plugin.stable.combination.runtime });
+  const inheritedIds = new Set(inherited.previous.plugins.map(plugin => plugin.pluginId));
+  const catalogRecords = [
+    ...inherited.previous.plugins.map(plugin => certificate.proxies.find(record => record.pluginId === plugin.pluginId)
+      ?? { pluginId: plugin.pluginId, version: plugin.stable.pluginVersion, runtime: plugin.stable.combination.runtime }),
+    ...certificate.proxies.filter(record => !inheritedIds.has(record.pluginId)),
+  ];
   const { localizations } = projectInformation(source, catalogRecords);
   for (const record of certificate.proxies) {
     const release = JSON.parse(gh('api', `repos/${repository}/releases/tags/${record.tag}`));
