@@ -262,7 +262,7 @@ function isConfigValue(value: unknown): value is ConfigValue {
     || (typeof value === 'number' && Number.isFinite(value));
 }
 
-function standardError(error: unknown): GrokProtocolError | GrokJsonRpcError {
+export function standardError(error: unknown): GrokProtocolError | GrokJsonRpcError {
   if (error instanceof GrokProtocolError || error instanceof GrokJsonRpcError) return error;
   if (error instanceof GrokProxyError) {
     if (error.code === 'INVALID_REQUEST') {
