@@ -47,6 +47,14 @@ export const upstreamRuntimeCandidates = Object.freeze({
     sha256: 'b5e9a77313855e6a763608bda12ff0e26855d311a4faeed770ae915c7ee7c39a',
     size: 62298935,
   }),
+  grok: Object.freeze({
+    version: '1.0.41',
+    format: 'raw',
+    entryRelativePath: 'bin/grok',
+    url: 'https://x.ai/cli/grok-1.0.41-macos-aarch64',
+    sha256: '9c844eb13365180787d9ad22b2b3748a024be8e1ed845253cc114781b31c591d',
+    size: 145657952,
+  }),
 });
 
 function digest(bytes) {

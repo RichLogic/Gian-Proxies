@@ -1,12 +1,12 @@
 {
   "name": "@gian/grok-proxy",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "private": true,
   "type": "module",
   "main": "./dist/src/cli/spawn.js",
   "gianProxy": {
     "releaseId": "grok",
-    "shipping": false,
+    "shipping": true,
     "realAcceptance": {
       "binaryEnv": "GROK_BIN",
       "proxyBinaryArg": "--grok-bin",

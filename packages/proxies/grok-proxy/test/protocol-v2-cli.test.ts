@@ -66,7 +66,7 @@ test('Grok CLI negotiates gian.proxy/2.1 independently from its ACP runtime vers
   const result = initializeResultSchema.parse(initialized.result);
   assert.equal(result.protocol.version, '2.1');
   assert.equal(result.plugin.id, 'grok');
-  assert.equal(result.plugin.version, '0.3.4');
+  assert.equal(result.plugin.version, '0.3.5');
   assert.equal(result.process.scope, 'session');
   assert.equal(result.capabilities.interaction, 1);
   // Live 1.0.41 stdio registers no x.ai/* methods and initialize cannot
