@@ -2,7 +2,7 @@
   "schema": 1,
   "product": "Gian-Proxies",
   "sourceRepository": "RichLogic/Gian-Dev",
-  "sourceCommit": "a620e096c6e61f1526732fd7ea5921cbd39ed1e2",
+  "sourceCommit": "def40b1613a069087b9041b02a65865967151a5b",
   "workingTree": false,
   "externalPackages": [
     {
@@ -2561,7 +2561,7 @@
     {
       "source": "scripts/verify-zcode-runtime-protocol.mjs",
       "path": "scripts/verify-zcode-runtime-protocol.mjs",
-      "sha256": "6c33668844e44a63fe86bf7d38d1c285142886958e4587a0c01f83a14331d360"
+      "sha256": "42ec147cc3f69c97b846522bb33b22b1194eb70e2c0338dd997fbaf37f77c551"
     },
     {
       "source": "scripts/zcode-runtime-integration.mjs",
@@ -5113,7 +5113,7 @@
     {
       "path": "scripts/verify-zcode-runtime-protocol.mjs",
       "mode": 420,
-      "sha256": "6c33668844e44a63fe86bf7d38d1c285142886958e4587a0c01f83a14331d360"
+      "sha256": "42ec147cc3f69c97b846522bb33b22b1194eb70e2c0338dd997fbaf37f77c551"
     },
     {
       "path": "scripts/zcode-runtime-integration.mjs",
