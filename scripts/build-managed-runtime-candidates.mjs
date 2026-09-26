@@ -17,6 +17,8 @@ import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
 import { proxyReleaseMetadata } from './proxy-release-metadata.mjs';
+import { stageZcodeRuntime } from './build-zcode-runtime.mjs';
+import { validateZcodeRuntimeSource, zcodeRuntimeSource } from './zcode-runtime-source.mjs';
 
 const execFileAsync = promisify(execFile);
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -40,21 +42,12 @@ export const upstreamRuntimeCandidates = Object.freeze({
     size: 127394863,
   }),
   kimi: Object.freeze({
-    version: '2.1.0',
+    version: '2.1.1',
     format: 'tar.gz',
     entryRelativePath: 'kimi',
-    url: 'https://github.com/MoonshotAI/kimi-code/releases/download/%40moonshot-ai/kimi-code%402.1.0/kimi-code-darwin-arm64.tar.gz',
-    sha256: 'b5e9a77313855e6a763608bda12ff0e26855d311a4faeed770ae915c7ee7c39a',
-    size: 62298935,
-  }),
-  grok: Object.freeze({
-    version: '1.0.41',
-    format: 'raw',
-    entryRelativePath: 'bin/grok',
-    url: 'https://x.ai/cli/grok-1.0.41-macos-aarch64',
-    sha256: '9c844eb13365180787d9ad22b2b3748a024be8e1ed845253cc114781b31c591d',
-    size: 145657952,
-    publish: true,
+    url: 'https://github.com/MoonshotAI/kimi-code/releases/download/%40moonshot-ai/kimi-code%402.1.1/kimi-code-darwin-arm64.tar.gz',
+    sha256: '8c3bad99571b16abd113ab5d511a98a36b852c0d5493991842a67b8c2bc4ecd0',
+    size: 62296524,
   }),
 });
 
@@ -70,7 +63,8 @@ function parseVersion(output, provider) {
 
 async function inspectEntry(provider, path, expectedVersion, environment = {}) {
   const bytes = await readFile(path);
-  const { stdout, stderr } = await execFileAsync(path, ['--version'], {
+  const script = /\.(?:c?js|mjs)$/.test(path);
+  const { stdout, stderr } = await execFileAsync(script ? process.execPath : path, script ? [path, '--version'] : ['--version'], {
     cwd: rootDir,
     encoding: 'utf8',
     timeout: 20_000,
@@ -117,10 +111,6 @@ async function buildUpstream(provider, candidate, outputDir, workDir) {
   };
   await mkdir(environment.HOME, { recursive: true, mode: 0o700 });
   const entry = await inspectEntry(provider, entryPath, candidate.version, environment);
-  const publish = candidate.publish === true;
-  const catalogUrl = publish
-    ? `https://github.com/RichLogic/Gian-Proxies/releases/download/${proxyReleaseMetadata(provider).tag}/${assetName}`
-    : candidate.url;
   return {
     provider,
     version: candidate.version,
@@ -130,10 +120,10 @@ async function buildUpstream(provider, candidate, outputDir, workDir) {
     asset: {
       name: basename(assetPath),
       path: assetPath,
-      url: catalogUrl,
+      url: candidate.url,
       sha256: candidate.sha256,
       size: candidate.size,
-      publish,
+      publish: false,
     },
     candidateBin: entryPath,
   };
@@ -149,10 +139,10 @@ async function archiveFileList(directory, prefix = '') {
     else if (item.isFile()) paths.push(relative);
     else if (item.isSymbolicLink()) {
       const target = await stat(path);
-      if (!target.isFile()) throw new Error(`DSH Runtime link must resolve to a file: ${relative}`);
+      if (!target.isFile()) throw new Error(`Runtime link must resolve to a file: ${relative}`);
       paths.push(relative);
     } else {
-      throw new Error(`DSH Runtime contains an unsupported filesystem entry: ${relative}`);
+      throw new Error(`Runtime contains an unsupported filesystem entry: ${relative}`);
     }
   }
   return paths.sort((left, right) => left.localeCompare(right));
@@ -165,6 +155,44 @@ async function normalizeArchiveTimes(root, paths) {
       utimes(join(root, ...relative.split('/')), epoch, epoch)
     )));
   }
+}
+
+async function packRuntime(runtimeRoot, path, listPath, paths) {
+  await normalizeArchiveTimes(runtimeRoot, paths);
+  await writeFile(listPath, Buffer.from(`${paths.join('\0')}\0`, 'utf8'));
+  await execFileAsync('/usr/bin/tar', [
+    '-czhf', path, '--format', 'ustar', '--uid', '0', '--gid', '0',
+    '--uname', 'root', '--gname', 'root', '--numeric-owner',
+    '--no-xattrs', '--no-acls', '--no-fflags', '--no-mac-metadata',
+    '--options', 'gzip:!timestamp', '-C', runtimeRoot, '--null', '-T', listPath,
+  ], { maxBuffer: 1024 * 1024, env: { ...process.env, COPYFILE_DISABLE: '1' } });
+  const bytes = await readFile(path);
+  if (bytes.length > MAX_RUNTIME_ASSET_BYTES) throw new Error('Runtime archive exceeds the size limit.');
+  return bytes;
+}
+
+async function buildZcode(outputDir, workDir) {
+  const metadata = proxyReleaseMetadata('zcode');
+  const source = validateZcodeRuntimeSource();
+  if (!metadata.runtime.verifiedVersions.includes(source.cliVersion)) {
+    throw new Error('ZCode Proxy Manifest does not admit its pinned CLI version.');
+  }
+  const base = `https://github.com/RichLogic/Gian-Proxies/releases/download/${metadata.tag}/`;
+  const runtimeRoot = await stageZcodeRuntime(workDir, base);
+  const entryPath = join(runtimeRoot, source.entryRelativePath);
+  const home = join(workDir, 'zcode-home');
+  await mkdir(home, { mode: 0o700 });
+  const entry = await inspectEntry('zcode', entryPath, source.cliVersion, { HOME: home });
+  const name = `gian-runtime-zcode-${source.cliVersion}-${source.commit}-${source.platform}.tar.gz`;
+  const path = join(outputDir, name);
+  const bytes = await packRuntime(runtimeRoot, path, join(workDir, 'zcode-runtime-files'),
+    await archiveFileList(runtimeRoot));
+  return {
+    provider: 'zcode', version: source.cliVersion, source: zcodeRuntimeSource,
+    format: 'tar.gz', entryRelativePath: source.entryRelativePath, entry,
+    asset: { name, path, url: `${base}${name}`, sha256: digest(bytes), size: bytes.length, publish: true },
+    candidateBin: entryPath,
+  };
 }
 
 async function buildDsh(outputDir, workDir) {
@@ -261,6 +289,7 @@ export async function buildManagedRuntimeCandidates({ outputDir, githubEnv = nul
     candidates.push(await buildUpstream(provider, definition, target, workDir));
   }
   candidates.push(await buildDsh(target, workDir));
+  candidates.push(await buildZcode(target, workDir));
   const manifest = {
     schemaVersion: 1,
     platform: 'darwin-arm64',
@@ -271,7 +300,7 @@ export async function buildManagedRuntimeCandidates({ outputDir, githubEnv = nul
   };
   await writeFile(join(target, 'runtime-candidates.json'), `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
   if (githubEnv) {
-    const envNames = { claude: 'CLAUDE_BIN', codex: 'CODEX_BIN', kimi: 'KIMI_BIN', dsh: 'DSH_BIN' };
+    const envNames = { claude: 'CLAUDE_BIN', codex: 'CODEX_BIN', kimi: 'KIMI_BIN', dsh: 'DSH_BIN', zcode: 'ZCODE_BIN' };
     const body = candidates.map(candidate => `${envNames[candidate.provider]}=${candidate.candidateBin}`).join('\n');
     await writeFile(resolve(githubEnv), `${body}\n`, { flag: 'a' });
   }

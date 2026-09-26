@@ -14,15 +14,11 @@ export function selectReleaseDefinitions(definitions, selection) {
 export function assertSelectedCatalogExecutables(previous, next, selectedIds) {
   if (next.sourceId !== previous.sourceId || next.sequence <= previous.sequence
     || new Set(selectedIds).size !== selectedIds.length
-    || selectedIds.some(id => !next.plugins.some(plugin => plugin.pluginId === id))) {
+    || selectedIds.some(id => !previous.plugins.some(plugin => plugin.pluginId === id))) {
     throw new Error('Invalid selected Catalog update identity');
   }
-  const previousIds = new Set(previous.plugins.map(plugin => plugin.pluginId));
-  const nextIds = new Set(next.plugins.map(plugin => plugin.pluginId));
-  if ([...previousIds].some(id => !nextIds.has(id))) throw new Error('Selected update cannot remove Proxies');
-  if ([...nextIds].some(id => !previousIds.has(id) && !selectedIds.includes(id))) {
-    throw new Error('Selected update cannot add an unselected Proxy');
-  }
+  const ids = index => index.plugins.map(plugin => plugin.pluginId).sort();
+  if (!isDeepStrictEqual(ids(previous), ids(next))) throw new Error('Selected update cannot add or remove Proxies');
   for (const old of previous.plugins) {
     if (!selectedIds.includes(old.pluginId)
       && !isDeepStrictEqual(old.stable, next.plugins.find(plugin => plugin.pluginId === old.pluginId)?.stable)) {
