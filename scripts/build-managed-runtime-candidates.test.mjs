@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import test from 'node:test';
 
 import {
+  ZCODE_RUNTIME_ASSET_NAME,
   upstreamRuntimeCandidates,
   validateRuntimeCandidateDefinitions,
 } from './build-managed-runtime-candidates.mjs';
@@ -40,6 +41,8 @@ test('DeepSeek Harness Runtime has a complete exact npm lock', async () => {
 });
 
 test('ZCode source lock binds CLI, immutable Git revision, toolchain and dependencies', () => {
+  assert.equal(ZCODE_RUNTIME_ASSET_NAME, 'zcode.tar.gz');
+  assert.ok(ZCODE_RUNTIME_ASSET_NAME.length <= 16, 'GitHub CDN redirect must fit Gian 0.6.3 URL bounds');
   assert.equal(validateZcodeRuntimeSource(), zcodeRuntimeSource);
   for (const commit of ['main', 'v3.14.3', '328c1a0']) {
     assert.throws(() => validateZcodeRuntimeSource({ ...zcodeRuntimeSource, commit }), /source lock/);

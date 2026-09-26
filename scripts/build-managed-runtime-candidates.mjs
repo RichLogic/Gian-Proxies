@@ -23,6 +23,7 @@ import { validateZcodeRuntimeSource, zcodeRuntimeSource } from './zcode-runtime-
 const execFileAsync = promisify(execFile);
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const MAX_RUNTIME_ASSET_BYTES = 512 * 1024 * 1024;
+export const ZCODE_RUNTIME_ASSET_NAME = 'zcode.tar.gz';
 
 export const upstreamRuntimeCandidates = Object.freeze({
   claude: Object.freeze({
@@ -183,7 +184,11 @@ async function buildZcode(outputDir, workDir) {
   const home = join(workDir, 'zcode-home');
   await mkdir(home, { mode: 0o700 });
   const entry = await inspectEntry('zcode', entryPath, source.cliVersion, { HOME: home });
-  const name = `gian-runtime-zcode-${source.cliVersion}-${source.commit}-${source.platform}.tar.gz`;
+  // GitHub's signed release-asset redirect repeats the asset name in a long
+  // query string. Keep the immutable version and source binding in the
+  // certificate/Release tag, while using a short asset name so Gian 0.6.3's
+  // 1024-character redirect guard accepts the official CDN URL.
+  const name = ZCODE_RUNTIME_ASSET_NAME;
   const path = join(outputDir, name);
   const bytes = await packRuntime(runtimeRoot, path, join(workDir, 'zcode-runtime-files'),
     await archiveFileList(runtimeRoot));

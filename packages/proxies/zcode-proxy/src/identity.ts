@@ -2,7 +2,7 @@
  *  the initialize handshake; Host validates both against the registry). */
 export const PLUGIN_ID = 'com.zhipu.zcode';
 export const PLUGIN_NAME = 'ZCode';
-export const PLUGIN_VERSION = '0.4.1';
+export const PLUGIN_VERSION = '0.4.2';
 
 /** Inner wire facts for the open-source ZCode CLI 0.16.9
  *  (github.com/zai-org/ZCode @ 328c1a0c0ffaa5a4f65e8fa199af5e4c20706e5f). */

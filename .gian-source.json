@@ -2,7 +2,7 @@
   "schema": 1,
   "product": "Gian-Proxies",
   "sourceRepository": "RichLogic/Gian-Dev",
-  "sourceCommit": "3fcd5a9f48c084ea99ac031e0323e36db741f9f7",
+  "sourceCommit": "cb7aa21f4906f9052d451ad270ffca653b3a48ee",
   "workingTree": false,
   "externalPackages": [
     {
@@ -531,7 +531,7 @@
     {
       "source": "delivery/proxies/release-selection.json",
       "path": "release-selection.json",
-      "sha256": "62430bb0134e73e7a0e5f67d6e96fd5bfa2d8327c66e6791275758e4bf6527e0"
+      "sha256": "c638763c0365c3c02cb184534cdfc1b3aa72639cb5f4aea792f9febd6ac2c086"
     },
     {
       "source": "delivery/proxies/scripts/catalog-docs-policy.mjs",
@@ -2011,12 +2011,12 @@
     {
       "source": "packages/proxies/zcode-proxy/manifest.json",
       "path": "packages/proxies/zcode-proxy/manifest.json",
-      "sha256": "01f65f496458df058e718f34832eb07bf86dce532b7aab33fd5c601416181282"
+      "sha256": "7edc05c64413c2733971ff12beac9b11d13a34191af7ba8789e75dc1891af963"
     },
     {
       "source": "packages/proxies/zcode-proxy/package.json",
       "path": "packages/proxies/zcode-proxy/package.json",
-      "sha256": "8158a43eed7c38fe377ef960d2b2d31f355cfe584000c1326e1597450fa0b078"
+      "sha256": "032ff3cf8c92c82808be53e14e5b2885e8cb42ac035693cf6c89b5cc4c198adc"
     },
     {
       "source": "packages/proxies/zcode-proxy/probes/wp0/lib.mjs",
@@ -2116,7 +2116,7 @@
     {
       "source": "packages/proxies/zcode-proxy/src/identity.ts",
       "path": "packages/proxies/zcode-proxy/src/identity.ts",
-      "sha256": "8fcbfc8cedf29fee20d8674c5bb5c7dc399128baef314ea31981de7ec670bbdc"
+      "sha256": "65a1572d0d2c99dd5bffc50b3e293974041c8fb73dba79cd01eb2a3597672e87"
     },
     {
       "source": "packages/proxies/zcode-proxy/src/inner/model.ts",
@@ -2516,12 +2516,12 @@
     {
       "source": "scripts/build-managed-runtime-candidates.mjs",
       "path": "scripts/build-managed-runtime-candidates.mjs",
-      "sha256": "3bd81e2dca3018adbe30a393b788add1f1fd76330ece9233c1d4881311a5bfb3"
+      "sha256": "3a0a278950df1cb4bf73ecde3dced2a55ec41806e575d489218bc73ac8e6ff37"
     },
     {
       "source": "scripts/build-managed-runtime-candidates.test.mjs",
       "path": "scripts/build-managed-runtime-candidates.test.mjs",
-      "sha256": "98c30cc389edc278d8814b8d16b51d4392e90c644e2438946fd6fd82f4c68ade"
+      "sha256": "0ba9f2a5413c708fd0ba6e93f5da89a0785b9086ada2b68cb4e161f1a5ad542c"
     },
     {
       "source": "scripts/build-proxy-artifacts.mjs",
@@ -2743,7 +2743,7 @@
     {
       "path": "catalog/official-source/plugins/com.zhipu.zcode/entry.json",
       "mode": 420,
-      "sha256": "310cd49422734ed0a9301457f33608d3a409669ca9355ec5792e8db1628515c1"
+      "sha256": "4111b1a2255971a8756d8d419f2c2ffec99ecde82a46a6406e79d08acf31dbc1"
     },
     {
       "path": "catalog/official-source/plugins/com.zhipu.zcode/overview.md",
@@ -2758,7 +2758,7 @@
     {
       "path": "catalog/official-source/plugins/com.zhipu.zcode/sidecar.json",
       "mode": 420,
-      "sha256": "01f65f496458df058e718f34832eb07bf86dce532b7aab33fd5c601416181282"
+      "sha256": "7edc05c64413c2733971ff12beac9b11d13a34191af7ba8789e75dc1891af963"
     },
     {
       "path": "catalog/official-source/plugins/com.zhipu.zcode/troubleshooting.md",
@@ -4518,12 +4518,12 @@
     {
       "path": "packages/proxies/zcode-proxy/manifest.json",
       "mode": 420,
-      "sha256": "01f65f496458df058e718f34832eb07bf86dce532b7aab33fd5c601416181282"
+      "sha256": "7edc05c64413c2733971ff12beac9b11d13a34191af7ba8789e75dc1891af963"
     },
     {
       "path": "packages/proxies/zcode-proxy/package.json",
       "mode": 420,
-      "sha256": "802384786b6709805ad93ca40150ab033d7f063a816c1bd208edf51fbd53bb28"
+      "sha256": "2a42d704f100f8e6dbf7070d29ab173e1bdf11124fd0ad123548f38d9a6f9b9e"
     },
     {
       "path": "packages/proxies/zcode-proxy/probes/wp0/lib.mjs",
@@ -4628,7 +4628,7 @@
     {
       "path": "packages/proxies/zcode-proxy/src/identity.ts",
       "mode": 420,
-      "sha256": "8fcbfc8cedf29fee20d8674c5bb5c7dc399128baef314ea31981de7ec670bbdc"
+      "sha256": "65a1572d0d2c99dd5bffc50b3e293974041c8fb73dba79cd01eb2a3597672e87"
     },
     {
       "path": "packages/proxies/zcode-proxy/src/inner/model.ts",
@@ -5028,7 +5028,7 @@
     {
       "path": "release-selection.json",
       "mode": 420,
-      "sha256": "62430bb0134e73e7a0e5f67d6e96fd5bfa2d8327c66e6791275758e4bf6527e0"
+      "sha256": "c638763c0365c3c02cb184534cdfc1b3aa72639cb5f4aea792f9febd6ac2c086"
     },
     {
       "path": "runtimes/deepseek-harness/package-lock.json",
@@ -5043,12 +5043,12 @@
     {
       "path": "scripts/build-managed-runtime-candidates.mjs",
       "mode": 420,
-      "sha256": "86701ccf6179f69fbb416c4f28f27c2591f63179108a460b78969d501d056ecd"
+      "sha256": "0693e40f8ce28e3d84ea64fa2a61fd91f09bae2fcb15a6d34085582a475eda30"
     },
     {
       "path": "scripts/build-managed-runtime-candidates.test.mjs",
       "mode": 420,
-      "sha256": "98c30cc389edc278d8814b8d16b51d4392e90c644e2438946fd6fd82f4c68ade"
+      "sha256": "0ba9f2a5413c708fd0ba6e93f5da89a0785b9086ada2b68cb4e161f1a5ad542c"
     },
     {
       "path": "scripts/build-proxy-artifacts.mjs",
