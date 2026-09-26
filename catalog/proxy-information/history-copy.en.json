@@ -36,5 +36,6 @@
   "交互响应可在活动 Turn 期间并发处理，避免工具审批阻塞请求循环。": "Allow interaction responses to overtake an active Turn so tool approval cannot deadlock the request loop.",
   "将受管 Grok Runtime 与 Proxy 发布到同一受信任的 GitHub Release，使已发布 Gian 能通过 Catalog 下载和验证。": "Publish the managed Grok Runtime beside the Proxy in the same trusted GitHub Release so released Gian clients can download and verify it through Catalog.",
   "适配 DeepSeek Harness 0.1.5-rc.3 的完整能力面，支持文件与图片输入、Steer、Fork、结构化问题以及计划和 Diff 事件；随包内置 Bridge 0.1.5。": "Adapt the full DeepSeek Harness 0.1.5-rc.3 capability surface: file and image input, steer, fork, structured questions, and plan and diff events, with bundled Bridge 0.1.5.",
-  "改为从固定上游源码构建并托管 ZCode CLI 0.16.9，提供模型目录、文件与图片输入、Steer、Fork、结构化交互和原生事件。": "Build and manage ZCode CLI 0.16.9 from pinned upstream source, exposing the model catalog, file and image input, steer, fork, structured interactions, and native events."
+  "改为从固定上游源码构建并托管 ZCode CLI 0.16.9，提供模型目录、文件与图片输入、Steer、Fork、结构化交互和原生事件。": "Build and manage ZCode CLI 0.16.9 from pinned upstream source, exposing the model catalog, file and image input, steer, fork, structured interactions, and native events.",
+  "改用 Kimi Code 2.1.1 本地 Server API，支持原生会话管理、Steer、结构化交互及计划和 Diff 事件；不再使用 ACP 子进程。": "Use the Kimi Code 2.1.1 local Server API for native session management, steer, structured interactions, and plan and diff events, retiring the ACP child."
 }

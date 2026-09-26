@@ -1,6 +1,6 @@
 {
-  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.13.0",
-  "sequence": 13,
+  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.14.0",
+  "sequence": 14,
   "sourceId": "gian-official",
   "plugins": [
     {
@@ -60,27 +60,27 @@
     {
       "id": "kimi",
       "displayName": "Kimi Code",
-      "version": "0.3.3",
+      "version": "0.4.1",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "shared",
       "combination": {
         "certificate": {
-          "id": "proxies-4740fab7dc3370cc812984519b5e9509bbcad2c0-35981492220-1",
-          "sha256": "40871590ad311083b3fa678e9eb114b3a3a71e09641afb6b362f5721abf531b3"
+          "id": "proxies-8074b4386217a8936710f83c74829f5707776fdc-36242778360-1",
+          "sha256": "45e73b22d76580d81b3f93a5119c80c6646a694d556e481b716800b9231c0b86"
         },
         "companions": [],
-        "generationId": "kimi-0.3.3-runtime-2.1.0",
+        "generationId": "kimi-0.4.1-runtime-2.1.1",
         "runtime": {
-          "asset": {
-            "sha256": "b5e9a77313855e6a763608bda12ff0e26855d311a4faeed770ae915c7ee7c39a",
-            "size": 62298935,
-            "url": "https://github.com/MoonshotAI/kimi-code/releases/download/%40moonshot-ai/kimi-code%402.1.0/kimi-code-darwin-arm64.tar.gz"
-          },
-          "entryRelativePath": "kimi",
-          "format": "tar.gz",
           "kind": "native-binary",
           "runtimeId": "kimi",
-          "version": "2.1.0"
+          "version": "2.1.1",
+          "asset": {
+            "url": "https://github.com/MoonshotAI/kimi-code/releases/download/%40moonshot-ai/kimi-code%402.1.1/kimi-code-darwin-arm64.tar.gz",
+            "sha256": "8c3bad99571b16abd113ab5d511a98a36b852c0d5493991842a67b8c2bc4ecd0",
+            "size": 62296524
+          },
+          "format": "tar.gz",
+          "entryRelativePath": "kimi"
         }
       }
     },
@@ -98,16 +98,16 @@
         "companions": [],
         "generationId": "dsh-0.3.3-runtime-0.1.5-rc.3",
         "runtime": {
+          "asset": {
+            "sha256": "6a44f74e8efa53c985b23cbbdc676d320bd9eee6d4bba84ad9266b8fcebe4a7f",
+            "size": 54370791,
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-dsh-v0.3.3/gian-runtime-dsh-0.1.5-rc.3-darwin-arm64.tar.gz"
+          },
+          "entryRelativePath": "node_modules/@deepseek-ai/dsh/lib/bin.js",
+          "format": "tar.gz",
           "kind": "native-binary",
           "runtimeId": "deepseek-harness",
-          "version": "0.1.5-rc.3",
-          "asset": {
-            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-dsh-v0.3.3/gian-runtime-dsh-0.1.5-rc.3-darwin-arm64.tar.gz",
-            "sha256": "6a44f74e8efa53c985b23cbbdc676d320bd9eee6d4bba84ad9266b8fcebe4a7f",
-            "size": 54370791
-          },
-          "format": "tar.gz",
-          "entryRelativePath": "node_modules/@deepseek-ai/dsh/lib/bin.js"
+          "version": "0.1.5-rc.3"
         }
       }
     },
@@ -125,16 +125,16 @@
         "companions": [],
         "generationId": "zcode-0.4.1-runtime-0.16.9",
         "runtime": {
+          "asset": {
+            "sha256": "be3efd6b54bd88865d7f1461951df0f9de5294903c9c8292b4682bac728acb57",
+            "size": 80788053,
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.1/gian-runtime-zcode-0.16.9-328c1a0c0ffaa5a4f65e8fa199af5e4c20706e5f-darwin-arm64.tar.gz"
+          },
+          "entryRelativePath": "zcode/agent/zcode.cjs",
+          "format": "tar.gz",
           "kind": "native-binary",
           "runtimeId": "zcode",
-          "version": "0.16.9",
-          "asset": {
-            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.1/gian-runtime-zcode-0.16.9-328c1a0c0ffaa5a4f65e8fa199af5e4c20706e5f-darwin-arm64.tar.gz",
-            "sha256": "be3efd6b54bd88865d7f1461951df0f9de5294903c9c8292b4682bac728acb57",
-            "size": 80788053
-          },
-          "format": "tar.gz",
-          "entryRelativePath": "zcode/agent/zcode.cjs"
+          "version": "0.16.9"
         }
       }
     },
