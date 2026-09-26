@@ -1318,5 +1318,55 @@
     "process": {
       "scope": "shared"
     }
+  },
+  {
+    "tag": "proxy-dsh-v0.3.3",
+    "url": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-dsh-v0.3.3",
+    "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-dsh-v0.3.3/gian-proxy-dsh-0.3.3-darwin-arm64.tar.gz.manifest.json",
+    "digest": "sha256:a22a2a0564d0715927012b3009b45cd858cdb74e865338ec2a09c6b908a010af",
+    "assetDigestVerified": true,
+    "schemaVersion": 4,
+    "pluginId": "ai.deepseek.harness",
+    "pluginVersion": "0.3.3",
+    "protocol": {
+      "name": "gian.proxy",
+      "range": ">=2.2 <3.0"
+    },
+    "runtime": {
+      "kind": "external",
+      "id": "deepseek-harness",
+      "displayName": "DeepSeek Harness",
+      "verifiedVersions": [
+        "0.1.5-rc.3"
+      ]
+    },
+    "process": {
+      "scope": "shared"
+    }
+  },
+  {
+    "tag": "proxy-zcode-v0.4.1",
+    "url": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-zcode-v0.4.1",
+    "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.1/gian-proxy-zcode-0.4.1-darwin-arm64.tar.gz.manifest.json",
+    "digest": "sha256:01f65f496458df058e718f34832eb07bf86dce532b7aab33fd5c601416181282",
+    "assetDigestVerified": true,
+    "schemaVersion": 4,
+    "pluginId": "com.zhipu.zcode",
+    "pluginVersion": "0.4.1",
+    "protocol": {
+      "name": "gian.proxy",
+      "range": ">=2.2 <3.0"
+    },
+    "runtime": {
+      "kind": "external",
+      "id": "zcode",
+      "displayName": "ZCode Runtime",
+      "verifiedVersions": [
+        "0.16.9"
+      ]
+    },
+    "process": {
+      "scope": "shared"
+    }
   }
 ]

@@ -1,8 +1,50 @@
 {
   "schemaVersion": 1,
   "pluginId": "com.zhipu.zcode",
-  "currentVersion": "0.3.2",
+  "currentVersion": "0.4.1",
   "entries": [
+    {
+      "version": "0.4.1",
+      "firstPublishedAt": "2026-09-26T12:21:03Z",
+      "evidenceCoverage": "detailed",
+      "distributions": [
+        {
+          "repository": "RichLogic/Gian-Proxies",
+          "tag": "proxy-zcode-v0.4.1",
+          "publishedAt": "2026-09-26T12:21:03Z",
+          "releaseUrl": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-zcode-v0.4.1",
+          "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.1/gian-proxy-zcode-0.4.1-darwin-arm64.tar.gz.manifest.json",
+          "manifestSha256": "01f65f496458df058e718f34832eb07bf86dce532b7aab33fd5c601416181282",
+          "archive": {
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.1/gian-proxy-zcode-0.4.1-darwin-arm64.tar.gz",
+            "sha256": "a6a6a77ebbd6901a2bf5cef1d7afebcb980c4199c686dcbd01c432ca4479f225",
+            "size": 142047
+          },
+          "runtimeDeclaration": {
+            "id": "zcode",
+            "versions": [
+              "0.16.9"
+            ],
+            "basis": "verified-declaration"
+          },
+          "companionDeclarations": [],
+          "protocolRange": ">=2.2 <3.0",
+          "manifestSchema": 4,
+          "processScope": "shared"
+        }
+      ],
+      "changes": [
+        {
+          "category": "changed",
+          "text": "改为从固定上游源码构建并托管 ZCode CLI 0.16.9，提供模型目录、文件与图片输入、Steer、Fork、结构化交互和原生事件。",
+          "evidence": [
+            "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-zcode-v0.4.1",
+            "https://github.com/RichLogic/Gian-Proxies/blob/proxy-zcode-v0.4.1/packages/proxies/zcode-proxy/README.md"
+          ]
+        }
+      ],
+      "unknowns": []
+    },
     {
       "version": "0.3.2",
       "firstPublishedAt": "2026-09-20T09:48:30Z",

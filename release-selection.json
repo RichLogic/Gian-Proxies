@@ -1,5 +1,5 @@
 {
   "schema": 1,
-  "providers": ["kimi", "dsh", "zcode"],
+  "providers": ["dsh", "zcode"],
   "baseCatalogTag": "catalog-v1.12.0"
 }

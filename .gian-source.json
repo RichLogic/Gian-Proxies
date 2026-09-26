@@ -2,7 +2,7 @@
   "schema": 1,
   "product": "Gian-Proxies",
   "sourceRepository": "RichLogic/Gian-Dev",
-  "sourceCommit": "dcfb58a78cec03a70b682643d4c0c3f5fce7fc38",
+  "sourceCommit": "2da77ebbd4078df3c43710df3b70fa7eb439097a",
   "workingTree": false,
   "externalPackages": [
     {
@@ -296,12 +296,12 @@
     {
       "source": "catalog/proxy-information/ai.deepseek.harness/changelog.json",
       "path": "catalog/proxy-information/ai.deepseek.harness/changelog.json",
-      "sha256": "d04d6259d56be3b826601983b03beb4b8d32be8ca4d1a7b3f835f1de6325eb36"
+      "sha256": "4133d24b5f7ee44ef8cb3b1ec421734226f5af369090929ef51077b737e5aee0"
     },
     {
       "source": "catalog/proxy-information/ai.deepseek.harness/changelog.md",
       "path": "catalog/proxy-information/ai.deepseek.harness/changelog.md",
-      "sha256": "088d38591b2a9aa4b23af61e63a5128d11b8382ac690667181f19273cb185636"
+      "sha256": "f7b8a6389a36af3ecd2a91eaf486dcd024c6eb0a0796863e27fe806a8294fd85"
     },
     {
       "source": "catalog/proxy-information/ai.deepseek.harness/tutorial.en.md",
@@ -326,7 +326,7 @@
     {
       "source": "catalog/proxy-information/claude/changelog.md",
       "path": "catalog/proxy-information/claude/changelog.md",
-      "sha256": "785ca43f1b16720af0bc543065bb9af6cfbab860beb3fe4c689a1c8fec0330e4"
+      "sha256": "73f8fac228cc1ab05331b06408e46962ebcb944e4323cecedda627980152e79d"
     },
     {
       "source": "catalog/proxy-information/claude/tutorial.en.md",
@@ -351,7 +351,7 @@
     {
       "source": "catalog/proxy-information/codex/changelog.md",
       "path": "catalog/proxy-information/codex/changelog.md",
-      "sha256": "47491555a777453fd71aff72e13d63a052e21e7faec8d4445407ee2a2a88f969"
+      "sha256": "1b2090b0f60690ca40a63ec1a8457520a7722293d16550d441d40cf34f6eb8df"
     },
     {
       "source": "catalog/proxy-information/codex/tutorial.en.md",
@@ -371,22 +371,22 @@
     {
       "source": "catalog/proxy-information/com.zhipu.zcode/changelog.json",
       "path": "catalog/proxy-information/com.zhipu.zcode/changelog.json",
-      "sha256": "2e3d4a81a0dcb3ddf283337abf939f030bfce4648cf3b6fd0b78e7affe032e50"
+      "sha256": "c4096d4f92003f52b61eaf24ebe433ab08e647417cc7068f902b70c824fe67d3"
     },
     {
       "source": "catalog/proxy-information/com.zhipu.zcode/changelog.md",
       "path": "catalog/proxy-information/com.zhipu.zcode/changelog.md",
-      "sha256": "8a2de243f86f5a89f5570668aa5a2409814f24ce0497293aba27447e11ec0297"
+      "sha256": "b06a4d1c8fdbe33b752ac63c81b07f340b110d0642d432589940332fddbc1186"
     },
     {
       "source": "catalog/proxy-information/com.zhipu.zcode/tutorial.en.md",
       "path": "catalog/proxy-information/com.zhipu.zcode/tutorial.en.md",
-      "sha256": "e882ff6191500093e34c84b0820b6a297e34e84daf1dd765b70df79c0bb0ed06"
+      "sha256": "4087a917c3aaceaa7b27711414e2dbd38d64231f23fbd453a7c7b266c83e2d3a"
     },
     {
       "source": "catalog/proxy-information/com.zhipu.zcode/tutorial.md",
       "path": "catalog/proxy-information/com.zhipu.zcode/tutorial.md",
-      "sha256": "3dda40016ff93ccfbb433b81f298697d9fe2aea92ad092ef26a40004c878aacf"
+      "sha256": "cd5d91c31cc539e3aba608ae9b6ea2611fba0e02b0f413152a5c663cb043cb17"
     },
     {
       "source": "catalog/proxy-information/evidence/README.md",
@@ -396,7 +396,7 @@
     {
       "source": "catalog/proxy-information/evidence/current-combinations.json",
       "path": "catalog/proxy-information/evidence/current-combinations.json",
-      "sha256": "919e4ecd65d136043050d9c4bfc2cda67638004f8dba53befef2e446d7a25e71"
+      "sha256": "1f767ff8a14e1192b089be938fa3ec9d945f8b06beed6c00c3e186cafe5c17b1"
     },
     {
       "source": "catalog/proxy-information/evidence/dsh-bridge-versions.json",
@@ -406,12 +406,12 @@
     {
       "source": "catalog/proxy-information/evidence/manifests.json",
       "path": "catalog/proxy-information/evidence/manifests.json",
-      "sha256": "15a8ec5c9068bf1e856c402bc98f89beca71e304ca0ceac1444b1039662be4f7"
+      "sha256": "41458d845400eb718bda908a0b1f64a0a0352db65e57aedbea6c52d122ef4a96"
     },
     {
       "source": "catalog/proxy-information/evidence/releases.json",
       "path": "catalog/proxy-information/evidence/releases.json",
-      "sha256": "e3a8403e7e0a17b677a6c457ca78420cb2c086601cdf62076b87844cb5b12bc8"
+      "sha256": "9a76dc93a446d9498908f25df18eb591837621c4d6d68ae5823cdbb8bbbf790a"
     },
     {
       "source": "catalog/proxy-information/grok/basic.md",
@@ -426,7 +426,7 @@
     {
       "source": "catalog/proxy-information/grok/changelog.md",
       "path": "catalog/proxy-information/grok/changelog.md",
-      "sha256": "00aeaf8640a530f3b57950bcba1f98e2a468590e01fd913c9870b804e42d6270"
+      "sha256": "811f472ebdde05732d68c54c80755c4db460febaed7a570b185d45baddb554c8"
     },
     {
       "source": "catalog/proxy-information/grok/tutorial.en.md",
@@ -441,7 +441,7 @@
     {
       "source": "catalog/proxy-information/history-copy.en.json",
       "path": "catalog/proxy-information/history-copy.en.json",
-      "sha256": "6f6e9540a88f28d98cf7512e13c13229df07ca990fe040e004bd501359cf5cd6"
+      "sha256": "d23d2602256c7e50ab61bd67814de9ff564d4b3183219080e22607db92958539"
     },
     {
       "source": "catalog/proxy-information/kimi/basic.md",
@@ -456,7 +456,7 @@
     {
       "source": "catalog/proxy-information/kimi/changelog.md",
       "path": "catalog/proxy-information/kimi/changelog.md",
-      "sha256": "9055d2eb5d0f7c20666996e7ca46a69125f70fa77921a777cdb2600ecb399f10"
+      "sha256": "6ffd34766c87d46267c71663c7dd62eefc140207e52e5463179767142db449d0"
     },
     {
       "source": "catalog/proxy-information/kimi/tutorial.en.md",
@@ -486,7 +486,7 @@
     {
       "source": "catalog/proxy-information/validate.mjs",
       "path": "catalog/proxy-information/validate.mjs",
-      "sha256": "08fd1a33bede96ac2662acb33912073b9998d43aec287b94851b8c355fd42b7f"
+      "sha256": "fa2f5e50037074be9a985a264fe5f64b6374e16b544ada759cd234a1c3305027"
     },
     {
       "source": "delivery/proxies/.github/workflows/catalog-docs.yml",
@@ -531,7 +531,7 @@
     {
       "source": "delivery/proxies/release-selection.json",
       "path": "release-selection.json",
-      "sha256": "4dee1b6af5ae6d52c5cb9b664d4d86cfd819f96d41b4e023af317c01bbaf688c"
+      "sha256": "1b5ac6fa14de2f32be6a66250fb25d6c444487b3ab02fa076e48ba96adb353e8"
     },
     {
       "source": "delivery/proxies/scripts/catalog-docs-policy.mjs",
@@ -551,7 +551,7 @@
     {
       "source": "delivery/proxies/scripts/release-product.mjs",
       "path": "scripts/release-product.mjs",
-      "sha256": "78fe59ebdbf178e28e6ae1b0751e9b4261b7b123fd7377aeed3f16e69ecc4cc5"
+      "sha256": "6d0506f9a10b696cc066a25c1c5bb4f0003db9c04a1b13dfc08bc5e3a83fedd1"
     },
     {
       "source": "delivery/proxies/scripts/verify-source.mjs",
@@ -2863,12 +2863,12 @@
     {
       "path": "catalog/proxy-information/ai.deepseek.harness/changelog.json",
       "mode": 420,
-      "sha256": "d04d6259d56be3b826601983b03beb4b8d32be8ca4d1a7b3f835f1de6325eb36"
+      "sha256": "4133d24b5f7ee44ef8cb3b1ec421734226f5af369090929ef51077b737e5aee0"
     },
     {
       "path": "catalog/proxy-information/ai.deepseek.harness/changelog.md",
       "mode": 420,
-      "sha256": "088d38591b2a9aa4b23af61e63a5128d11b8382ac690667181f19273cb185636"
+      "sha256": "f7b8a6389a36af3ecd2a91eaf486dcd024c6eb0a0796863e27fe806a8294fd85"
     },
     {
       "path": "catalog/proxy-information/ai.deepseek.harness/tutorial.en.md",
@@ -2893,7 +2893,7 @@
     {
       "path": "catalog/proxy-information/claude/changelog.md",
       "mode": 420,
-      "sha256": "785ca43f1b16720af0bc543065bb9af6cfbab860beb3fe4c689a1c8fec0330e4"
+      "sha256": "73f8fac228cc1ab05331b06408e46962ebcb944e4323cecedda627980152e79d"
     },
     {
       "path": "catalog/proxy-information/claude/tutorial.en.md",
@@ -2918,7 +2918,7 @@
     {
       "path": "catalog/proxy-information/codex/changelog.md",
       "mode": 420,
-      "sha256": "47491555a777453fd71aff72e13d63a052e21e7faec8d4445407ee2a2a88f969"
+      "sha256": "1b2090b0f60690ca40a63ec1a8457520a7722293d16550d441d40cf34f6eb8df"
     },
     {
       "path": "catalog/proxy-information/codex/tutorial.en.md",
@@ -2938,22 +2938,22 @@
     {
       "path": "catalog/proxy-information/com.zhipu.zcode/changelog.json",
       "mode": 420,
-      "sha256": "2e3d4a81a0dcb3ddf283337abf939f030bfce4648cf3b6fd0b78e7affe032e50"
+      "sha256": "c4096d4f92003f52b61eaf24ebe433ab08e647417cc7068f902b70c824fe67d3"
     },
     {
       "path": "catalog/proxy-information/com.zhipu.zcode/changelog.md",
       "mode": 420,
-      "sha256": "8a2de243f86f5a89f5570668aa5a2409814f24ce0497293aba27447e11ec0297"
+      "sha256": "b06a4d1c8fdbe33b752ac63c81b07f340b110d0642d432589940332fddbc1186"
     },
     {
       "path": "catalog/proxy-information/com.zhipu.zcode/tutorial.en.md",
       "mode": 420,
-      "sha256": "e882ff6191500093e34c84b0820b6a297e34e84daf1dd765b70df79c0bb0ed06"
+      "sha256": "4087a917c3aaceaa7b27711414e2dbd38d64231f23fbd453a7c7b266c83e2d3a"
     },
     {
       "path": "catalog/proxy-information/com.zhipu.zcode/tutorial.md",
       "mode": 420,
-      "sha256": "3dda40016ff93ccfbb433b81f298697d9fe2aea92ad092ef26a40004c878aacf"
+      "sha256": "cd5d91c31cc539e3aba608ae9b6ea2611fba0e02b0f413152a5c663cb043cb17"
     },
     {
       "path": "catalog/proxy-information/CONTRACT.md",
@@ -2963,7 +2963,7 @@
     {
       "path": "catalog/proxy-information/evidence/current-combinations.json",
       "mode": 420,
-      "sha256": "919e4ecd65d136043050d9c4bfc2cda67638004f8dba53befef2e446d7a25e71"
+      "sha256": "1f767ff8a14e1192b089be938fa3ec9d945f8b06beed6c00c3e186cafe5c17b1"
     },
     {
       "path": "catalog/proxy-information/evidence/dsh-bridge-versions.json",
@@ -2973,7 +2973,7 @@
     {
       "path": "catalog/proxy-information/evidence/manifests.json",
       "mode": 420,
-      "sha256": "15a8ec5c9068bf1e856c402bc98f89beca71e304ca0ceac1444b1039662be4f7"
+      "sha256": "41458d845400eb718bda908a0b1f64a0a0352db65e57aedbea6c52d122ef4a96"
     },
     {
       "path": "catalog/proxy-information/evidence/README.md",
@@ -2983,7 +2983,7 @@
     {
       "path": "catalog/proxy-information/evidence/releases.json",
       "mode": 420,
-      "sha256": "e3a8403e7e0a17b677a6c457ca78420cb2c086601cdf62076b87844cb5b12bc8"
+      "sha256": "9a76dc93a446d9498908f25df18eb591837621c4d6d68ae5823cdbb8bbbf790a"
     },
     {
       "path": "catalog/proxy-information/grok/basic.md",
@@ -2998,7 +2998,7 @@
     {
       "path": "catalog/proxy-information/grok/changelog.md",
       "mode": 420,
-      "sha256": "00aeaf8640a530f3b57950bcba1f98e2a468590e01fd913c9870b804e42d6270"
+      "sha256": "811f472ebdde05732d68c54c80755c4db460febaed7a570b185d45baddb554c8"
     },
     {
       "path": "catalog/proxy-information/grok/tutorial.en.md",
@@ -3013,7 +3013,7 @@
     {
       "path": "catalog/proxy-information/history-copy.en.json",
       "mode": 420,
-      "sha256": "6f6e9540a88f28d98cf7512e13c13229df07ca990fe040e004bd501359cf5cd6"
+      "sha256": "d23d2602256c7e50ab61bd67814de9ff564d4b3183219080e22607db92958539"
     },
     {
       "path": "catalog/proxy-information/kimi/basic.md",
@@ -3028,7 +3028,7 @@
     {
       "path": "catalog/proxy-information/kimi/changelog.md",
       "mode": 420,
-      "sha256": "9055d2eb5d0f7c20666996e7ca46a69125f70fa77921a777cdb2600ecb399f10"
+      "sha256": "6ffd34766c87d46267c71663c7dd62eefc140207e52e5463179767142db449d0"
     },
     {
       "path": "catalog/proxy-information/kimi/tutorial.en.md",
@@ -3063,7 +3063,7 @@
     {
       "path": "catalog/proxy-information/validate.mjs",
       "mode": 420,
-      "sha256": "08fd1a33bede96ac2662acb33912073b9998d43aec287b94851b8c355fd42b7f"
+      "sha256": "fa2f5e50037074be9a985a264fe5f64b6374e16b544ada759cd234a1c3305027"
     },
     {
       "path": "CHANGELOG.md",
@@ -5028,7 +5028,7 @@
     {
       "path": "release-selection.json",
       "mode": 420,
-      "sha256": "4dee1b6af5ae6d52c5cb9b664d4d86cfd819f96d41b4e023af317c01bbaf688c"
+      "sha256": "1b5ac6fa14de2f32be6a66250fb25d6c444487b3ab02fa076e48ba96adb353e8"
     },
     {
       "path": "runtimes/deepseek-harness/package-lock.json",
@@ -5093,7 +5093,7 @@
     {
       "path": "scripts/release-product.mjs",
       "mode": 420,
-      "sha256": "78fe59ebdbf178e28e6ae1b0751e9b4261b7b123fd7377aeed3f16e69ecc4cc5"
+      "sha256": "6d0506f9a10b696cc066a25c1c5bb4f0003db9c04a1b13dfc08bc5e3a83fedd1"
     },
     {
       "path": "scripts/stage-official-catalog-release.mjs",

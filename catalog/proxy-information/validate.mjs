@@ -86,7 +86,11 @@ function renderHistory(history, current) {
       md += '\n';
     }
   }
-  md += '## 已撤回版本\n\n0.4.0 已于 2026-09-20 撤回，不进入可用版本列表。仓库拆分不构成统一升级所有 Proxy 版本的理由。\n';
+  md += '## 已撤回版本\n\n';
+  if (!history.withdrawnVersions.length) md += '无。\n';
+  for (const item of history.withdrawnVersions) {
+    md += `- ${item.version}：${item.withdrawnOn} 已撤回，不可安装。[依据](${item.evidence})\n`;
+  }
   return md;
 }
 
@@ -206,7 +210,12 @@ export function renderEnglishHistory(history, current) {
       md += '\n';
     }
   }
-  return md + '## Withdrawn versions\n\n0.4.0 was withdrawn on 2026-09-20 and is not installable. Separating repositories does not justify assigning one shared version to all Proxies.\n';
+  md += '## Withdrawn versions\n\n';
+  if (!history.withdrawnVersions.length) md += 'None.\n';
+  for (const item of history.withdrawnVersions) {
+    md += `- ${item.version}: withdrawn on ${item.withdrawnOn}; not installable. [Source](${item.evidence})\n`;
+  }
+  return md;
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

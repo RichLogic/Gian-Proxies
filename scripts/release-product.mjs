@@ -43,8 +43,8 @@ export function validateCertificate(certificate, expected = {}) {
   const required = ['source', 'build', 'proxy-contracts', 'runtime-artifacts', 'archive-self-tests'];
   if (!Array.isArray(certificate.steps) || required.some(id => certificate.steps.filter(s => s.id === id && s.status === 'PASS').length !== 1)
     || certificate.steps.some(s => s.status !== 'PASS')) throw new Error('Incomplete Proxy qualification evidence');
-  if (!Array.isArray(certificate.proxies) || certificate.proxies.length !== shipping.length
-    || new Set(certificate.proxies.map(p => p.provider)).size !== shipping.length) throw new Error('Incomplete shipping set');
+  if (!Array.isArray(certificate.proxies) || certificate.proxies.length < shipping.length
+    || new Set(certificate.proxies.map(p => p.provider)).size !== certificate.proxies.length) throw new Error('Incomplete shipping set');
   for (const definition of shipping) {
     const record = certificate.proxies.find(p => p.provider === definition.id);
     const metadata = proxyReleaseMetadata(definition.id);
@@ -187,7 +187,7 @@ function publishRelease(tag, paths, notes, latest = false) {
 async function publish(directory) {
   const certificate = readCertified(directory);
   if (process.env.GITHUB_REPOSITORY !== repository) throw new Error('Wrong publication repository');
-  for (const record of certificate.proxies) {
+  for (const record of certificate.proxies.filter(item => shipping.some(definition => definition.id === item.provider))) {
     if (git('rev-parse', `refs/tags/${record.tag}^{commit}`) !== certificate.revision) throw new Error('Maintainer must authorize an immutable tag at the qualified commit');
     const names = [record.archive, `${record.archive}.sha256`, `${record.archive}.manifest.json`, 'certificate.json'];
     if (record.publishRuntime) names.push(record.runtimeAsset);
@@ -210,6 +210,7 @@ function authorizeCatalogPublication(sequence, issuedAt) {
 
 async function catalog(directory, sequence, issuedAt) {
   const certificate = readCertified(directory);
+  const selected = certificate.proxies.filter(item => shipping.some(definition => definition.id === item.provider));
   const tag = authorizeCatalogPublication(sequence, issuedAt);
   command('pnpm', ['--filter', '@gian/shared', 'build']);
   command('pnpm', ['--filter', '@gian/proxy-catalog-contract', 'build']);
@@ -219,10 +220,10 @@ async function catalog(directory, sequence, issuedAt) {
   cpSync(join(root, 'catalog/official-source'), source, { recursive: true });
   const inherited = await inheritCatalogExecutables(source, sequence);
   const { projectInformation } = await import('../catalog/proxy-information/project.mjs');
-  const catalogRecords = inherited.previous.plugins.map(plugin => certificate.proxies.find(record => record.pluginId === plugin.pluginId)
+  const catalogRecords = inherited.previous.plugins.map(plugin => selected.find(record => record.pluginId === plugin.pluginId)
     ?? { pluginId: plugin.pluginId, version: plugin.stable.pluginVersion, runtime: plugin.stable.combination.runtime });
   const { localizations } = projectInformation(source, catalogRecords);
-  for (const record of certificate.proxies) {
+  for (const record of selected) {
     const release = JSON.parse(gh('api', `repos/${repository}/releases/tags/${record.tag}`));
     if (release.draft || release.prerelease) throw new Error('Catalog cannot reference a draft Proxy');
     for (const name of [record.archive, `${record.archive}.manifest.json`, 'certificate.json', ...(record.publishRuntime ? [record.runtimeAsset] : [])]) {
@@ -250,7 +251,7 @@ async function catalog(directory, sequence, issuedAt) {
     allowedArtifactRepositories: inherited.repositories,
     allowedRuntimeAssetPrefixes: [...policy.runtimeAssetPrefixes, `https://github.com/${repository}/releases/download/`],
   });
-  assertSelectedCatalogExecutables(inherited.previous, bundle.index, certificate.proxies.map(record => record.pluginId));
+  assertSelectedCatalogExecutables(inherited.previous, bundle.index, selected.map(record => record.pluginId));
   await writeCompiledCatalogBundle(join(root, 'output/catalog-bundle'), bundle.files);
   const { stageOfficialCatalogRelease } = await import('./stage-official-catalog-release.mjs');
   const target = join(root, 'output/catalog-release');
