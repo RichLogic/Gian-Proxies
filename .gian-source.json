@@ -2,7 +2,7 @@
   "schema": 1,
   "product": "Gian-Proxies",
   "sourceRepository": "RichLogic/Gian-Dev",
-  "sourceCommit": "2da77ebbd4078df3c43710df3b70fa7eb439097a",
+  "sourceCommit": "4e99e5d086b9f302a56462eddc97d42d0656fca4",
   "workingTree": false,
   "externalPackages": [
     {
@@ -481,7 +481,7 @@
     {
       "source": "catalog/proxy-information/project.test.mjs",
       "path": "catalog/proxy-information/project.test.mjs",
-      "sha256": "3e0f879259f4b357380bdf4e2928a28d5008ed984d940c499141b55c9d2880c5"
+      "sha256": "e64c1058f3c3f6ab13c125d63f281272e0d0f27e648764bb8f5d24dc15acd8a2"
     },
     {
       "source": "catalog/proxy-information/validate.mjs",
@@ -3053,7 +3053,7 @@
     {
       "path": "catalog/proxy-information/project.test.mjs",
       "mode": 420,
-      "sha256": "3e0f879259f4b357380bdf4e2928a28d5008ed984d940c499141b55c9d2880c5"
+      "sha256": "e64c1058f3c3f6ab13c125d63f281272e0d0f27e648764bb8f5d24dc15acd8a2"
     },
     {
       "path": "catalog/proxy-information/README.md",
