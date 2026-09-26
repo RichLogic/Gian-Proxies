@@ -2,7 +2,7 @@
   "schema": 1,
   "product": "Gian-Proxies",
   "sourceRepository": "RichLogic/Gian-Dev",
-  "sourceCommit": "4e99e5d086b9f302a56462eddc97d42d0656fca4",
+  "sourceCommit": "38d04b57cc353b4bfc394e3c721df4d0cc72589d",
   "workingTree": false,
   "externalPackages": [
     {
@@ -531,7 +531,7 @@
     {
       "source": "delivery/proxies/release-selection.json",
       "path": "release-selection.json",
-      "sha256": "1b5ac6fa14de2f32be6a66250fb25d6c444487b3ab02fa076e48ba96adb353e8"
+      "sha256": "62430bb0134e73e7a0e5f67d6e96fd5bfa2d8327c66e6791275758e4bf6527e0"
     },
     {
       "source": "delivery/proxies/scripts/catalog-docs-policy.mjs",
@@ -1641,12 +1641,12 @@
     {
       "source": "packages/proxies/kimi-proxy/manifest.json",
       "path": "packages/proxies/kimi-proxy/manifest.json",
-      "sha256": "7c3b54ea8ea5f1b2437ded20f6ff4007b135249c95f6aa5192d5cd81e4c22c5f"
+      "sha256": "78e3f4c59c261c1d00dace25f44de7d039ce84e2d87d43c2f3362ac13bd70d86"
     },
     {
       "source": "packages/proxies/kimi-proxy/package.json",
       "path": "packages/proxies/kimi-proxy/package.json",
-      "sha256": "41c1ac5f91dadbe0b25b9e08d75dc71188f702bbbc40075e3099fcd1eac266f2"
+      "sha256": "1f245f6d5a877702e606454a3b7d1602bfcec3778c65880c94a171a6f6cdba1c"
     },
     {
       "source": "packages/proxies/kimi-proxy/scripts/fake-catalog-ui-proxy.mjs",
@@ -1656,7 +1656,7 @@
     {
       "source": "packages/proxies/kimi-proxy/src/cli/spawn.ts",
       "path": "packages/proxies/kimi-proxy/src/cli/spawn.ts",
-      "sha256": "ebc672eb56b1de90b8c23ec36784aac882d8956f8ab8affc8874354f4971e3f0"
+      "sha256": "67519b02fba8b4d74bc259f26e54f8e5c41ca44e3cb6ff6068de86b35714e136"
     },
     {
       "source": "packages/proxies/kimi-proxy/src/core/customization.ts",
@@ -2823,7 +2823,7 @@
     {
       "path": "catalog/official-source/plugins/kimi/entry.json",
       "mode": 420,
-      "sha256": "796b80d79ef6e6a19984b0a5fada72b0a1b1ff53e018d97fa4080766d65ec846"
+      "sha256": "39840ccd78a98749d8a04d954666b9e4df503494f43845a74361c94380fef50d"
     },
     {
       "path": "catalog/official-source/plugins/kimi/overview.md",
@@ -2838,7 +2838,7 @@
     {
       "path": "catalog/official-source/plugins/kimi/sidecar.json",
       "mode": 420,
-      "sha256": "7c3b54ea8ea5f1b2437ded20f6ff4007b135249c95f6aa5192d5cd81e4c22c5f"
+      "sha256": "78e3f4c59c261c1d00dace25f44de7d039ce84e2d87d43c2f3362ac13bd70d86"
     },
     {
       "path": "catalog/official-source/plugins/kimi/troubleshooting.md",
@@ -4148,12 +4148,12 @@
     {
       "path": "packages/proxies/kimi-proxy/manifest.json",
       "mode": 420,
-      "sha256": "7c3b54ea8ea5f1b2437ded20f6ff4007b135249c95f6aa5192d5cd81e4c22c5f"
+      "sha256": "78e3f4c59c261c1d00dace25f44de7d039ce84e2d87d43c2f3362ac13bd70d86"
     },
     {
       "path": "packages/proxies/kimi-proxy/package.json",
       "mode": 420,
-      "sha256": "3a7c5b367345c04529943430cc1567f61720d87fc109110f8938f454a42c381c"
+      "sha256": "7834d8e71a8da53a78abc10d93733abaf692cf1142d39a3fad4a61f113dd1b1b"
     },
     {
       "path": "packages/proxies/kimi-proxy/README.md",
@@ -4168,7 +4168,7 @@
     {
       "path": "packages/proxies/kimi-proxy/src/cli/spawn.ts",
       "mode": 420,
-      "sha256": "ebc672eb56b1de90b8c23ec36784aac882d8956f8ab8affc8874354f4971e3f0"
+      "sha256": "67519b02fba8b4d74bc259f26e54f8e5c41ca44e3cb6ff6068de86b35714e136"
     },
     {
       "path": "packages/proxies/kimi-proxy/src/core/customization.ts",
@@ -5028,7 +5028,7 @@
     {
       "path": "release-selection.json",
       "mode": 420,
-      "sha256": "1b5ac6fa14de2f32be6a66250fb25d6c444487b3ab02fa076e48ba96adb353e8"
+      "sha256": "62430bb0134e73e7a0e5f67d6e96fd5bfa2d8327c66e6791275758e4bf6527e0"
     },
     {
       "path": "runtimes/deepseek-harness/package-lock.json",
