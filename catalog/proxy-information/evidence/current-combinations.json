@@ -1,6 +1,6 @@
 {
-  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.14.0",
-  "sequence": 14,
+  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.15.0",
+  "sequence": 15,
   "sourceId": "gian-official",
   "plugins": [
     {
@@ -71,16 +71,16 @@
         "companions": [],
         "generationId": "kimi-0.4.1-runtime-2.1.1",
         "runtime": {
+          "asset": {
+            "sha256": "8c3bad99571b16abd113ab5d511a98a36b852c0d5493991842a67b8c2bc4ecd0",
+            "size": 62296524,
+            "url": "https://github.com/MoonshotAI/kimi-code/releases/download/%40moonshot-ai/kimi-code%402.1.1/kimi-code-darwin-arm64.tar.gz"
+          },
+          "entryRelativePath": "kimi",
+          "format": "tar.gz",
           "kind": "native-binary",
           "runtimeId": "kimi",
-          "version": "2.1.1",
-          "asset": {
-            "url": "https://github.com/MoonshotAI/kimi-code/releases/download/%40moonshot-ai/kimi-code%402.1.1/kimi-code-darwin-arm64.tar.gz",
-            "sha256": "8c3bad99571b16abd113ab5d511a98a36b852c0d5493991842a67b8c2bc4ecd0",
-            "size": 62296524
-          },
-          "format": "tar.gz",
-          "entryRelativePath": "kimi"
+          "version": "2.1.1"
         }
       }
     },
@@ -114,27 +114,27 @@
     {
       "id": "com.zhipu.zcode",
       "displayName": "ZCode",
-      "version": "0.4.1",
+      "version": "0.4.2",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "shared",
       "combination": {
         "certificate": {
-          "id": "proxies-536c991299ab2042d44ca47ad38d134a093cf667-36213761610-1",
-          "sha256": "58a84c30c1ce686afb2542c2c587dc889e1bd7c40daa39aa17cd0ad41745623e"
+          "id": "proxies-b49795d20bbdef9bdf6aae7b8d1e7f6d78630c07-36246793247-1",
+          "sha256": "2dff352fab4bfab9b49e807c0b075ec05f89732f405581b3a8945802e6357e2a"
         },
         "companions": [],
-        "generationId": "zcode-0.4.1-runtime-0.16.9",
+        "generationId": "zcode-0.4.2-runtime-0.16.9",
         "runtime": {
-          "asset": {
-            "sha256": "be3efd6b54bd88865d7f1461951df0f9de5294903c9c8292b4682bac728acb57",
-            "size": 80788053,
-            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.1/gian-runtime-zcode-0.16.9-328c1a0c0ffaa5a4f65e8fa199af5e4c20706e5f-darwin-arm64.tar.gz"
-          },
-          "entryRelativePath": "zcode/agent/zcode.cjs",
-          "format": "tar.gz",
           "kind": "native-binary",
           "runtimeId": "zcode",
-          "version": "0.16.9"
+          "version": "0.16.9",
+          "asset": {
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.2/zcode.tar.gz",
+            "sha256": "265f28aa89462a73daf074573b5312863cd75d21a0b89f810ce90d362753dcc1",
+            "size": 80788064
+          },
+          "format": "tar.gz",
+          "entryRelativePath": "zcode/agent/zcode.cjs"
         }
       }
     },

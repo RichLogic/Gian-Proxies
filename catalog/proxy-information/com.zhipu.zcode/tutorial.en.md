@@ -2,7 +2,7 @@
 
 ## 1. What it does in Gian
 
-ZCode Integration brings ZCode CLI coding sessions, model configuration and activity into Gian. Version 0.4.1 uses the pinned and verified ZCode CLI 0.16.9 shipped with the Proxy release. It no longer depends on the Runtime embedded in ZCode.app or reads desktop-process credentials.
+ZCode Integration brings ZCode CLI coding sessions, model configuration and activity into Gian. Version 0.4.2 uses the pinned and verified ZCode CLI 0.16.9 shipped with the Proxy release. It no longer depends on the Runtime embedded in ZCode.app or reads desktop-process credentials.
 
 ## 2. Capabilities and limitations
 
@@ -22,7 +22,7 @@ Install ZCode Integration from Gian's official Catalog. Gian verifies and prepar
 
 ## 5. First use
 
-1. Install and prepare ZCode Integration in Gian; confirm Proxy 0.4.1 and CLI 0.16.9 verification.
+1. Install and prepare ZCode Integration in Gian; confirm Proxy 0.4.2 and CLI 0.16.9 verification.
 2. Configure the Provider through the installed CLI's `zcode login` or ZCode TUI.
 3. Select a model and workspace for the Agent, then try a small text task. Other capabilities depend on the actual model and Provider.
 
