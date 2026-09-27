@@ -2,7 +2,18 @@
 
 本文件由 changelog.json 的结构化记录投影，按 Proxy 版本倒序。首次发布日期与新仓库分发日期分别记录；未知历史不会用当前版本说明回填。
 
-本次发布组合快照：Proxy **0.4.1**，Runtime **2.1.1**。这是发布目标，不表示当前机器已安装。
+本次发布组合快照：Proxy **0.4.2**，Runtime **2.1.1**。这是发布目标，不表示当前机器已安装。
+
+## 0.4.2
+
+首次公开发布：2026-09-27T03:23:17Z（UTC）。
+
+- [RichLogic/Gian-Proxies 分发](https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-kimi-v0.4.2)：2026-09-27T03:23:17Z。
+- 对应 CLI：2.1.1（Manifest 兼容声明，不是本机状态）。
+
+### 变更
+
+- 以 0.4.2 重新签发：能力面与 0.4.1 完全一致（Kimi Code 2.1.1 本地 Server API），仅更新版本标识，无功能变更。 [依据1](https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-kimi-v0.4.2) [依据2](https://github.com/RichLogic/Gian-Proxies/blob/proxy-kimi-v0.4.2/packages/proxies/kimi-proxy/README.md)
 
 ## 0.4.1
 

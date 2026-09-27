@@ -1,12 +1,11 @@
 {
-  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.15.0",
-  "sequence": 15,
+  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.16.0",
+  "sequence": 16,
   "sourceId": "gian-official",
   "plugins": [
     {
       "id": "claude",
       "displayName": "Claude Code",
-      "version": "0.3.2",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "session",
       "combination": {
@@ -33,7 +32,6 @@
     {
       "id": "codex",
       "displayName": "Codex",
-      "version": "0.3.2",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "shared",
       "combination": {
@@ -60,34 +58,33 @@
     {
       "id": "kimi",
       "displayName": "Kimi Code",
-      "version": "0.4.1",
+      "version": "0.4.2",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "shared",
       "combination": {
         "certificate": {
-          "id": "proxies-8074b4386217a8936710f83c74829f5707776fdc-36242778360-1",
-          "sha256": "45e73b22d76580d81b3f93a5119c80c6646a694d556e481b716800b9231c0b86"
+          "id": "proxies-7d321265bc149f4366ad34a6987a9c0c9e4d9fdb-36290943236-1",
+          "sha256": "9d1143fe8fb4219576f2a3a34d60e6da892160afc08e39f38b0688b3b96b70cb"
         },
         "companions": [],
-        "generationId": "kimi-0.4.1-runtime-2.1.1",
+        "generationId": "kimi-0.4.2-runtime-2.1.1",
         "runtime": {
-          "asset": {
-            "sha256": "8c3bad99571b16abd113ab5d511a98a36b852c0d5493991842a67b8c2bc4ecd0",
-            "size": 62296524,
-            "url": "https://github.com/MoonshotAI/kimi-code/releases/download/%40moonshot-ai/kimi-code%402.1.1/kimi-code-darwin-arm64.tar.gz"
-          },
-          "entryRelativePath": "kimi",
-          "format": "tar.gz",
           "kind": "native-binary",
           "runtimeId": "kimi",
-          "version": "2.1.1"
+          "version": "2.1.1",
+          "asset": {
+            "url": "https://github.com/MoonshotAI/kimi-code/releases/download/%40moonshot-ai/kimi-code%402.1.1/kimi-code-darwin-arm64.tar.gz",
+            "sha256": "8c3bad99571b16abd113ab5d511a98a36b852c0d5493991842a67b8c2bc4ecd0",
+            "size": 62296524
+          },
+          "format": "tar.gz",
+          "entryRelativePath": "kimi"
         }
       }
     },
     {
       "id": "ai.deepseek.harness",
       "displayName": "DeepSeek Harness",
-      "version": "0.3.3",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "shared",
       "combination": {
@@ -114,7 +111,6 @@
     {
       "id": "com.zhipu.zcode",
       "displayName": "ZCode",
-      "version": "0.4.2",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "shared",
       "combination": {
@@ -141,7 +137,6 @@
     {
       "id": "grok",
       "displayName": "Grok Build",
-      "version": "0.3.6",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "session",
       "combination": {
