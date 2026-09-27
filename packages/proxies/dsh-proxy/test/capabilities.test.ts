@@ -83,7 +83,7 @@ function fakeBridge(options: {
         case 'initialize':
           return {
             protocol: { name: 'gian.dsh.bridge', version: '1.0' },
-            plugin: { id: 'ai.deepseek.harness', bundle: '@gian/dsh-bridge', version: '0.1.5' },
+            plugin: { id: 'ai.deepseek.harness', bundle: '@gian/dsh-bridge', version: '0.1.6' },
             runtime: {
               id: 'deepseek-harness',
               package: '@deepseek-ai/dsh',
@@ -228,12 +228,12 @@ test('capabilities narrow to exactly what the connected bridge verified', async 
   assert.equal(caps['input.skill'], 1);
   assert.equal(caps['session.fork'], 1);
   assert.equal(caps['session.fork.atTurn'], 1);
+  assert.equal(caps['sidechat'], 1);
   assert.equal(caps['session.native.list'], 1);
   assert.equal(caps['event.plan'], 1);
   assert.equal(caps['event.diff'], 1);
   assert.equal(caps['session.rename'], undefined);
   assert.equal(caps['session.native.delete'], undefined);
-  assert.equal(caps['sidechat'], undefined);
   assert.equal(caps['integration.mcp.streamableHttp'], undefined);
 });
 

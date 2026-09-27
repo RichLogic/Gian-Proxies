@@ -431,7 +431,10 @@ export class ZcodeV2Adapter {
     // Execution closure: when the entry lives inside a resource tree that also
     // contains bundled plugins, cover the whole tree (WP0 G8).
     const packagesDir = join(dirname(entry), 'packages');
-    if (existsSync(packagesDir)) {
+    const managedRoot = resolve(dirname(entry), '..');
+    if (existsSync(join(managedRoot, 'gian-source.json'))) {
+      hash.update(`closure:${hashTree(managedRoot)}\u0000`);
+    } else if (existsSync(packagesDir)) {
       hash.update(`closure:${hashTree(dirname(entry))}\u0000`);
     }
     this.runtimeKeyCache = hash.digest('hex');
@@ -490,26 +493,37 @@ export class ZcodeV2Adapter {
     return presentation;
   }
 
-  /** The pinned managed CLI exposes its configured model Registry without
-   *  creating a session or returning Provider credentials. */
+  private assertInnerProtocol(state: InnerReadState): void {
+    if (state.protocol !== undefined && state.protocol !== null) {
+      if (state.protocol.name !== INNER_PROTOCOL_NAME || state.protocol.version !== INNER_PROTOCOL_VERSION) {
+        throw new ServiceError(
+          'INCOMPATIBLE_PROTOCOL',
+          `ZCode runtime protocol must be ${INNER_PROTOCOL_NAME}/${INNER_PROTOCOL_VERSION}.`,
+        );
+      }
+    }
+  }
+
+  /** The pinned CLI exposes the configured Registry without creating a
+   * session or returning Provider credentials. */
   private async readModelCatalog(): Promise<InnerReadState> {
-    const result = await this.transport.request('gian/modelCatalog', {}) as Record<string, unknown> | null;
-    if (result?.schemaVersion !== 1 || !Array.isArray(result.models)) {
+    const catalog = await this.transport.request('gian/modelCatalog', {}) as Record<string, unknown> | null;
+    if (catalog?.schemaVersion !== 1 || !Array.isArray(catalog.models)) {
       throw new ServiceError('RUNTIME_UNAVAILABLE', 'ZCode Runtime does not expose the pinned model catalog contract.');
     }
-    for (const model of result.models) {
+    for (const model of catalog.models) {
       if (!model || typeof model !== 'object'
         || typeof model.ref?.providerId !== 'string' || !model.ref.providerId
         || typeof model.ref?.modelId !== 'string' || !model.ref.modelId) {
         throw new ServiceError('RUNTIME_UNAVAILABLE', 'ZCode model catalog contains an invalid model reference.');
       }
     }
-    const current = result.selection as InnerModelRef | undefined;
+    const current = catalog.selection as InnerModelRef | undefined;
     if (current && (typeof current.providerId !== 'string' || typeof current.modelId !== 'string')) {
       throw new ServiceError('RUNTIME_UNAVAILABLE', 'ZCode model catalog contains an invalid selection.');
     }
     return { settings: { model: {
-      available: result.models as InnerModelInfo[],
+      available: catalog.models as InnerModelInfo[],
       ...(current ? { current } : {}),
     } } };
   }
@@ -527,17 +541,6 @@ export class ZcodeV2Adapter {
       model: { ...full.settings?.model, current },
       ...(observed?.thoughtLevel ? { thoughtLevel: observed.thoughtLevel } : {}),
     } };
-  }
-
-  private assertInnerProtocol(state: InnerReadState): void {
-    if (state.protocol !== undefined && state.protocol !== null) {
-      if (state.protocol.name !== INNER_PROTOCOL_NAME || state.protocol.version !== INNER_PROTOCOL_VERSION) {
-        throw new ServiceError(
-          'INCOMPATIBLE_PROTOCOL',
-          `ZCode runtime protocol must be ${INNER_PROTOCOL_NAME}/${INNER_PROTOCOL_VERSION}.`,
-        );
-      }
-    }
   }
 
   private async catalogList(): Promise<unknown> {
@@ -722,13 +725,17 @@ export class ZcodeV2Adapter {
     const settings = (created?.settings ?? {}) as Record<string, unknown>;
     const model = (settings.model ?? {}) as Record<string, unknown>;
     const current = model.current as InnerModelRef | undefined;
+    const modelOptions = current?.options;
     const thought = (settings.thoughtLevel ?? {}) as Record<string, unknown>;
     const permission = (settings.permission ?? {}) as Record<string, unknown>;
     return {
       ...(current && typeof current.providerId === 'string' && typeof current.modelId === 'string'
-        ? { model: { providerId: current.providerId, modelId: current.modelId } }
+        ? { model: { providerId: current.providerId, modelId: current.modelId,
+          ...(typeof modelOptions?.reasoningLevel === 'string' ? { options: { reasoningLevel: modelOptions.reasoningLevel } } : {}),
+        } }
         : {}),
-      ...(typeof thought.current === 'string' ? { thoughtLevel: thought.current } : {}),
+      ...(typeof modelOptions?.reasoningLevel === 'string' ? { thoughtLevel: modelOptions.reasoningLevel }
+        : typeof thought.current === 'string' ? { thoughtLevel: thought.current } : {}),
       ...(typeof permission.mode === 'string' ? { mode: permission.mode } : {}),
     };
   }
@@ -889,12 +896,13 @@ export class ZcodeV2Adapter {
     return (ackEnvelope?.ack ?? ackEnvelope ?? {}) as InnerCommandAck;
   }
 
-  /** Effective 0.16.9 model vocabulary for a ref, from observed snapshots. */
+  /** Effective 0.16.9 model vocabulary for a ref, from the full Registry
+   * catalog when available; session snapshots may expose only the current. */
   private modelVocabulary(ref: InnerModelRef): {
     levels: string[] | null;
     defaultLevel: string | null;
   } {
-    const settings = this.options.modelFacts?.current()?.settings;
+    const settings = this.catalogModelState?.settings ?? this.options.modelFacts?.current()?.settings;
     for (const model of settings?.model?.available ?? []) {
       if (model.ref?.providerId === ref.providerId && model.ref?.modelId === ref.modelId) {
         return {
@@ -939,6 +947,16 @@ export class ZcodeV2Adapter {
           const providerValue = config['provider'];
           if (typeof providerValue === 'string' && providerValue !== ref.providerId) {
             throw new ConfigValueInvalidError('Provider and model config values do not match.');
+          }
+          // turn.start may arrive before catalog.list. Read the same
+          // side-effect-free Registry contract on demand, then fail cleanly
+          // instead of leaking a raw runtime rejection after admission.
+          this.catalogModelState ??= await this.readModelCatalog();
+          const available = this.catalogModelState.settings?.model?.available ?? [];
+          const known = available.some((model) =>
+            model.ref?.providerId === ref.providerId && model.ref?.modelId === ref.modelId);
+          if (!known) {
+            throw new ConfigValueInvalidError(`Unknown model ${ref.providerId}/${ref.modelId}.`);
           }
           confirmed.model = { providerId: ref.providerId, modelId: ref.modelId };
         }

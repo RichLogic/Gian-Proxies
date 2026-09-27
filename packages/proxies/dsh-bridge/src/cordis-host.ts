@@ -1429,8 +1429,94 @@ export class CordisDshHost implements BridgeHost {
     return this.sessionResult(record);
   }
 
-  async sessionResume(): Promise<Record<string, unknown>> {
-    throw new Error('cordis host session.resume is exercised only inside a live DSH profile');
+  /**
+   * Re-attach an existing native DSH session under a new bridge session id
+   * (Side Chat resume). This is a proxy-internal surface: unlike
+   * `session.create`'s native branch there is no Host ownership proof,
+   * because the bridge process itself is the trust boundary and the caller
+   * authenticated through the sealed resumeRef. Selection falls back to the
+   * catalog defaults; the next `turn.start.config` re-pins the real one.
+   */
+  async sessionResume(params: { sessionId: string; nativeSessionId: string }): Promise<Record<string, unknown>> {
+    if (this.sessions.has(params.sessionId)) {
+      throw new BridgeProtocolError(
+        -32000,
+        `CONFLICT: DSH bridge session ${params.sessionId} already exists`,
+        'CONFLICT',
+      );
+    }
+    if (this.byNativeId.has(params.nativeSessionId)) {
+      throw new BridgeProtocolError(
+        -32000,
+        `CONFLICT: DSH native session ${params.nativeSessionId} is already attached`,
+        'CONFLICT',
+      );
+    }
+    const models = await this.catalogModels();
+    const defaults = this.defaultSelection(models);
+    const selection: DshModelSelectionRef = {
+      current: { provider: defaults.provider, model: defaults.model },
+    };
+    const presets = this.agentPresetsRuntime();
+    const setup = async (agentCtx: AnyContext) => {
+      if (presets !== null) {
+        const scopedAgent = agentCtx.agent;
+        if (!scopedAgent) {
+          throw new Error('RUNTIME_UNAVAILABLE: resumed DSH Agent is unavailable during setup');
+        }
+        const persistedPreset = await presets.resolve(sessionAgentPreset(scopedAgent.session));
+        if (persistedPreset.broken) {
+          throw new Error(`RUNTIME_UNAVAILABLE: DSH Agent preset ${persistedPreset.id} is broken: ${persistedPreset.broken}`);
+        }
+        await presets.mount(agentCtx, persistedPreset.id);
+      }
+      installModelSelection(agentCtx, selection);
+      this.installApprovalInteraction(agentCtx, params.sessionId);
+      this.installUserQuestions(agentCtx, params.sessionId);
+    };
+    let handle: CordisAgentHandle;
+    try {
+      handle = await this.agentRegistry().resume({
+        resumeSessionId: params.nativeSessionId,
+        agentOptions: { provider: selection.current.provider, model: selection.current.model },
+        setup,
+      });
+    } catch (error) {
+      if (error instanceof Error && /^session ".+" not found$/.test(error.message)) {
+        throw new BridgeProtocolError(
+          -32000,
+          `DSH native session ${params.nativeSessionId} was not found.`,
+          'NATIVE_SESSION_NOT_FOUND',
+        );
+      }
+      throw error;
+    }
+    const header = handle.agent.session.header ?? null;
+    const createdAtMs = header !== null && typeof header.createdAt === 'number' ? header.createdAt : undefined;
+    const record: CordisSessionRecord = {
+      id: params.sessionId,
+      nativeId: params.nativeSessionId,
+      // The live Cordis session header carries no cwd; the Side Chat record
+      // re-derives cwd/roots from its parent on the proxy side.
+      cwd: '',
+      // Roots are a bridge-level sandbox concept with no native header
+      // counterpart; the Side Chat record re-derives them from its parent.
+      roots: [],
+      config: {},
+      createdAt: new Date(createdAtMs ?? Date.now()).toISOString(),
+      handle,
+      selection,
+      lastTurn: null,
+      lastStep: null,
+      openTurn: null,
+    };
+    this.sessions.set(record.id, record);
+    this.byNativeId.set(record.nativeId, record);
+    this.emit({
+      method: 'agent.status',
+      params: { sessionId: record.id, nativeId: record.nativeId, status: handle.agent.status },
+    });
+    return this.sessionResult(record);
   }
 
   async sessionGet(params: { sessionId: string }): Promise<Record<string, unknown>> {
@@ -1473,9 +1559,12 @@ export class CordisDshHost implements BridgeHost {
       ? Number(params.cursor)
       : 0;
     // Subagent-origin sessions are presentation children, not continuable
-    // user sessions; they stay out of the list.
+    // user sessions, and fork-lineage children (persistent forks and Side
+    // Chats) are owned by their Gian parent — listing them would invite
+    // double adoption of an already-managed context, so both stay out.
     const summaries = snapshots
-      .filter(snapshot => snapshot.header.origin !== 'subagent')
+      .filter(snapshot => snapshot.header.origin !== 'subagent'
+        && snapshot.header.parentSession === undefined)
       .map(snapshot => ({
         id: String(snapshot.header.id),
         cwd: snapshot.header.cwd,

@@ -4,6 +4,9 @@ import { createInterface } from 'node:readline';
 
 const script = process.env.DSH_FAKE_SCRIPT ?? 'success';
 const sessions = new Map();
+// Native sessions ever created, keyed by nativeId, for session.resume
+// re-attachment (Side Chat resume survives bridge-session loss).
+const nativeSessions = new Map();
 let sessionCounter = 0;
 let interactionCounter = 0;
 
@@ -216,7 +219,7 @@ async function handle(method, params) {
         plugin: {
           id: 'ai.deepseek.harness',
           bundle: '@gian/dsh-bridge',
-          version: '0.1.5',
+          version: '0.1.6',
         },
         runtime: {
           id: 'deepseek-harness',
@@ -263,6 +266,7 @@ async function handle(method, params) {
         pending: null,
       };
       sessions.set(params.sessionId, state);
+      nativeSessions.set(nativeId, { cwd: state.cwd, roots: state.roots, config: state.config });
       notify('agent.status', {
         sessionId: params.sessionId,
         nativeId,
@@ -277,6 +281,41 @@ async function handle(method, params) {
           state: 'idle',
           config: state.config,
           createdAt: state.createdAt,
+        },
+      };
+    }
+    case 'session.resume': {
+      if (sessions.has(params.sessionId)) {
+        throw new Error(`CONFLICT: fake session ${params.sessionId} already exists`);
+      }
+      const known = nativeSessions.get(params.nativeSessionId);
+      if (known === undefined) {
+        throw new Error(`session "${params.nativeSessionId}" not found`);
+      }
+      sessions.set(params.sessionId, {
+        nativeId: params.nativeSessionId,
+        cwd: known.cwd,
+        roots: known.roots,
+        config: { ...known.config },
+        createdAt: new Date().toISOString(),
+        events: [],
+        turns: 0,
+        pending: null,
+      });
+      notify('agent.status', {
+        sessionId: params.sessionId,
+        nativeId: params.nativeSessionId,
+        status: 'idle',
+      });
+      return {
+        session: {
+          id: params.sessionId,
+          nativeId: params.nativeSessionId,
+          cwd: known.cwd,
+          roots: known.roots,
+          state: 'idle',
+          config: known.config,
+          createdAt: new Date().toISOString(),
         },
       };
     }
@@ -354,6 +393,7 @@ async function handle(method, params) {
         pending: null,
         parentNativeId: source.nativeId,
       });
+      nativeSessions.set(childNativeId, { cwd: source.cwd, roots: source.roots, config: source.config });
       notify('agent.status', { sessionId: params.newSessionId, nativeId: childNativeId, status: 'idle' });
       return {
         session: {

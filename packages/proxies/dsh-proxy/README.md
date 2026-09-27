@@ -34,7 +34,7 @@ boundary; everything else fails closed with `CAPABILITY_NOT_SUPPORTED`.
 | `input.skill` | supported | `ctx.skills.get` + runtime `renderSkillContent`; native `skill-invocation` instructions-form injection |
 | `turn.steer` | supported | `agent.steer` consumed at the open turn's next step boundary; active-turn-only, retry-idempotent |
 | `session.fork` / `session.fork.atTurn` | supported | `agents.create` with `parentSession`/`isSeeded`/verified seed prefix; atTurn cuts at the durable `turn/end` seq; unverifiable boundaries → `FORK_BOUNDARY_UNAVAILABLE` |
-| `session.native.list` | supported | `ctx.sessionPersistence.list()` metadata (read-only, subagent children excluded) |
+| `session.native.list` | supported | `ctx.sessionPersistence.list()` metadata (read-only; subagent and fork-lineage children excluded) |
 | `session.resume` / replay | supported (Gian-owned) | `AgentRegistry.resume` behind the per-process Host binding proof; unattested native adoption fails closed (no ownership identity in the storage contract) |
 | `event.plan` | supported | `todo/write` → `plan.updated` (stable `planId`, content-derived step ids); `plan/mode` stays a generic activity (different semantics, documented) |
 | `event.diff` | supported | `tool/result` `FsDiffMeta` hunks → per-file `diff.updated` with stable `diffId`; no meta → no diff, never guessed from tool arguments |
@@ -43,7 +43,7 @@ boundary; everything else fails closed with `CAPABILITY_NOT_SUPPORTED`.
 | `event.reasoning` / `usage` / `step` / `request` | supported | durable `assistant/message` blocks, per-step usage, step boundaries, request headers |
 | `session.rename` | unsupported | no title field in `SessionHeader`, no rename surface in 0.1.5-rc.3 |
 | `session.native.delete` | unsupported | `SessionPersistence` contract exposes create/open/flush/stat/list only — no delete |
-| `sidechat` | unsupported | no isolated sidechat primitive; native fork does not provide workspace isolation beyond the fork seed |
+| `sidechat` | supported at idle turn boundaries | a native fork creates a transient child with an opaque sealed resume reference; `resume` reattaches it, while `close` detaches and tombstones the reference without claiming Provider data deletion. Active-input anchors remain unavailable. |
 | `integration.mcp.streamableHttp` | unsupported | MCP servers are static profile plugin instances with no session isolation boundary; Host MCP injection fails loud (`hostServices` rejected) |
 | `customization.list` | partial | `skill` kind inventories `ctx.skills` read-only (`provider_api`, stable `ci1_` ids); `mcp`/`hook`/`rule` answer `provider_unsupported` — no enumeration API in this build |
 | Agent Presets vs approval mode | distinct | Agent Presets stay session-bound (`agent_preset`); approval maps to real `ctx.permissionPresets` presets (`permission_preset`) |
@@ -75,6 +75,7 @@ The suite runs the complete `gian.proxy` contract through
 `@gian/proxy-protocol`'s `HostProtocolValidator` against a fake bridge runtime:
 initialize identity and capability narrowing, catalog (input descriptors,
 permission presets, agent presets), session create/reattach idempotency, turn
-lifecycle, steering, fork (head and turn-anchored), native list, plan/diff
-projections, interaction idempotency, replay identity parity, runtime-crash
-terminalization, and the real stdio CLI path — zero model calls.
+lifecycle, steering, fork (head and turn-anchored), Side Chat
+create/resume/close, native list, plan/diff projections, interaction
+idempotency, replay identity parity, runtime-crash terminalization, and the
+real stdio CLI path — zero model calls.

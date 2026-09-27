@@ -7,11 +7,11 @@
  * Terminal).
  */
 
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import type { BridgeNotification } from '../runtime/bridge-client.js';
 
 export const PLUGIN_ID = 'ai.deepseek.harness';
-export const PLUGIN_VERSION = '0.3.1';
+export const PLUGIN_VERSION = '0.3.4';
 export const PLUGIN_NAME = 'DeepSeek Harness';
 
 export type ConfigValue = string | boolean | number | null;
@@ -205,7 +205,9 @@ export class DshProxyService {
     const session: AttachedSession = {
       id: params.sessionId,
       nativeSessionId: params.nativeSessionId,
-      streamId: `stream-${params.sessionId}-${createdAt}`,
+      // Wall-clock milliseconds can collide across a rapid Proxy restart;
+      // every attach generation must have a fresh stream identity.
+      streamId: `stream-${params.sessionId}-${randomUUID()}`,
       cwd: params.cwd,
       roots: params.roots,
       sessionConfig: params.sessionConfig,
@@ -242,6 +244,25 @@ export class DshProxyService {
     // session.close is a request whose success response is authoritative; the
     // Host validator deletes the attach on the response, so no session.updated
     // notification may follow it (10.11.4 step 7).
+  }
+
+  /**
+   * Side Chat close barrier (10.5.4): finalize the active turn and every open
+   * child lifecycle now — interactions settle as `turn_ended`, open work is
+   * cancelled, and the terminal turn event is emitted before the close
+   * response is written — then drop the route so no notification is ever
+   * projected for this Side Chat again.
+   */
+  closeSidechatRoute(sessionId: string): void {
+    const session = this.sessions.get(sessionId);
+    if (!session) return;
+    const turn = session.activeTurn !== null ? session.turnState.get(session.activeTurn) : undefined;
+    if (turn) {
+      this.terminalEvent(session, turn, 'turn.completed', { stopReason: 'cancelled' }, session.sequence + 1);
+    }
+    session.closed = true;
+    session.state = 'closed';
+    this.sessions.delete(sessionId);
   }
 
   /* ---------------- Notifications ---------------- */

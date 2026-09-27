@@ -299,10 +299,8 @@ async function handle(request) {
       reply(id, {
         schemaVersion: scenario.catalogSchemaVersion ?? 1,
         models: settings.model?.available ?? [],
-        ...(selected ? { selection: {
-          ...selected,
-          ...(settings.thoughtLevel?.current
-            ? { options: { reasoningLevel: settings.thoughtLevel.current } } : {}),
+        ...(selected ? { selection: { ...selected,
+          ...(settings.thoughtLevel?.current ? { options: { reasoningLevel: settings.thoughtLevel.current } } : {}),
         } } : {}),
       });
       return;
@@ -316,7 +314,7 @@ async function handle(request) {
         }
       }
       reply(id, {
-        workspace: { workspacePath: '/tmp/fake-ws', workspaceKey: '/tmp/fake-ws' },
+        workspace: params.workspace,
         mode: state.mode,
         slashCommands: [
           { name: 'goal', description: 'Show or set the current session goal.', source: 'builtin', inputHint: '/goal [objective]' },
@@ -617,7 +615,11 @@ async function handle(request) {
       return;
     }
     case 'session/setMode': {
-      const known = ['plan', 'build', 'edit', 'yolo', 'auto'];
+      if (scenario.behavior?.failMode === params.mode) {
+        replyError(id, { code: -32603, message: 'Mode update failed' });
+        return;
+      }
+      const known = ['plan', 'build', 'edit', 'yolo'];
       if (known.includes(params.mode) === false) {
         replyError(id, { code: -32602, message: 'Invalid params — mode: Invalid option' });
         return;

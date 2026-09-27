@@ -2,9 +2,10 @@
  * Catalog projection (Revision 2 §7) for ZCode CLI 0.16.9.
  *
  * `catalog.list` stays side-effect-free: `workspace/readPresentation` supplies
- * mode and slash commands, while the pinned Gian integration method
- * `gian/modelCatalog` returns allowlisted model metadata from the same
- * Registry used for turns. Neither call creates a session or returns secrets.
+ * mode and slash commands, while the pinned `gian/modelCatalog` integration
+ * returns allowlisted Registry metadata without creating a session or
+ * exposing Provider credentials. Live snapshots may update only the current
+ * selection when it still belongs to that Registry catalog.
  *
  * Outer ConfigValue stays scalar; model references use the versioned
  * reversible encoding `zmodel:v1:<base64url(JSON.stringify([providerId,
@@ -337,7 +338,6 @@ export function projectCatalog(
       { value: 'build', displayName: 'Build' },
       { value: 'edit', displayName: 'Edit' },
       { value: 'yolo', displayName: 'Yolo' },
-      { value: 'auto', displayName: 'Auto' },
     ],
   });
 

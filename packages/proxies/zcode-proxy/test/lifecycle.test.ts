@@ -502,8 +502,10 @@ test('invalid model config fails the turn before send and restores state', async
     assert.equal(failed.kind, 'error');
     assert.equal(
       ((failed.payload as { error: { data: { domainCode: string } } }).error.data?.domainCode),
-      'RUNTIME_ERROR',
+      'CONFIG_VALUE_INVALID',
     );
+    assert.equal(harness.fakeLog().filter((entry) => entry.method === 'gian/modelCatalog').length, 1,
+      'turn.start validates the full Registry even before catalog.list');
     const sends = harness.fakeLog().filter((entry) => entry.method === 'v4/command'
       && (entry.params as { type?: string })?.type === 'sendText');
     assert.equal(sends.length, 0, 'no prompt is ever sent with unknown config');
@@ -520,9 +522,10 @@ test('a partial config failure restores the previous model and leaves the turn r
     scenario: {
       initialModel: previousModel,
       availableModels: [
-        { ref: previousModel, label: 'GLM-5.3-Flash', reasoning },
-        { ref: nextModel, label: 'GLM-5.1', reasoning },
+        { ref: previousModel, label: 'GLM-5.3-Flash', reasoning: { enabled: true, levels: [{ value: 'max' }], defaultLevel: 'max' } },
+        { ref: nextModel, label: 'GLM-5.1', reasoning: { enabled: true, levels: [{ value: 'high' }], defaultLevel: 'high' } },
       ],
+      behavior: { failMode: 'edit' },
     },
   });
   try {
@@ -535,22 +538,18 @@ test('a partial config failure restores the previous model and leaves the turn r
     const failed = await harness.request('turn.start', {
       sessionId: 's_1', streamId, turnId: 't_retryable',
       input: [{ type: 'text', text: 'go' }],
-      config: { provider: nextModel.providerId, model, thinking: 'broken' },
+      config: { provider: nextModel.providerId, model, thinking: 'high', approval_mode: 'edit' },
     });
     assert.equal(failed.kind, 'error');
     // The fake registry rejects a level outside the TARGET model's vocabulary
     // (the real 0.16.9 error surface for the old split setModel+thoughtLevel
     // flow). Rollback restores the COMPLETE previous selection atomically.
     const setModels = harness.fakeLog().filter(entry => entry.method === 'session/setModel');
-    assert.deepEqual((setModels.at(-1)?.params as { model?: unknown } | undefined)?.model, {
-      ...previousModel,
-      options: { reasoningLevel: 'max' },
-    });
-    assert.equal(
-      harness.fakeLog().filter(entry => entry.method === 'session/setThoughtLevel').length,
-      0,
-      'rollback restores the full selection via setModel, never setThoughtLevel',
-    );
+    assert.deepEqual((setModels[0]?.params as { model?: unknown } | undefined)?.model,
+      { ...nextModel, options: { reasoningLevel: 'high' } });
+    assert.deepEqual((setModels.at(-1)?.params as { model?: unknown } | undefined)?.model,
+      { ...previousModel, options: { reasoningLevel: 'max' } });
+    assert.equal(harness.fakeLog().some(entry => entry.method === 'session/setThoughtLevel'), false);
 
     const retried = await harness.request('turn.start', {
       sessionId: 's_1', streamId, turnId: 't_retryable',

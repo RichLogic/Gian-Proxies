@@ -39,7 +39,7 @@ const FULL_SETTINGS = {
   thoughtLevel: { available: [{ value: 'low' }, { value: 'max' }], current: 'max', defaultLevel: 'max', enabled: true },
 };
 
-test('Registry projection exposes model metadata without Provider credentials', () => {
+test('Registry projection returns metadata and exact reasoning choices without credentials', () => {
   const secret = 'fixture-secret-never-on-wire';
   const provider = {
     providerId: 'custom', providerName: 'Custom',
@@ -50,21 +50,33 @@ test('Registry projection exposes model metadata without Provider credentials', 
       optionSpecs: { reasoningLevel: { values: ['disabled', 'max'] }, maxOutputTokens: { max: 4096 } },
     } }],
   };
-  const dto = serializeModelCatalog({ providers: [provider] });
+  const selection = { providerId: 'custom', modelId: 'vendor/model', options: { reasoningLevel: 'max' } };
+  const dto = serializeModelCatalog({ providers: [provider], preferredSelection: selection });
   assert.equal(dto.schemaVersion, 1);
+  assert.deepEqual(dto.selection, selection);
   assert.deepEqual(dto.models[0]?.reasoning.levels, [{ value: 'disabled' }, { value: 'max' }]);
   assert.equal(JSON.stringify(dto).includes(secret), false);
+  provider.models[0]!.config.enabled = false;
+  assert.deepEqual(serializeModelCatalog({ providers: [provider] }).models, []);
 });
 
-test('catalog revision changes when Registry model metadata changes', () => {
+test('catalog revision changes when a model, reasoning choice or Registry entry changes', () => {
+  const presentation = { mode: 'build', slashCommands: [] };
   const first = { settings: FULL_SETTINGS };
   const second = structuredClone(first);
-  second.settings.model.available[0]!.label = 'Renamed';
-  const presentation = { mode: 'build', slashCommands: [] };
-  assert.notEqual(revisionFor('runtime', presentation, first), revisionFor('runtime', presentation, second));
+  second.settings.model.current = { providerId: 'bigmodel', modelId: 'GLM-5.3' };
+  const third = structuredClone(first);
+  third.settings.thoughtLevel.current = 'low';
+  const fourth = structuredClone(first);
+  fourth.settings.model.available[0]!.label = 'Renamed';
+  const firstRevision = revisionFor('runtime', presentation, first);
+  assert.notEqual(revisionFor('runtime', presentation, second), firstRevision);
+  assert.notEqual(revisionFor('runtime', presentation, third), firstRevision);
+  assert.notEqual(revisionFor('runtime', presentation, fourth), firstRevision);
+  assert.equal(revisionFor('runtime', presentation, first), firstRevision);
 });
 
-test('missing or incompatible model catalog fails closed', async () => {
+test('missing or incompatible model bridge fails instead of advertising invented models', async () => {
   for (const scenario of [{ behavior: { missingModelCatalog: true } }, { catalogSchemaVersion: 2 }]) {
     const harness = startHarness({ scenario });
     try {
@@ -93,7 +105,7 @@ async function createSession(harness: Harness, sessionId = 's_1'): Promise<void>
   assert.equal(created.kind, 'result', `session.create failed: ${JSON.stringify(created.payload)}`);
 }
 
-test('catalog.list reads Registry metadata and workspace presentation without creating a session', async () => {
+test('catalog.list reads Registry metadata and presentation without creating a session', async () => {
   const harness = startHarness({ scenario: {} });
   try {
     const init = await initialize(harness);
@@ -161,7 +173,7 @@ test('Registry model facts feed the catalog marketplace before a session exists'
     assert.deepEqual(
       (provider!.choices as Array<{ value: string }>).map((choice) => choice.value),
       ['bigmodel', 'zai'],
-      'the model catalog carries the full marketplace across providers',
+      'the Registry carries the full marketplace across providers',
     );
     assert.equal((result.specialCatalogs as Record<string, string>).model, 'model');
     assert.ok(options.find((option) => option.id === 'thinking'), 'reasoning levels project for the current model');

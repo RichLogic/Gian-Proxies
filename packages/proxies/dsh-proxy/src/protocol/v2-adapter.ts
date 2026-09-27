@@ -8,7 +8,11 @@
  */
 
 import { createHash } from 'node:crypto';
-import { verifyNativeSessionHostBinding } from '@gian/proxy-protocol';
+import {
+  OpaqueSidechatResumeStore,
+  verifyNativeSessionHostBinding,
+  type SidechatAnchor,
+} from '@gian/proxy-protocol';
 import {
   PLUGIN_ID,
   PLUGIN_NAME,
@@ -20,6 +24,7 @@ import {
   hashId,
   todoStatusFor,
   unifiedDiff,
+  type AttachedSession,
   type ConfigValue,
   type SessionStateName,
 } from '../core/service.js';
@@ -98,9 +103,23 @@ const BRIDGE_CAPABILITY_MAP: Record<string, string[]> = {
   'turn.steer': ['turn.steer'],
   'input.attachments': ['input.localFile', 'input.localImage'],
   'input.skill': ['input.skill'],
-  'session.fork': ['session.fork', 'session.fork.atTurn'],
+  'session.fork': ['session.fork', 'session.fork.atTurn', 'sidechat'],
   'session.native.list': ['session.native.list'],
 };
+
+/**
+ * One open Side Chat route. The transient conversation itself lives as an
+ * attached session keyed by the sidechatId; this record only carries the
+ * parent binding, the sealed resume reference, and the creation anchor.
+ */
+interface SidechatRecord {
+  parentSessionId: string;
+  resumeRefId: string;
+  anchor: SidechatAnchor;
+  createFingerprint: string;
+  /** Set on resume so a retried identical resume replays the first result. */
+  resumeFingerprint?: string;
+}
 
 function canonicalJson(value: unknown): string {
   const canonicalize = (input: unknown): unknown => {
@@ -146,6 +165,14 @@ export class DshV2Adapter {
   }>();
   /** turnId → last steer fingerprint for retry-idempotent steering. */
   private readonly steerFingerprints = new Map<string, string>();
+  /** sidechatId → parent binding / sealed resumeRef / anchor. */
+  private readonly sidechats = new Map<string, SidechatRecord>();
+  /**
+   * Seals Provider-owned recovery data into opaque resumeRefs and persists
+   * hashed close tombstones (GIAN_PLUGIN_DATA_DIR). The ref is never logged
+   * and only travels inside sidechat results.
+   */
+  private readonly resumeStore = new OpaqueSidechatResumeStore();
 
   constructor(
     private readonly bridge: BridgeClient,
@@ -260,6 +287,18 @@ export class DshV2Adapter {
           throw new ServiceError('CAPABILITY_NOT_SUPPORTED', 'session.fork is not advertised for DSH.');
         }
         return this.sessionFork(params);
+      case 'sidechat.create':
+        if (this.capabilities.sidechat === undefined) {
+          throw new ServiceError('CAPABILITY_NOT_SUPPORTED', 'sidechat is not advertised for DSH.');
+        }
+        return this.createSidechat(params);
+      case 'sidechat.resume':
+        if (this.capabilities.sidechat === undefined) {
+          throw new ServiceError('CAPABILITY_NOT_SUPPORTED', 'sidechat is not advertised for DSH.');
+        }
+        return this.resumeSidechat(params);
+      case 'sidechat.close':
+        return this.closeSidechat(params);
       case 'runtime.discover':
         if (this.protocolVersion === '2.1') {
           throw new ServiceError('METHOD_NOT_FOUND', 'runtime.discover requires gian.proxy/2.2.');
@@ -603,8 +642,10 @@ export class DshV2Adapter {
       actions: [
         {
           id: 'sidechat.create',
-          supported: false,
-          reason: 'DSH native fork semantics do not provide an isolated sidechat surface.',
+          supported: this.capabilities.sidechat !== undefined,
+          ...(this.capabilities.sidechat === undefined
+            ? { reason: 'Requires the native fork surface.' }
+            : {}),
         },
         { id: 'session.fork', supported: this.capabilities['session.fork'] !== undefined },
         {
@@ -713,6 +754,10 @@ export class DshV2Adapter {
     if (parsed.hostServices.length > 0) {
       throw new ServiceError('CAPABILITY_NOT_SUPPORTED', 'integration.mcp.streamableHttp is not declared.');
     }
+    // An ordinary session.create must never adopt or revive a Side Chat route.
+    if (this.sidechats.has(parsed.sessionId)) {
+      throw new ServiceError('SESSION_NOT_FOUND', `Session ${parsed.sessionId} is not attached.`);
+    }
     if (parsed.nativeSessionId !== null) {
       const key = this.options.hostBindingKey;
       const binding = {
@@ -770,7 +815,7 @@ export class DshV2Adapter {
   }
 
   private async sessionGet(params: Record<string, unknown>): Promise<unknown> {
-    const session = this.service.requireSession(stringField(params, 'sessionId'));
+    const session = this.requireOrdinarySession(stringField(params, 'sessionId'));
     const remote = await this.bridge.request('session.get', { sessionId: session.id }).catch(() => null);
     return { session: this.snapshot(session.id, session.streamId, remote) };
   }
@@ -936,7 +981,9 @@ export class DshV2Adapter {
     const sourceSessionId = stringField(params, 'sourceSessionId');
     const sourceStreamId = stringField(params, 'sourceStreamId');
     const newSessionId = stringField(params, 'sessionId');
-    const source = this.service.requireStream(sourceSessionId, sourceStreamId);
+    // A Side Chat is a one-off context snapshot and can never seed a
+    // persistent fork (10.5.1).
+    const source = this.requireOrdinaryStream(sourceSessionId, sourceStreamId);
     const anchor = (params.anchor ?? {}) as Record<string, unknown>;
     const sourceNativeId = source.nativeSessionId ?? sourceSessionId;
     let bridgeAnchor: { kind: 'head' } | { kind: 'turn'; nativeTurn: number };
@@ -1017,6 +1064,240 @@ export class DshV2Adapter {
     return latest;
   }
 
+  /* ------------------------------- Side Chat ------------------------------- */
+
+  /**
+   * Ordinary-session lookup: Side Chat routes stay invisible to every core
+   * Session Method; a sidechatId must answer SESSION_NOT_FOUND (10.5.1).
+   */
+  private requireOrdinarySession(sessionId: string) {
+    if (this.sidechats.has(sessionId)) {
+      throw new ServiceError('SESSION_NOT_FOUND', `Session ${sessionId} is not attached.`);
+    }
+    return this.service.requireSession(sessionId);
+  }
+
+  private requireOrdinaryStream(sessionId: string, streamId: string) {
+    const session = this.requireOrdinarySession(sessionId);
+    if (session.streamId !== streamId) {
+      throw new ServiceError('SESSION_STALE', `Stream ${streamId} is no longer active.`);
+    }
+    return session;
+  }
+
+  /**
+   * The Side Chat context boundary follows ADR-0041's idle-only rule: DSH's
+   * native fork only certifies completed-turn cuts, so creation requires an
+   * idle parent and anchors on its latest terminal turn (empty when the
+   * parent never accepted a turn). The activeInput anchor is unavailable
+   * until DSH proves a live-turn boundary.
+   */
+  private sidechatAnchorFor(parent: AttachedSession): {
+    anchor: SidechatAnchor;
+    bridgeAnchor: { kind: 'head' } | { kind: 'turn'; nativeTurn: number };
+  } {
+    if (parent.activeTurn !== null || parent.pendingGianTurns.length > 0 || parent.state === 'running') {
+      throw new ServiceError('SESSION_BUSY', 'Side Chat requires an idle parent Session.');
+    }
+    const latest = this.latestCompletedTurn(parent);
+    if (latest) {
+      const nativeTurn = nativeTurnFromSourceId(latest.sourceTurnId, parent.nativeSessionId ?? parent.id);
+      if (nativeTurn === null) {
+        throw new ServiceError(
+          'FORK_BOUNDARY_UNAVAILABLE',
+          `Side Chat anchor ${latest.sourceTurnId} does not resolve to a native turn.`,
+        );
+      }
+      return {
+        anchor: { type: 'turn', turnId: latest.turnId, sourceTurnId: latest.sourceTurnId },
+        bridgeAnchor: { kind: 'turn', nativeTurn },
+      };
+    }
+    return { anchor: { type: 'empty' }, bridgeAnchor: { kind: 'head' } };
+  }
+
+  private async createSidechat(params: Record<string, unknown>): Promise<unknown> {
+    const parentSessionId = stringField(params, 'parentSessionId');
+    const parentStreamId = stringField(params, 'parentStreamId');
+    const sidechatId = stringField(params, 'sidechatId');
+    const parent = this.requireOrdinaryStream(parentSessionId, parentStreamId);
+    const fingerprint = JSON.stringify({ parentSessionId, parentStreamId });
+    const existing = this.sidechats.get(sidechatId);
+    if (existing) {
+      if (existing.createFingerprint !== fingerprint) {
+        throw new ServiceError('CONFLICT', `Side Chat ${sidechatId} was reused with a different parent.`);
+      }
+      return { sidechat: this.serializeSidechat(this.service.requireSession(sidechatId), existing) };
+    }
+    if (this.service.hasSession(sidechatId)) {
+      throw new ServiceError('CONFLICT', `Side Chat ${sidechatId} already belongs to an ordinary Session.`);
+    }
+    const { anchor, bridgeAnchor } = this.sidechatAnchorFor(parent);
+    const forked = await this.bridge.request('session.fork', {
+      sessionId: parentSessionId,
+      newSessionId: sidechatId,
+      anchor: bridgeAnchor,
+    });
+    const session = (forked.session ?? null) as Record<string, unknown> | null;
+    const nativeId = session !== null && typeof session.nativeId === 'string' ? session.nativeId : null;
+    const attached = this.service.attach({
+      sessionId: sidechatId,
+      cwd: nonEmptyOrDefault(session !== null ? session.cwd : undefined, parent.cwd),
+      roots: session !== null && Array.isArray(session.roots)
+        ? (session.roots as unknown[]).map(String)
+        : parent.roots,
+      // sidechat.create carries no config: the Session-bound config is
+      // inherited verbatim from the parent (10.5.1).
+      sessionConfig: parent.sessionConfig,
+      nativeSessionId: nativeId,
+      createFingerprint: createHash('sha256')
+        .update(canonicalJson({ sidechat: sidechatId, parent: fingerprint }))
+        .digest('hex'),
+    });
+    if (nativeId !== null) attached.nativeSessionId = nativeId;
+    const sealed = this.resumeStore.seal({
+      sidechatId,
+      parentSessionId,
+      nativeSessionId: attached.nativeSessionId ?? sidechatId,
+      anchor,
+      sessionConfig: parent.sessionConfig,
+      createdAt: attached.createdAt,
+    });
+    const record: SidechatRecord = {
+      parentSessionId,
+      resumeRefId: sealed.id,
+      anchor,
+      createFingerprint: fingerprint,
+    };
+    this.sidechats.set(sidechatId, record);
+    return { sidechat: this.serializeSidechat(attached, record) };
+  }
+
+  private async resumeSidechat(params: Record<string, unknown>): Promise<unknown> {
+    const sidechatId = stringField(params, 'sidechatId');
+    const parentSessionId = stringField(params, 'parentSessionId');
+    const resumeRef = (params.resumeRef ?? null) as Record<string, unknown> | null;
+    const resumeRefId = resumeRef !== null && typeof resumeRef.id === 'string' ? resumeRef.id : '';
+    if (resumeRefId.length === 0) {
+      throw new ServiceError('INVALID_PARAMS', 'params.resumeRef.id must be a non-empty string.');
+    }
+    if (this.resumeStore.closed(resumeRefId)) {
+      throw new ServiceError('SIDECHAT_UNAVAILABLE', 'Side Chat was already closed.');
+    }
+    const payload = this.resumeStore.open(resumeRefId);
+    if (!payload) {
+      throw new ServiceError('SIDECHAT_UNAVAILABLE', 'Side Chat resume reference is unavailable.');
+    }
+    if (payload.sidechatId !== sidechatId || payload.parentSessionId !== parentSessionId) {
+      throw new ServiceError('CONFLICT', 'Side Chat resume identity does not match.');
+    }
+    const parent = this.requireOrdinarySession(parentSessionId);
+    const fingerprint = JSON.stringify({ parentSessionId, resumeRefId });
+    const existing = this.sidechats.get(sidechatId);
+    if (existing) {
+      if (existing.resumeFingerprint !== fingerprint) {
+        throw new ServiceError('CONFLICT', `Side Chat ${sidechatId} is attached with another resume reference.`);
+      }
+      return { sidechat: this.serializeSidechat(this.service.requireSession(sidechatId), existing, payload.createdAt) };
+    }
+    if (this.service.hasSession(sidechatId)) {
+      throw new ServiceError('CONFLICT', `Side Chat ${sidechatId} already belongs to an ordinary Session.`);
+    }
+    const resumed = await this.bridge.request('session.resume', {
+      sessionId: sidechatId,
+      nativeSessionId: payload.nativeSessionId,
+    });
+    const session = (resumed.session ?? null) as Record<string, unknown> | null;
+    const nativeId = session !== null && typeof session.nativeId === 'string' ? session.nativeId : null;
+    const attached = this.service.attach({
+      sessionId: sidechatId,
+      cwd: nonEmptyOrDefault(session !== null ? session.cwd : undefined, parent.cwd),
+      roots: session !== null && Array.isArray(session.roots)
+        ? (session.roots as unknown[]).map(String)
+        : parent.roots,
+      sessionConfig: payload.sessionConfig,
+      nativeSessionId: nativeId ?? payload.nativeSessionId,
+      createFingerprint: createHash('sha256')
+        .update(canonicalJson({ sidechatResume: sidechatId, resumeRefId }))
+        .digest('hex'),
+    });
+    if (nativeId !== null) attached.nativeSessionId = nativeId;
+    const record: SidechatRecord = {
+      parentSessionId,
+      resumeRefId,
+      anchor: payload.anchor,
+      createFingerprint: fingerprint,
+      resumeFingerprint: fingerprint,
+    };
+    this.sidechats.set(sidechatId, record);
+    return { sidechat: this.serializeSidechat(attached, record, payload.createdAt) };
+  }
+
+  /**
+   * Close barrier (10.5.4): terminalize the active turn and every open child
+   * lifecycle BEFORE the Success response (the CLI writes the queued events
+   * first for this method), keep the Provider session intact — DSH's
+   * persistence contract has no delete, so providerDataDeleted stays false —
+   * and converge unknown references idempotently.
+   */
+  private async closeSidechat(params: Record<string, unknown>): Promise<unknown> {
+    const sidechatId = stringField(params, 'sidechatId');
+    const resumeRef = (params.resumeRef ?? null) as Record<string, unknown> | null;
+    const resumeRefId = resumeRef !== null && typeof resumeRef.id === 'string' ? resumeRef.id : '';
+    if (resumeRefId.length === 0) {
+      throw new ServiceError('INVALID_PARAMS', 'params.resumeRef.id must be a non-empty string.');
+    }
+    const streamId = typeof params.streamId === 'string' && params.streamId.length > 0
+      ? params.streamId
+      : null;
+    const closed = this.resumeStore.closed(resumeRefId);
+    if (closed) {
+      return {
+        ok: true as const,
+        sidechatId,
+        providerDataDeleted: closed.sidechatId === sidechatId ? closed.providerDataDeleted : false,
+      };
+    }
+    const payload = this.resumeStore.open(resumeRefId);
+    if (payload && payload.sidechatId !== sidechatId) {
+      throw new ServiceError('CONFLICT', 'resumeRef belongs to another live Side Chat.');
+    }
+    const live = this.sidechats.get(sidechatId);
+    if (live) {
+      if (live.resumeRefId !== resumeRefId) {
+        throw new ServiceError('CONFLICT', 'resumeRef belongs to another Side Chat attachment.');
+      }
+      const session = this.service.requireSession(sidechatId);
+      if (streamId !== null && session.streamId !== streamId) {
+        throw new ServiceError('SESSION_STALE', `Stream ${streamId} is no longer active.`);
+      }
+      this.service.closeSidechatRoute(sidechatId);
+      await this.bridge.request('session.close', { sessionId: sidechatId });
+      this.sidechats.delete(sidechatId);
+    }
+    const providerDataDeleted = false;
+    this.resumeStore.rememberClosed(resumeRefId, { sidechatId, providerDataDeleted });
+    return { ok: true as const, sidechatId, providerDataDeleted };
+  }
+
+  private serializeSidechat(
+    session: AttachedSession,
+    sidechat: SidechatRecord,
+    createdAt = session.createdAt,
+  ): Record<string, unknown> {
+    return {
+      id: session.id,
+      parentSessionId: sidechat.parentSessionId,
+      streamId: session.streamId,
+      state: session.state,
+      resumeRef: { id: sidechat.resumeRefId },
+      anchor: sidechat.anchor,
+      sessionConfig: session.sessionConfig,
+      createdAt,
+      updatedAt: session.updatedAt,
+    };
+  }
+
   private async customization(method: string, params: Record<string, unknown>): Promise<unknown> {
     const kind = String(params.kind ?? '');
     if (kind !== 'skill' && kind !== 'mcp' && kind !== 'hook' && kind !== 'rule') {
@@ -1047,7 +1328,9 @@ export class DshV2Adapter {
   private async sessionClose(params: Record<string, unknown>): Promise<unknown> {
     const sessionId = stringField(params, 'sessionId');
     const streamId = stringField(params, 'streamId');
-    const session = this.service.requireStream(sessionId, streamId);
+    // session.close(sidechatId) never closes a Side Chat; only the explicit
+    // sidechat.close barrier may tear the transient route down (10.5.1).
+    const session = this.requireOrdinaryStream(sessionId, streamId);
     if (session.closed) return { ok: true };
     await this.bridge.request('session.close', { sessionId });
     this.service.closeSession(sessionId, streamId);
@@ -1057,7 +1340,7 @@ export class DshV2Adapter {
   private async sessionReplay(params: Record<string, unknown>): Promise<unknown> {
     const sessionId = stringField(params, 'sessionId');
     const streamId = stringField(params, 'streamId');
-    const session = this.service.requireStream(sessionId, streamId);
+    const session = this.requireOrdinaryStream(sessionId, streamId);
     const cursor = params.cursor === null || params.cursor === undefined ? null : String(params.cursor);
     const limit = typeof params.limit === 'number' ? params.limit : 500;
     const page = await this.bridge.request('session.events.read', { sessionId, cursor, limit });
@@ -1437,6 +1720,17 @@ export class DshV2Adapter {
 
   private snapshot(sessionId: string, streamId: string, _remote: Record<string, unknown> | null = null): Record<string, unknown> {
     const session = this.service.requireSession(sessionId);
+    const busy = session.activeTurn !== null
+      || session.pendingGianTurns.length > 0
+      || session.state === 'running';
+    const boundary = this.latestCompletedTurn(session) !== null;
+    const everAccepted = session.acceptedTurns.size > 0;
+    const idleAnchor = !busy && (boundary || !everAccepted);
+    const idleBoundary = !busy && boundary;
+    const forkSupported = this.capabilities['session.fork'] !== undefined;
+    const atTurnSupported = this.capabilities['session.fork.atTurn'] !== undefined;
+    const busyReason = 'Wait for the active turn to finish.';
+    const boundaryReason = 'No stable terminal turn is available in this attach generation.';
     return {
       id: session.id,
       ...(session.nativeSessionId ? { nativeSession: { id: session.nativeSessionId } } : {}),
@@ -1445,6 +1739,26 @@ export class DshV2Adapter {
       sessionConfig: session.sessionConfig,
       createdAt: session.createdAt,
       updatedAt: session.updatedAt,
+      availableActions: {
+        ...(this.capabilities.sidechat === undefined ? {} : {
+          'sidechat.create': {
+            enabled: idleAnchor,
+            ...(idleAnchor ? {} : { reason: busy ? busyReason : boundaryReason }),
+          },
+        }),
+        ...(forkSupported ? {
+          'session.fork': {
+            enabled: idleBoundary,
+            ...(idleBoundary ? {} : { reason: busy ? busyReason : boundaryReason }),
+          },
+        } : {}),
+        ...(atTurnSupported ? {
+          'session.fork.atTurn': {
+            enabled: idleBoundary,
+            ...(idleBoundary ? {} : { reason: busy ? busyReason : boundaryReason }),
+          },
+        } : {}),
+      },
     };
   }
 
@@ -1521,6 +1835,11 @@ function nativeIdFromBridge(remote: unknown): string | null {
   if (session === null || typeof session !== 'object') return null;
   const nativeId = (session as { nativeId?: unknown }).nativeId;
   return typeof nativeId === 'string' && nativeId.length > 0 ? nativeId : null;
+}
+
+/** Bridge cwd values may be empty on resume paths; fall back to the parent's. */
+function nonEmptyOrDefault(value: unknown, fallback: string): string {
+  return typeof value === 'string' && value.length > 0 ? value : fallback;
 }
 
 function coerceInput(input: unknown[]): Array<Record<string, unknown>> {

@@ -13,7 +13,7 @@ types leak into Host/Web.
   (`runtime.verifiedVersions` / `src/identity.ts`). All capability claims
   below carry a file:line reference into that tree.
 - The runtime no longer comes from ZCode.app. Hosted qualification builds the
-  complete CLI from the pinned Git commit and publishes its certified archive.
+  complete CLI from the pinned Git commit and publishes a certified archive.
   `provider/zcode-builtin.json` must remain next to `zcode.cjs`; provenance,
   archive contents and the extracted app-server are checked before publication.
 - Inner app-servers are pooled per canonical workspace cwd
@@ -23,7 +23,7 @@ types leak into Host/Web.
   - `workspace/readState` is gone; the side-effect-free read is
     `workspace/readPresentation` (`packages/shared/src/zcode-protocol/index.ts:1998`).
   - The versioned `gian/modelCatalog` integration exposes allowlisted Registry
-    metadata without credentials or session creation. Session snapshots still
+    metadata without credentials or session creation. Session snapshots may
     narrow model facts to the current selection.
   - Turns are driven by the v4 `sendText` command
     (`packages/shared/src/zcode-protocol-v4/command.ts:81`); legacy
@@ -35,8 +35,8 @@ types leak into Host/Web.
 
 ## Prerequisites the user must satisfy themselves
 
-- Configure a Provider through the installed CLI's `zcode login` or TUI. The
-  pinned CLI uses `~/.zcode/v2/provider_config.json` and can import legacy
+- Configure a Provider through the installed CLI's login or TUI. The pinned
+  CLI uses `~/.zcode/v2/provider_config.json` and can import legacy
   `~/.zcode/cli/config.json`. The Proxy never writes Provider credentials.
 
 ## Capability map
@@ -90,6 +90,13 @@ state, release ownership — provider history stays visible via
 
 ## Known limitations
 
+- Configuration now uses complete `ModelSelection` values, including
+  `options.reasoningLevel`, in both `session/setModel` and `session/send`.
+  The supported modes are build/edit/plan/yolo; the old `auto` choice is not
+  advertised. Failed updates restore the previous complete selection.
+- The extracted Runtime protocol probe must pass both model metadata and
+  presentation requests before publication. Historical real-provider evidence
+  is not a qualification of this source-built candidate.
 - Official MCP auth (`interaction/requestOfficialMcpAuthHeaders`) is answered
   with a structured `official_auth_unavailable`; ZCode degrades gracefully.
 - `interaction/requestProviderRuntimeHeaders` and the browser-control reverse
@@ -109,12 +116,9 @@ state, release ownership — provider history stays visible via
 ## Verification
 
 - `pnpm -F @gian/zcode-proxy build && pnpm -F @gian/zcode-proxy test` —
-  deterministic suite against the scriptable fake app-server,
-  covering every row of the capability map above, live/replay identity,
-  Registry catalog safety, restart recovery, and response-barrier ordering.
-- Hosted qualification builds the pinned managed CLI and probes both
-  `gian/modelCatalog` and `workspace/readPresentation` from its extracted
-  archive before certifying the Proxy/Runtime pair.
+  deterministic suite against the scriptable fake app-server, covering every
+  row of the capability map above, live/replay identity, Registry catalog
+  safety, restart recovery, and response-barrier ordering.
 - `pnpm -F @gian/zcode-proxy test:real-app-server` — EXPLICIT canary against a
   real standalone runtime (synthetic config, no model traffic). It skips with
   an explicit note when only the installed ZCode.app bundle is present
