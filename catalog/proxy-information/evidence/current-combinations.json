@@ -6,6 +6,7 @@
     {
       "id": "claude",
       "displayName": "Claude Code",
+      "version": "0.3.2",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "session",
       "combination": {
@@ -32,6 +33,7 @@
     {
       "id": "codex",
       "displayName": "Codex",
+      "version": "0.3.2",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "shared",
       "combination": {
@@ -85,6 +87,7 @@
     {
       "id": "ai.deepseek.harness",
       "displayName": "DeepSeek Harness",
+      "version": "0.3.3",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "shared",
       "combination": {
@@ -111,6 +114,7 @@
     {
       "id": "com.zhipu.zcode",
       "displayName": "ZCode",
+      "version": "0.4.2",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "shared",
       "combination": {
@@ -137,6 +141,7 @@
     {
       "id": "grok",
       "displayName": "Grok Build",
+      "version": "0.3.6",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "session",
       "combination": {
