@@ -1,6 +1,6 @@
 {
-  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.16.0",
-  "sequence": 16,
+  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.17.0",
+  "sequence": 17,
   "sourceId": "gian-official",
   "plugins": [
     {
@@ -60,16 +60,16 @@
     {
       "id": "kimi",
       "displayName": "Kimi Code",
-      "version": "0.4.2",
+      "version": "0.4.3",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "shared",
       "combination": {
         "certificate": {
-          "id": "proxies-7d321265bc149f4366ad34a6987a9c0c9e4d9fdb-36290943236-1",
-          "sha256": "9d1143fe8fb4219576f2a3a34d60e6da892160afc08e39f38b0688b3b96b70cb"
+          "id": "proxies-e643a988c502fb9c1825b516616b0d68e7bc9beb-36442867052-1",
+          "sha256": "fb1dd946e39d4ca7d11cdf1134660195c8b5cdb55e8e347e1d6d914970ce43c3"
         },
         "companions": [],
-        "generationId": "kimi-0.4.2-runtime-2.1.1",
+        "generationId": "kimi-0.4.3-runtime-2.1.1",
         "runtime": {
           "kind": "native-binary",
           "runtimeId": "kimi",

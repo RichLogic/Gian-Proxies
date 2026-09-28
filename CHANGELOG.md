@@ -1,5 +1,10 @@
 # Gian Proxies Changelog
 
+## Catalog 1.17.0 - 2026-09-28
+
+- Select the published Kimi Proxy 0.4.3 release and its Kimi Code 2.1.1 Runtime.
+- Retain every other signed Proxy coordinate from Catalog 1.16.0. No App release.
+
 ## Kimi Proxy 0.4.3 - 2026-09-28
 
 - Keep previously returned Catalog revisions valid while the underlying Kimi
