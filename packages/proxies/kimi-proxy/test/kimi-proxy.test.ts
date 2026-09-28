@@ -135,6 +135,44 @@ test('catalog projects models/thinking/approval from GET /models and resolve dro
   }
 });
 
+test('catalog.resolve keeps listed and model-specific revisions valid for later effort changes', async () => {
+  const harness = startHarness({
+    models: [
+      { model: 'kimi', display_name: 'Kimi', max_context_size: 256000, support_efforts: ['low', 'high'], default_effort: 'high' },
+      { model: 'k2', display_name: 'K2', max_context_size: 100000, support_efforts: [], default_effort: '' },
+    ],
+    default_model: 'kimi',
+  });
+  try {
+    await initialize(harness);
+    const listed = await harness.request('catalog.list', {});
+    const baseRevision = ((listed.payload as { result: { catalogRevision: string } }).result.catalogRevision);
+    const switched = await harness.request('catalog.resolve', {
+      catalogRevision: baseRevision,
+      sessionConfig: {},
+      turnConfig: { model: 'k2' },
+    });
+    assert.equal(switched.kind, 'result', JSON.stringify(switched.payload));
+    const switchedRevision = ((switched.payload as { result: { catalogRevision: string } }).result.catalogRevision);
+    assert.notEqual(switchedRevision, baseRevision);
+
+    const relisted = await harness.request('catalog.list', {});
+    assert.equal((relisted.payload as { result: { catalogRevision: string } }).result.catalogRevision, baseRevision);
+    for (const revision of [baseRevision, switchedRevision]) {
+      const restored = await harness.request('catalog.resolve', {
+        catalogRevision: revision,
+        sessionConfig: {},
+        turnConfig: { model: 'kimi' },
+      });
+      assert.equal(restored.kind, 'result', JSON.stringify(restored.payload));
+      const options = (restored.payload as { result: { configOptions: Array<{ id: string; choices?: Array<{ value: string }> }> } }).result.configOptions;
+      assert.deepEqual(options.find((option) => option.id === 'thinking')?.choices?.map((choice) => choice.value), ['low', 'high']);
+    }
+  } finally {
+    await harness.close();
+  }
+});
+
 test('session lifecycle: fresh create, snapshot, rename, native list, delete, close-detach', async () => {
   const harness = startHarness({
     sessions: [

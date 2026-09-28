@@ -220,6 +220,7 @@ export class KimiProtocolV2Adapter {
   private readonly replayPager = new ReplayPager();
   private readonly createFingerprints = new Map<string, string>();
   private catalogRevision = '';
+  private readonly knownCatalogRevisions = new Set<string>();
 
   constructor(
     private readonly service: KimiProxyService,
@@ -358,7 +359,13 @@ export class KimiProtocolV2Adapter {
   // ---- catalog ----
 
   private async catalog() {
-    return this.finishCatalog(await this.projectedOptions({}));
+    const payload = await this.finishCatalog(await this.projectedOptions({}));
+    if (payload.catalogRevision !== this.catalogRevision) {
+      this.knownCatalogRevisions.clear();
+      this.catalogRevision = payload.catalogRevision;
+    }
+    this.knownCatalogRevisions.add(payload.catalogRevision);
+    return payload;
   }
 
   private async projectedOptions(turnConfig: TurnConfigMap): Promise<Array<Record<string, unknown>>> {
@@ -456,13 +463,18 @@ export class KimiProtocolV2Adapter {
       actions: payload.actions,
       slashCommands: payload.slashCommands,
     });
-    this.catalogRevision = payload.catalogRevision;
     return payload;
   }
 
   private async resolveCatalog(params: Record<string, unknown>) {
     const catalogRevision = nonEmptyString(params.catalogRevision, 'catalogRevision');
-    if (catalogRevision !== this.catalogRevision) {
+    const baseline = await this.projectedOptions({});
+    const currentRevision = (await this.finishCatalog(baseline)).catalogRevision;
+    if (currentRevision !== this.catalogRevision) {
+      this.knownCatalogRevisions.clear();
+      this.catalogRevision = currentRevision;
+    }
+    if (!this.knownCatalogRevisions.has(catalogRevision)) {
       throw new KimiProtocolError('CONFIG_VALUE_INVALID', 'Unknown catalogRevision; call catalog.list again.');
     }
     const sessionConfig = record(params.sessionConfig);
@@ -487,7 +499,6 @@ export class KimiProtocolV2Adapter {
       ...(typeof turnConfig.thinking === 'string' ? { thinking: turnConfig.thinking } : {}),
       ...(typeof turnConfig.approval_mode === 'string' ? { approval_mode: turnConfig.approval_mode } : {}),
     };
-    const baseline = await this.projectedOptions({});
     const baselineModel = (baseline.find((option) => option.id === 'model') as { defaultValue?: string } | undefined)?.defaultValue;
     const modelChanged = requested.model !== undefined && requested.model !== baselineModel;
     const projected = await this.projectedOptions(requested);
@@ -508,6 +519,7 @@ export class KimiProtocolV2Adapter {
       }
     }
     const payload = await this.finishCatalog(projected);
+    this.knownCatalogRevisions.add(payload.catalogRevision);
     return {
       ...payload,
       resolvedDefaults: {

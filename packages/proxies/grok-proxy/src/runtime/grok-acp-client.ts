@@ -94,6 +94,22 @@ export interface GrokAcpTransport {
 
 export type GrokAcpTransportFactory = (client: Client) => Promise<GrokAcpTransport>;
 
+/** The Agent HOME this Proxy serves: the Host-provided constrained
+ *  GIAN_AGENT_HOME wins; an inherited GROK_HOME is only a compatibility
+ *  fallback for the pre-gate Host generation. */
+export function agentHome(env: NodeJS.ProcessEnv): string | undefined {
+  if (env.GIAN_AGENT_HOME !== undefined && env.GIAN_AGENT_HOME !== '') return env.GIAN_AGENT_HOME;
+  return env.GROK_HOME;
+}
+
+/** Provider-specific child env: translates the Host's constrained
+ *  GIAN_AGENT_HOME into GROK_HOME so the CLI reads its state from the served
+ *  Agent's HOME and never from a stale machine-wide value. */
+export function grokChildHomeEnv(env: NodeJS.ProcessEnv): Record<string, string> {
+  const home = agentHome(env);
+  return home !== undefined ? { GROK_HOME: home } : {};
+}
+
 export interface GrokAcpClientOptions {
   binaryPath: string;
   cwd: string;
@@ -194,6 +210,11 @@ function processTransportFactory(
       env: {
         ...process.env,
         ...options.env,
+        // Home mapping lives in the owning Proxy (Host provides the
+        // constrained universal GIAN_AGENT_HOME). The explicit translation
+        // wins over any inherited GROK_HOME so a stale outer value can never
+        // point the CLI at another Agent's state.
+        ...grokChildHomeEnv(options.env ?? process.env),
         GROK_DISABLE_AUTOUPDATER: '1',
         GROK_SANDBOX: 'workspace',
       },

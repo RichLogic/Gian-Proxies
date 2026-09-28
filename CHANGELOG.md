@@ -1,5 +1,25 @@
 # Gian Proxies Changelog
 
+## Kimi Proxy 0.4.3 - 2026-09-28
+
+- Keep previously returned Catalog revisions valid while the underlying Kimi
+  model catalog is unchanged, so switching models can refresh the available
+  reasoning efforts without an erroneous revision rejection.
+- Require a new `catalog.list` when the underlying model catalog changes.
+  This release does not change the Proxy wire protocol or the Kimi 2.1.1 Runtime pin.
+
+## Published Catalog history restored - 2026-09-28
+
+- Restore the Catalog source that shipped without being merged to main. Grok
+  0.3.6 is an official Catalog plugin, and the authored histories match Catalog
+  1.16: Claude 0.3.2, Codex 0.3.2, Kimi 0.4.2, DeepSeek 0.3.3, ZCode 0.4.2, and
+  Grok 0.3.6.
+- DeepSeek Proxy 0.3.4 and ZCode Proxy 0.4.3 on main already match those
+  published local builds. Source may stay ahead of the last signed snapshot.
+- ZCode qualification uses a short macOS temporary directory so the Runtime
+  socket fits `sun_path`, and keeps a redacted stderr tail when the catalog
+  probe exits early.
+
 ## Catalog 1.10.0 - 2026-09-24
 
 - Select the certified Claude 0.3.2, Codex 0.3.2, Kimi 0.3.3 and DeepSeek 0.3.2

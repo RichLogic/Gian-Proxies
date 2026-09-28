@@ -22,7 +22,7 @@ test('release metadata is derived from every self-describing shipping package', 
   }
 });
 
-test('the published Grok package remains shipping while unknown packages are rejected', () => {
-  assert.equal(proxyReleaseMetadata('grok').id, 'grok');
+test('hidden and unknown packages cannot enter release publication', () => {
+  assert.throws(() => proxyReleaseMetadata('vendor-x'), /not in the shipping/);
   assert.throws(() => proxyReleaseMetadata('unknown'), /not in the shipping/);
 });
