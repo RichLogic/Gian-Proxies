@@ -191,17 +191,31 @@ export class KimiProxyService {
     }
     this.clearInterruptTimer(record.sessionId);
     this.reconcileState(record);
+    this.emitSessionUpdated(record);
   }
 
   // ---- runtime events ----
 
-  private handleFrame(frame: { type: string; seq: number; session_id?: string; payload: Record<string, unknown> }): void {
+  private handleFrame(frame: {
+    type: string;
+    seq: number;
+    session_id?: string;
+    volatile?: boolean;
+    offset?: number;
+    payload: Record<string, unknown>;
+  }): void {
     const sessionId = typeof frame.session_id === 'string' ? frame.session_id : '';
     const gianId = this.byNative.get(sessionId);
     if (gianId === undefined) return;
     const record = this.records.get(gianId);
     if (record === undefined) return;
-    record.projector.handleFrame({ type: frame.type, seq: frame.seq, payload: frame.payload });
+    record.projector.handleFrame({
+      type: frame.type,
+      seq: frame.seq,
+      payload: frame.payload,
+      ...(frame.volatile === true ? { volatile: true } : {}),
+      ...(typeof frame.offset === 'number' ? { offset: frame.offset } : {}),
+    });
     this.reconcileState(record);
   }
 
@@ -407,9 +421,58 @@ export class KimiProxyService {
       streamId: record.streamId,
       state: record.state === 'attaching' ? 'idle' : record.state,
       sessionConfig: {},
+      availableActions: this.availableActions(record),
       createdAt: record.createdAt,
       updatedAt: record.updatedAt,
     };
+  }
+
+  describeSession(sessionId: string): Record<string, unknown> {
+    return this.snapshot(this.requireSession(sessionId));
+  }
+
+  /** Fork and side chat share one gate. `session.fork.atTurn` stays off:
+   *  POST /sessions/{id}/children has no turn boundary. */
+  private availableActions(record: SessionRecord): Record<string, { enabled: boolean; reason?: string }> {
+    const busy = record.activeTurn !== null
+      || record.state === 'running'
+      || record.state === 'waiting_interaction';
+    const ready = !busy && record.state !== 'stale' && record.state !== 'attaching' && record.lastCompleted !== null;
+    const gate = ready
+      ? { enabled: true }
+      : {
+          enabled: false,
+          reason: busy
+            ? 'Wait for the active turn to finish.'
+            : 'No completed turn is available to fork from.',
+        };
+    return {
+      'sidechat.create': { ...gate },
+      'session.fork': { ...gate },
+      'session.fork.atTurn': {
+        enabled: false,
+        reason: 'POST /sessions/{id}/children has no turn boundary.',
+      },
+    };
+  }
+
+  private emitSessionUpdated(record: SessionRecord): void {
+    const state = record.state === 'attaching' ? 'idle' : record.state;
+    this.emitSink({
+      method: 'session.updated',
+      params: {
+        eventId: `evt-${sha32([record.sessionId, 'session.updated', state, record.updatedAt]).slice(0, 16)}`,
+        sessionId: record.sessionId,
+        streamId: record.streamId,
+        sequence: this.nextSequence(record.sessionId),
+        emittedAt: nowIso(),
+        data: {
+          state,
+          availableActions: this.availableActions(record),
+          updatedAt: record.updatedAt,
+        },
+      },
+    });
   }
 
   async closeSession(sessionId: string, streamId: string): Promise<void> {
@@ -546,6 +609,7 @@ export class KimiProxyService {
         data: {},
       },
     });
+    this.emitSessionUpdated(record);
   }
 
   async steerTurn(params: {

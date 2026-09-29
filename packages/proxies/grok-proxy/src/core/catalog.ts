@@ -150,6 +150,8 @@ export function catalogFromModelState(
   };
 }
 
+const TURN_BOUND_OPTION_IDS = new Set(['model', 'reasoning_effort']);
+
 export function toV2ConfigOptions(
   sessionOptions: ReturnType<typeof catalogFromModelState>['sessionOptions'],
 ) {
@@ -157,7 +159,7 @@ export function toV2ConfigOptions(
     return {
       id: option.id,
       displayName: option.displayName,
-      binding: 'session' as const,
+      binding: TURN_BOUND_OPTION_IDS.has(option.id) ? 'turn' as const : 'session' as const,
       control: 'select' as const,
       required: false,
       defaultValue: option.currentValue ?? null,

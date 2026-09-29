@@ -25,7 +25,7 @@ export interface GrokPermissionSpec {
 export const GROK_PERMISSION_SPECS: readonly GrokPermissionSpec[] = [
   {
     id: 'default',
-    displayName: '默认（逐次确认）',
+    displayName: 'Default',
     description: 'Ask before running tools.',
     isDefault: true,
     approval: 'relay',

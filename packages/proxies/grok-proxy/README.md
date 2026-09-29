@@ -47,8 +47,9 @@ override. The effective server catalog is re-verified after attach and
 unexpected entries are reported on the `mcpBoundary` session-update field.
 
 The child always receives `GROK_SANDBOX=workspace` and
-`GROK_DISABLE_AUTOUPDATER=1`. Accordingly, the adapter accepts exactly the
-session cwd as its writable workspace root (`workspace.roots` must be `[cwd]`).
+`GROK_DISABLE_AUTOUPDATER=1`. The sandbox stays the session cwd.
+`workspace.roots` must include that cwd. The Host may also list the session
+attachment directory; that path is not added to the sandbox.
 
 The entry point requires an absolute managed binary path:
 

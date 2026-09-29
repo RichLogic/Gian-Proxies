@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
 import { test } from 'node:test';
 
+import { resultSchemas } from '@gian/proxy-protocol';
+
 import { GrokProxyService } from '../src/core/service.js';
 import { GrokProtocolV2Adapter } from '../src/protocol/v2-adapter.js';
 import type { GrokAcpClient } from '../src/runtime/grok-acp-client.js';
@@ -267,22 +269,23 @@ test('catalog.resolve resolves thinking and defaults from model metadata without
   const { adapter } = wire(service);
   const session = await attachSession(adapter, service);
   const promptCallsBefore = runtime.calls.filter((call) => call === 'session/prompt').length;
-  const resolved = await adapter.handle(v2Request('c1', 'catalog.resolve', {
+  const resolved = resultSchemas['catalog.resolve'].parse(await adapter.handle(v2Request('c1', 'catalog.resolve', {
     catalogRevision: 'rev-1',
     sessionId: session.id,
     streamId: session.streamId,
-    sessionConfig: { model: 'grok-4.6' },
-  })) as {
-    specialCatalogs: Record<string, string>;
-    configOptions: Array<{ id: string; defaultValue: unknown; choices?: unknown[] }>;
-    resolvedDefaults: { sessionConfig: Record<string, unknown> };
-  };
-  assert.equal(resolved.specialCatalogs.model, 'model');
-  assert.equal(resolved.specialCatalogs.thinking, 'reasoning_effort');
-  assert.equal(resolved.specialCatalogs.approvalMode, 'permission_mode');
+    sessionConfig: {},
+    turnConfig: { model: 'grok-4.6' },
+  })));
+  assert.equal(resolved.specialCatalogs?.model, 'model');
+  assert.equal(resolved.specialCatalogs?.thinking, 'reasoning_effort');
+  assert.equal(resolved.specialCatalogs?.approvalMode, 'permission_mode');
   const thinking = resolved.configOptions.find((option) => option.id === 'reasoning_effort');
   assert.equal(thinking?.defaultValue, 'high');
-  assert.equal(resolved.resolvedDefaults.sessionConfig.model, 'grok-4.6');
+  assert.equal(thinking?.binding, 'turn');
+  assert.equal(resolved.resolvedDefaults.turnConfig.model, 'grok-4.6');
+  assert.equal(resolved.resolvedDefaults.turnConfig.reasoning_effort, 'high');
+  assert.equal(resolved.resolvedDefaults.sessionConfig.permission_mode, 'default');
+  assert.equal(resolved.resolvedDefaults.sessionConfig.model, undefined);
   assert.equal(
     runtime.calls.filter((call) => call === 'session/prompt').length,
     promptCallsBefore,

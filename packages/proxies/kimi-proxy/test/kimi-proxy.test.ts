@@ -231,15 +231,22 @@ test('turn lifecycle: prompt payload, event projection, single terminal, barrier
   try {
     await initialize(harness);
     const streamId = await createSession(harness);
+    const before = await harness.request('session.get', { sessionId: 's_1' });
+    const beforeActions = ((before.payload as { result: { session: { availableActions: Record<string, { enabled: boolean }> } } }).result.session.availableActions);
+    assert.equal(beforeActions['session.fork']?.enabled, false, 'fork stays off before a completed turn');
+    assert.equal(beforeActions['sidechat.create']?.enabled, false, 'side chat stays off before a completed turn');
+    assert.equal(beforeActions['session.fork.atTurn']?.enabled, false);
+
     const accepted = await harness.request('turn.start', {
       sessionId: 's_1', streamId, turnId: 't_1',
       input: [{ type: 'text', text: 'say hi' }], config: {},
     });
     assert.equal(accepted.kind, 'result', JSON.stringify(accepted.payload));
 
-    const notifications = await harness.waitNotifications(9);
+    const notifications = await harness.waitNotifications(11);
     const methods = notifications.map((line) => line.method);
-    // turn.started, content.delta x2, content.completed (finalizer), tool running + terminal, usage, turn.completed
+    // turn.started, session.updated running, content.delta x2, activity running + terminal,
+    // usage live, content.completed, usage final, turn.completed, session.updated idle
     assert.equal(methods.filter((method) => method === 'turn.started').length, 1);
     assert.equal(methods.filter((method) => method === 'turn.completed').length, 1, 'exactly one terminal');
     assert.equal(methods.includes('turn.failed'), false);
@@ -257,15 +264,36 @@ test('turn lifecycle: prompt payload, event projection, single terminal, barrier
 
     // content
     const delta = notifications.find((line) => line.method === 'content.delta')!;
-    assert.equal(((delta.payload.params as { data: { delta: string } }).data.delta), 'Hello');
+    const deltaData = (delta.payload.params as { data: { delta: string; kind: string; contentId: string } }).data;
+    assert.equal(deltaData.delta, 'Hello');
+    assert.equal(deltaData.kind, 'text', 'assistant prose is message text, not thinking');
+    assert.equal(deltaData.contentId, `assistant:${sourceTurnId}:0`);
     const contentCompleted = notifications.find((line) => line.method === 'content.completed')!;
-    assert.equal(((contentCompleted.payload.params as { data: { content: string } }).data.content), 'Hello world');
+    assert.equal(((contentCompleted.payload.params as { data: { content: string; kind: string } }).data.content), 'Hello world');
+    assert.equal(((contentCompleted.payload.params as { data: { kind: string } }).data.kind), 'text');
 
     // tool activity running → succeeded
     const activities = notifications.filter((line) => line.method === 'activity.updated')
       .map((line) => (line.payload.params as { data: { activityId: string; status: string } }).data);
     const toolStates = activities.filter((activity) => activity.activityId === 'call_1').map((activity) => activity.status);
     assert.deepEqual(toolStates, ['running', 'succeeded']);
+    const bash = notifications.filter((line) => line.method === 'activity.updated')
+      .map((line) => (line.payload.params as { data: { activityId: string; summary?: string; presentation: { type: string; data: { command?: string } } } }).data)
+      .filter((activity) => activity.activityId === 'call_1');
+    assert.equal(bash[0]?.presentation.type, 'command');
+    assert.equal(bash[0]?.presentation.data.command, 'echo hi');
+    assert.equal(bash[1]?.presentation.type, 'command', 'the terminal row keeps the command presentation');
+    assert.equal(bash[1]?.summary, 'hi');
+
+    const sessionUpdates = notifications.filter((line) => line.method === 'session.updated')
+      .map((line) => (line.payload.params as { data: { state: string; availableActions: Record<string, { enabled: boolean }> } }).data);
+    assert.equal(sessionUpdates.length, 2);
+    assert.equal(sessionUpdates[0]?.state, 'running');
+    assert.equal(sessionUpdates[0]?.availableActions['session.fork']?.enabled, false);
+    assert.equal(sessionUpdates[1]?.state, 'idle');
+    assert.equal(sessionUpdates[1]?.availableActions['session.fork']?.enabled, true);
+    assert.equal(sessionUpdates[1]?.availableActions['sidechat.create']?.enabled, true);
+    assert.equal(sessionUpdates[1]?.availableActions['session.fork.atTurn']?.enabled, false);
 
     // usage from agent.status.updated usage.total
     const usage = notifications.find((line) => line.method === 'usage.updated');
@@ -650,9 +678,10 @@ test('plan and subagent facts project from native displays and lifecycle events'
       { id: 'step-1', text: 'Fix it', status: 'in_progress' },
     ]);
 
-    // plan.waitNotificationFor already consumed turn.started + plan.updated;
-    // exactly 6 notifications remain (todo running/terminal, subagent
-    // spawn/completed, finalize usage, terminal).
+    // plan.waitNotificationFor already consumed turn.started, the running
+    // session.updated, and plan.updated. The next 6 are todo running/terminal,
+    // subagent spawn/completed, finalize usage, and the terminal. The idle
+    // session.updated follows those and is not part of this count.
     const agentActivities = (await harness.waitNotifications(6))
       .filter((line) => line.method === 'activity.updated')
       .map((line) => (line.payload.params as { data: Record<string, unknown> }).data)

@@ -6,11 +6,20 @@
  * - Durable-fact events (turn.started, activities, terminal) derive their
  *   eventId from stable native identities (prompt_id, tool_call_id), so live
  *   and replay projections of the same fact share one identity.
- * - Transient frames (deltas, notices) derive from the wire `seq`, which is
- *   unique and monotonic per session (durable + volatile share the journal
- *   counter).
- * - The seq guard drops frames at or before the last delivered durable seq,
- *   which makes cursor-based reconnect replays idempotent.
+ * - Kimi Code 2.1.1 volatile frames reuse the current durable journal seq
+ *   and are not replayed. They must not advance `lastSeq`. `assistant.delta`
+ *   and `thinking.delta` carry `offset` (length before append; reset when
+ *   `turn.step.started` begins the next step).
+ * - Assistant text and thinking each get a content id per step
+ *   (`assistant:<promptId>:<step>` / `thinking:<promptId>:<step>`). Text stays
+ *   kind `text`, so the host renders it as a message outside the Working
+ *   basket. Thinking stays kind `reasoning` and remains inside that basket.
+ * - A content.delta eventId includes the step, the offset, and the delta.
+ *   Frames that share a seq stay distinct, and an identical redelivery stays
+ *   idempotent.
+ * - Durable frames at or before the last delivered durable seq are dropped,
+ *   so cursor-based reconnect replays stay idempotent. A volatile frame is
+ *   dropped only when its seq is strictly older than that watermark.
  *
  * Main-agent filtering: only `agentId === "main"` frames project as turn
  * content/tools; subagent work arrives via the dedicated `subagent.*` /
@@ -25,6 +34,16 @@ import type { KimiToolDisplay } from './types.js';
 export interface OuterNotification {
   method: string;
   params: Record<string, unknown>;
+}
+
+/** One `/api/v1/ws` session-event frame. `volatile` and `offset` are envelope
+ *  fields on Kimi Code 2.1.1, not payload fields. */
+export interface KimiProjectedFrame {
+  type: string;
+  seq: number;
+  volatile?: boolean;
+  offset?: number;
+  payload: Record<string, unknown>;
 }
 
 export interface KimiErrorLike {
@@ -65,6 +84,15 @@ interface ActiveTurn {
 interface OpenActivity {
   name: string;
   input: unknown;
+  title?: string;
+  presentation?: { type: string; data: Record<string, unknown> };
+}
+
+interface OpenContent {
+  kind: 'text' | 'reasoning';
+  text: string;
+  /** Length of this step's text, matching the server offset cursor. */
+  stepLength: number;
 }
 
 export interface PendingInteractionState {
@@ -76,9 +104,14 @@ export interface PendingInteractionState {
 
 export class KimiSessionProjector {
   private streamId = '';
+  /** Last durable journal seq. Volatile frames reuse this value and must not move it. */
   private lastSeq = -1;
+  /** Bumps on each main-agent `turn.step.started`. Each step owns its content ids. */
+  private contentStep = 0;
+  /** Identity for text deltas that arrive without an offset. */
+  private unoffsetDelta = 0;
   private activeTurn: ActiveTurn | null = null;
-  private readonly openContent = new Map<string, { kind: 'text' | 'reasoning'; text: string }>();
+  private readonly openContent = new Map<string, OpenContent>();
   private readonly openActivities = new Map<string, OpenActivity>();
   readonly pendingInteractions = new Map<string, PendingInteractionState>();
   private lastPlanFingerprint: string | null = null;
@@ -96,6 +129,9 @@ export class KimiSessionProjector {
     this.activeTurn = { gianTurnId: turn.gianTurnId, promptId: turn.promptId, nativeTurnId: null, interruptAccepted: false };
     this.terminalSent = false;
     this.lastError = null;
+    this.lastUsageFingerprint = null;
+    this.contentStep = 0;
+    this.unoffsetDelta = 0;
   }
 
   markInterruptAccepted(): void {
@@ -137,11 +173,14 @@ export class KimiSessionProjector {
     this.services.emit({ method, params });
   }
 
-  /** Feed one wire frame. Returns false when the frame was dropped by the
-   *  seq guard (already delivered). */
-  handleFrame(frame: { type: string; seq: number; payload: Record<string, unknown> }): boolean {
-    if (frame.seq <= this.lastSeq) return false;
-    this.lastSeq = frame.seq;
+  /** Feed one wire frame. Returns false when the seq guard drops it. */
+  handleFrame(frame: KimiProjectedFrame): boolean {
+    if (frame.volatile === true) {
+      if (frame.seq < this.lastSeq) return false;
+    } else {
+      if (frame.seq <= this.lastSeq) return false;
+      this.lastSeq = frame.seq;
+    }
     const payload = frame.payload;
     const agentId = typeof payload.agentId === 'string' ? payload.agentId : 'main';
     const turn = this.activeTurn;
@@ -152,16 +191,29 @@ export class KimiSessionProjector {
         if (typeof payload.turnId === 'number') turn.nativeTurnId = payload.turnId;
         return true;
       }
+      case 'turn.step.started': {
+        if (agentId !== 'main') return true;
+        this.contentStep += 1;
+        return true;
+      }
       case 'assistant.delta':
       case 'thinking.delta': {
         if (agentId !== 'main' || turn === null) return true;
-        const kind = frame.type === 'assistant.delta' ? 'text' : 'reasoning';
-        const contentId = `${kind === 'text' ? 'assistant' : 'thinking'}:${turn.promptId}`;
+        const kind = frame.type === 'assistant.delta' ? 'text' as const : 'reasoning' as const;
+        const contentId = `${kind === 'text' ? 'assistant' : 'thinking'}:${turn.promptId}:${this.contentStep}`;
         const delta = typeof payload.delta === 'string' ? payload.delta : '';
-        const open = this.openContent.get(contentId) ?? { kind, text: '' };
-        open.text += delta;
+        const open = this.openContent.get(contentId) ?? { kind, text: '', stepLength: 0 };
+        const offset = typeof frame.offset === 'number' && Number.isFinite(frame.offset) ? frame.offset : null;
+        if (offset !== null) {
+          if (offset < open.stepLength) return true;
+          if (offset > open.stepLength) open.stepLength = offset;
+        }
         this.openContent.set(contentId, open);
-        this.emitTurn('content.delta', [frame.seq, 'delta'], { contentId, kind, delta }, turn);
+        if (delta === '') return true;
+        const position = offset ?? this.unoffsetDelta++;
+        open.text += delta;
+        open.stepLength += delta.length;
+        this.emitTurn('content.delta', [frame.type, this.contentStep, position, delta], { contentId, kind, delta }, turn);
         return true;
       }
       case 'tool.call.started': {
@@ -175,16 +227,19 @@ export class KimiSessionProjector {
         } else if (display?.kind === 'plan_review' && typeof display.plan === 'string') {
           this.emitPlanReview(display);
         }
-        this.openActivities.set(toolCallId, { name, input: payload.args });
+        const projected = projectToolCall(name, display, payload.args);
+        this.openActivities.set(toolCallId, {
+          name,
+          input: payload.args,
+          title: projected.title,
+          presentation: projected.presentation,
+        });
         this.emitTurn('activity.updated', [toolCallId, 'activity:running'], {
           activityId: toolCallId,
           kind: `tool:${name}`,
-          title: name,
+          title: projected.title,
           status: 'running',
-          presentation: {
-            type: 'tool',
-            data: { name, ...(payload.args !== undefined ? { input: payload.args } : {}) },
-          },
+          presentation: projected.presentation,
           ...(display !== undefined ? { details: { display } } : {}),
         }, turn);
         return true;
@@ -196,19 +251,15 @@ export class KimiSessionProjector {
         const open = this.openActivities.get(toolCallId);
         const name = open?.name ?? 'tool';
         this.openActivities.delete(toolCallId);
+        const presentation = open?.presentation ?? projectToolCall(name, undefined, open?.input).presentation;
+        const data: Record<string, unknown> = { ...presentation.data, output: payload.output ?? null };
         this.emitTurn('activity.updated', [toolCallId, 'activity:terminal'], {
           activityId: toolCallId,
           kind: `tool:${name}`,
-          title: name,
+          title: open?.title ?? name,
           status: payload.isError === true ? 'failed' : 'succeeded',
-          presentation: {
-            type: 'tool',
-            data: {
-              name,
-              ...(open?.input !== undefined ? { input: open.input } : {}),
-              output: payload.output ?? null,
-            },
-          },
+          ...(typeof payload.output === 'string' ? { summary: payload.output } : {}),
+          presentation: { type: presentation.type, data },
         }, turn);
         return true;
       }
@@ -224,7 +275,7 @@ export class KimiSessionProjector {
             const inputTokens = (numberOr(total.inputOther) ?? 0) + (numberOr(total.inputCacheRead) ?? 0) + (numberOr(total.inputCacheCreation) ?? 0);
             const outputTokens = numberOr(total.output);
             const cached = numberOr(total.inputCacheRead);
-            this.emitTurn('usage.updated', [frame.seq, 'usage'], {
+            this.emitTurn('usage.updated', ['usage', turn?.promptId ?? '', fingerprint], {
               conversation: {
                 mode: 'absolute',
                 ...(inputTokens > 0 ? { inputTokens } : {}),
@@ -541,15 +592,16 @@ export class KimiSessionProjector {
     this.openContent.clear();
 
     for (const [activityId, activity] of this.openActivities) {
+      const presentation = activity.presentation ?? {
+        type: 'tool',
+        data: { name: activity.name },
+      };
       this.emitTurn('activity.updated', [activityId, 'activity:finalizer'], {
         activityId,
         kind: `tool:${activity.name}`,
-        title: activity.name,
+        title: activity.title ?? activity.name,
         status: turn.interruptAccepted ? 'cancelled' : 'failed',
-        presentation: {
-          type: 'tool',
-          data: { name: activity.name },
-        },
+        presentation,
       }, turn);
     }
     this.openActivities.clear();
@@ -557,7 +609,7 @@ export class KimiSessionProjector {
     try {
       const usage = await this.services.finalUsage();
       if (usage !== null) {
-        this.emitTurn('usage.updated', ['final-usage', usage], {
+        this.emitTurn('usage.updated', ['final-usage', turn.promptId, usage], {
           conversation: {
             mode: 'absolute',
             ...(numberOr(usage.input_tokens) !== null ? { inputTokens: numberOr(usage.input_tokens) } : {}),
@@ -636,6 +688,84 @@ export class KimiSessionProjector {
       },
     });
   }
+}
+
+function argsRecord(value: unknown): Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
+
+function argString(args: Record<string, unknown>, key: string): string | null {
+  const value = args[key];
+  return typeof value === 'string' && value !== '' ? value : null;
+}
+
+interface ToolProjection {
+  title: string;
+  presentation: { type: string; data: Record<string, unknown> };
+}
+
+function genericTool(name: string, args: unknown): ToolProjection {
+  return {
+    title: name,
+    presentation: {
+      type: 'tool',
+      data: {
+        name,
+        ...(args !== undefined ? { input: args } : {}),
+      },
+    },
+  };
+}
+
+/** Map a Kimi tool display onto a basket row. Assistant prose is not a tool
+ *  and never comes through here. */
+function projectToolCall(name: string, display: KimiToolDisplay | undefined, args: unknown): ToolProjection {
+  const record = argsRecord(args);
+  if (display?.kind === 'command') {
+    const command = (typeof display.command === 'string' && display.command !== '' ? display.command : null)
+      ?? argString(record, 'command');
+    if (command !== null) {
+      return { title: command, presentation: { type: 'command', data: { command } } };
+    }
+  }
+  if (display?.kind === 'url_fetch') {
+    const query = (typeof display.url === 'string' && display.url !== '' ? display.url : null)
+      ?? argString(record, 'url');
+    if (query !== null) {
+      return { title: query, presentation: { type: 'search', data: { query } } };
+    }
+  }
+  if (display?.kind === 'file_io') {
+    const path = display.path ?? argString(record, 'path') ?? argString(record, 'file_path') ?? '';
+    const operation = display.operation ?? '';
+    if (path !== '' && (operation === 'read' || operation === 'write' || operation === 'delete' || operation === 'rename')) {
+      return { title: path, presentation: { type: 'file', data: { path, operation } } };
+    }
+    if (path !== '' && operation === 'edit') {
+      return { title: path, presentation: { type: 'file', data: { path, operation: 'write' } } };
+    }
+    if (operation === 'grep' || operation === 'glob' || operation === 'search') {
+      const pattern = argString(record, 'pattern')
+        ?? argString(record, 'glob')
+        ?? argString(record, 'query')
+        ?? (typeof display.query === 'string' && display.query !== '' ? display.query : null)
+        ?? name;
+      return {
+        title: pattern,
+        presentation: {
+          type: 'file-search',
+          data: {
+            pattern,
+            searchKind: operation === 'glob' ? 'glob' : 'grep',
+            ...(path !== '' ? { path } : {}),
+          },
+        },
+      };
+    }
+  }
+  return genericTool(name, args);
 }
 
 function numberOr(value: unknown): number | null {

@@ -349,6 +349,19 @@ function sanitizeUsage(data: Record<string, unknown>): Record<string, unknown> |
   return next;
 }
 
+// A conversation delta without a turn is rejected by the Host. When the turn
+// has already ended, keep a context snapshot and drop only the delta.
+function usageDeliverable(
+  usage: Record<string, unknown>,
+  turnId: string | undefined,
+): Record<string, unknown> | null {
+  if (turnId || record(usage.conversation).mode !== 'delta') return usage;
+  if (usage.context === undefined) return null;
+  const next = { ...usage };
+  delete next.conversation;
+  return next;
+}
+
 export class GrokProtocolV2Adapter {
   private readonly sessions = new Map<string, AttachedSession>();
   private readonly sessionByServiceId = new Map<string, AttachedSession>();
@@ -359,6 +372,13 @@ export class GrokProtocolV2Adapter {
   /** Maps turn ids minted by GrokProxyService to the Host turn.start id. */
   private readonly hostTurnByServiceTurn = new Map<string, string>();
   private readonly startedTurns = new Set<string>();
+  // Held until turn.started is queued. Config applied inside turn.start can
+  // emit model, effort, and MCP notices before the Host has a live turn.
+  private readonly pendingTurnEvents = new Map<string, Array<{
+    method: string;
+    data: Record<string, unknown>;
+    identity?: string;
+  }>>();
   private readonly interruptedTurns = new Set<string>();
   private readonly interactions = new Map<string, InteractionRef>();
   private readonly openActivitiesByTurn = new Map<string, Set<string>>();
@@ -753,6 +773,7 @@ export class GrokProtocolV2Adapter {
   private sessionConfigFromRequested(requested: Record<string, unknown>): Record<string, ConfigValue> {
     const next: Record<string, ConfigValue> = {};
     for (const option of toV2ConfigOptions(this.service.currentCatalog().sessionOptions)) {
+      if (option.binding !== 'session') continue;
       const value = requested[option.id] !== undefined
         ? requested[option.id]
         : option.defaultValue;
@@ -783,10 +804,12 @@ export class GrokProtocolV2Adapter {
       ? workspace.roots.filter((item): item is string => typeof item === 'string').map((root) => resolve(root))
       : [];
     const uniqueRoots = [...new Set(roots)];
-    if (uniqueRoots.length !== 1 || uniqueRoots[0] !== cwd) {
+    // The sandbox granted to Grok is the session cwd. The Host also lists the
+    // session attachment directory here; that path is not added to the sandbox.
+    if (!uniqueRoots.includes(cwd)) {
       throw new GrokProtocolError(
         'CONFIG_VALUE_INVALID',
-        'Grok workspace sandbox requires workspace.roots to be exactly the session cwd.',
+        'Grok workspace sandbox requires workspace.roots to include the session cwd.',
       );
     }
     if (params.hostServices !== undefined) {
@@ -1257,6 +1280,9 @@ export class GrokProtocolV2Adapter {
     this.openContentByTurn.set(this.turnKey(session.id, turnId), new Map());
     try {
       this.validateConfig(config, 'turn', session.sessionConfig);
+      if (Object.keys(config).length > 0) {
+        await this.applyConfigMap(session.serviceSessionId, config);
+      }
       const normalized = normalizeInputItems(input, session.cwd);
       this.identityStore.recordLive(session.nativeSessionId, turnId, normalized);
       await this.service.beginTurn({
@@ -1443,10 +1469,10 @@ export class GrokProtocolV2Adapter {
   }
 
   /**
-   * catalog.resolve: resolve the session-scoped config surface for a
-   * requested model from runtime model metadata — thinking (reasoning
-   * effort) choices, input kinds, and defaults. No model is called and no
-   * live session is mutated.
+   * catalog.resolve: project the requested model's thinking choices and
+   * defaults. Model and thinking are turn-bound; permission mode stays
+   * session-bound. Both resolved default maps are always present. No model
+   * is called and no live session is mutated.
    */
   private async resolveCatalog(params: Record<string, unknown>) {
     const catalogRevision = nonEmptyString(params.catalogRevision);
@@ -1457,14 +1483,6 @@ export class GrokProtocolV2Adapter {
       throw new GrokJsonRpcError(-32602, 'sessionId and streamId must be sent together.');
     }
     if (sessionId && streamId) this.requireOrdinaryAttached(sessionId, streamId);
-    const sessionConfig = record(params.sessionConfig);
-    const turnConfig = record(params.turnConfig);
-    if (Object.keys(turnConfig).length > 0) {
-      throw new GrokProtocolError(
-        'CONFIG_BINDING_INVALID',
-        'Grok config options are session-bound; send them in sessionConfig, not turnConfig.',
-      );
-    }
     const raw = this.sessions.size > 0
       ? this.service.currentCatalog()
       : await this.service.listCapabilities();
@@ -1479,66 +1497,90 @@ export class GrokProtocolV2Adapter {
     if (models.length === 0) {
       throw new GrokProtocolError('CAPABILITY_NOT_SUPPORTED', 'Grok model metadata is not available.');
     }
-    const requestedModelId = typeof sessionConfig.model === 'string' ? sessionConfig.model : null;
-    const model = requestedModelId
-      ? models.find(item => item.id === requestedModelId)
-      : models.find(item => item.isDefault) ?? models[0]!;
-    if (!model) {
+    const sessionConfig = record(params.sessionConfig);
+    const turnConfig = record(params.turnConfig);
+    const turnDraft: Record<string, unknown> = { ...turnConfig };
+    // A page still holding the older session-bound catalog sends model and
+    // reasoning_effort inside sessionConfig. Lift them so that resolve can
+    // return the turn-bound catalog. An explicit turnConfig value wins.
+    for (const key of ['model', 'reasoning_effort']) {
+      if (!Object.prototype.hasOwnProperty.call(sessionConfig, key)) continue;
+      if (!Object.prototype.hasOwnProperty.call(turnDraft, key)) {
+        turnDraft[key] = sessionConfig[key];
+      }
+      delete sessionConfig[key];
+    }
+    this.validateConfig(sessionConfig, 'session');
+    const requestedModelId = typeof turnDraft.model === 'string' ? turnDraft.model : null;
+    const requestedModel = requestedModelId
+      ? models.find((item) => item.id === requestedModelId)
+      : undefined;
+    const resolvedModel = requestedModel
+      ?? (requestedModelId ? undefined : models.find((item) => item.isDefault) ?? models[0]);
+    if (resolvedModel && typeof turnDraft.reasoning_effort === 'string') {
+      const allowed = new Set(resolvedModel.efforts.map((effort) => effort.id));
+      if (!allowed.has(turnDraft.reasoning_effort)) {
+        const advertised = this.advertisedOptions().find((option) => option.id === 'reasoning_effort');
+        const known = advertised?.choices?.some((choice) => (
+          Object.is(choice.value, turnDraft.reasoning_effort)
+        )) === true;
+        // A thinking value left over from another model is dropped. The
+        // selected model's own default takes its place.
+        if (known) delete turnDraft.reasoning_effort;
+      }
+    }
+    const conditionValues: Record<string, ConfigValue> = resolvedModel && turnDraft.model === undefined
+      ? { model: resolvedModel.id }
+      : {};
+    this.validateConfig(turnDraft, 'turn', conditionValues);
+    if (!resolvedModel) {
       throw new GrokProtocolError(
         'CONFIG_VALUE_INVALID',
         `Unknown Grok model ${String(requestedModelId)}.`,
       );
     }
-    const permissionChoices = raw.modes.map((mode: { id: string; displayName: string }) => ({
-      value: mode.id,
-      displayName: mode.displayName,
-    }));
-    const configOptions = toV2ConfigOptions([
-      {
-        id: 'model',
-        displayName: 'Model',
-        category: 'model',
-        type: 'select' as const,
-        scope: 'session' as const,
-        currentValue: model.id,
-        choices: [{ value: model.id, displayName: model.displayName }],
-      },
-      ...(model.efforts.length > 0 ? [{
-        id: 'reasoning_effort',
-        displayName: 'Thinking',
-        category: 'reasoning_effort',
-        type: 'select' as const,
-        scope: 'session' as const,
-        currentValue: model.efforts.find(effort => effort.isDefault)?.id ?? model.efforts[0]!.id,
-        choices: model.efforts.map(effort => ({
+    const effortDefault = resolvedModel.efforts.find((effort) => effort.isDefault)?.id
+      ?? resolvedModel.efforts[0]?.id
+      ?? null;
+    const configOptions = toV2ConfigOptions(raw.sessionOptions).flatMap((option) => {
+      if (option.id === 'model') return [{ ...option, defaultValue: resolvedModel.id }];
+      if (option.id !== 'reasoning_effort') return [option];
+      if (resolvedModel.efforts.length === 0 || effortDefault === null) return [];
+      return [{
+        ...option,
+        defaultValue: effortDefault,
+        choices: resolvedModel.efforts.map((effort) => ({
           value: effort.id,
           displayName: effort.displayName,
         })),
-        enabledWhen: [{ optionId: 'model', oneOf: [model.id] as ConfigValue[] }],
-      }] : []),
-      {
-        id: 'permission_mode',
-        displayName: 'Mode',
-        category: 'mode',
-        type: 'select' as const,
-        scope: 'session' as const,
-        currentValue: (this.service.currentCatalog().sessionOptions.find(option => option.id === 'permission_mode')?.currentValue ?? 'default') as string,
-        choices: permissionChoices,
-      },
-    ]);
-    const resolvedDefaults: { sessionConfig: Record<string, ConfigValue> } = { sessionConfig: {} };
-    for (const option of configOptions) {
-      if (sessionConfig[option.id] !== undefined) continue;
-      if (!isConfigValue(option.defaultValue) || option.defaultValue === null) continue;
-      if (option.id === 'model' && option.defaultValue !== model.id) continue;
-      resolvedDefaults.sessionConfig[option.id] = option.defaultValue;
+        enabledWhen: [{ optionId: 'model', oneOf: [resolvedModel.id] }],
+      }];
+    });
+    const resolvedDefaults: {
+      sessionConfig: Record<string, ConfigValue>;
+      turnConfig: Record<string, ConfigValue>;
+    } = {
+      sessionConfig: {},
+      turnConfig: { model: resolvedModel.id },
+    };
+    if (
+      effortDefault !== null
+      && turnDraft.reasoning_effort === undefined
+    ) {
+      resolvedDefaults.turnConfig.reasoning_effort = effortDefault;
     }
-    if (resolvedDefaults.sessionConfig.model === undefined) {
-      resolvedDefaults.sessionConfig.model = model.id;
+    const permission = configOptions.find((option) => option.id === 'permission_mode');
+    if (
+      permission
+      && sessionConfig.permission_mode === undefined
+      && isConfigValue(permission.defaultValue)
+      && permission.defaultValue !== null
+    ) {
+      resolvedDefaults.sessionConfig.permission_mode = permission.defaultValue;
     }
     const payload = {
       catalogRevision: stableId('catalog-resolve', {
-        model: model.id,
+        model: resolvedModel.id,
         options: configOptions,
       }),
       input: [
@@ -1548,9 +1590,13 @@ export class GrokProtocolV2Adapter {
       ],
       configOptions,
       specialCatalogs: {
-        model: 'model',
-        ...(model.efforts.length > 0 ? { thinking: 'reasoning_effort' } : {}),
-        approvalMode: 'permission_mode',
+        ...(configOptions.some((option) => option.id === 'model') ? { model: 'model' } : {}),
+        ...(configOptions.some((option) => option.id === 'reasoning_effort')
+          ? { thinking: 'reasoning_effort' }
+          : {}),
+        ...(configOptions.some((option) => option.id === 'permission_mode')
+          ? { approvalMode: 'permission_mode' }
+          : {}),
       },
       slashCommands: [] as Array<{ name: string; description: string; source: 'builtin'; argHints: Array<{ kind: 'free'; placeholder: string }> }>,
       resolvedDefaults,
@@ -1570,10 +1616,8 @@ export class GrokProtocolV2Adapter {
       ?? this.activeTurnBySession.get(session.id);
 
     if (method === 'turn.started') {
-      if (!turnId || this.startedTurns.has(this.turnKey(session.id, turnId))) return;
-      this.startedTurns.add(this.turnKey(session.id, turnId));
-      this.updateSession(session, { state: 'running', lastError: null });
-      this.emitTurnEvent('turn.started', session, turnId, {});
+      if (!turnId) return;
+      this.ensureTurnStarted(session, turnId);
       return;
     }
     if (method === 'turn.completed') {
@@ -1585,7 +1629,8 @@ export class GrokProtocolV2Adapter {
       return;
     }
     if (method === 'usage.updated') {
-      const usage = sanitizeUsage(data);
+      const sanitized = sanitizeUsage(data);
+      const usage = sanitized ? usageDeliverable(sanitized, turnId) : null;
       if (!usage) return;
       if (turnId) this.emitTurnEvent('usage.updated', session, turnId, usage);
       else this.emitSessionEvent('usage.updated', session, usage);
@@ -1871,7 +1916,8 @@ export class GrokProtocolV2Adapter {
       return;
     }
     if (event.method === 'usage.updated') {
-      const usage = sanitizeUsage(event.data);
+      const sanitized = sanitizeUsage(event.data);
+      const usage = sanitized ? usageDeliverable(sanitized, turnId) : null;
       if (!usage) return;
       if (turnId) this.emitTurnEvent('usage.updated', session, turnId, usage);
       else this.emitSessionEvent('usage.updated', session, usage);
@@ -1922,6 +1968,7 @@ export class GrokProtocolV2Adapter {
     data: Record<string, unknown>,
   ): void {
     if (!this.activeTurnBySession.has(session.id)) return;
+    this.ensureTurnStarted(session, turnId);
     const terminalOrder = this.terminalOrderBySession.get(session.id) ?? [];
     if (!terminalOrder.some((entry) => entry.turnId === turnId)) {
       terminalOrder.push({ turnId, sourceTurnId: turnId });
@@ -2226,6 +2273,25 @@ export class GrokProtocolV2Adapter {
       : entityIdentity ?? `occurrence:${occurrence}`;
   }
 
+  private ensureTurnStarted(session: AttachedSession, turnId: string): void {
+    const key = this.turnKey(session.id, turnId);
+    if (this.startedTurns.has(key)) return;
+    this.startedTurns.add(key);
+    this.updateSession(session, { state: 'running', lastError: null });
+    this.emitTurnEvent('turn.started', session, turnId, {});
+    this.flushTurnPrelude(session, turnId);
+  }
+
+  private flushTurnPrelude(session: AttachedSession, turnId: string): void {
+    const key = this.turnKey(session.id, turnId);
+    const pending = this.pendingTurnEvents.get(key);
+    if (!pending || pending.length === 0) return;
+    this.pendingTurnEvents.delete(key);
+    for (const event of pending) {
+      this.emitTurnEvent(event.method, session, turnId, event.data, event.identity);
+    }
+  }
+
   private emitTurnEvent(
     method: string,
     session: AttachedSession,
@@ -2234,6 +2300,16 @@ export class GrokProtocolV2Adapter {
     identity?: string,
   ): void {
     const turnKey = this.turnKey(session.id, turnId);
+    if (method !== 'turn.started' && !this.startedTurns.has(turnKey)) {
+      const pending = this.pendingTurnEvents.get(turnKey) ?? [];
+      pending.push({
+        method,
+        data,
+        ...(identity !== undefined ? { identity } : {}),
+      });
+      this.pendingTurnEvents.set(turnKey, pending);
+      return;
+    }
     const occurrenceKey = `${turnKey}\u0000${method}`;
     const occurrence = (this.eventOccurrences.get(occurrenceKey) ?? 0) + 1;
     this.eventOccurrences.set(occurrenceKey, occurrence);
@@ -2291,6 +2367,7 @@ export class GrokProtocolV2Adapter {
     const key = this.turnKey(sessionId, turnId);
     this.activeTurnBySession.delete(sessionId);
     this.startedTurns.delete(key);
+    this.pendingTurnEvents.delete(key);
     this.interruptedTurns.delete(key);
     this.openActivitiesByTurn.delete(key);
     this.openContentByTurn.delete(key);

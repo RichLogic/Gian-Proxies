@@ -2,7 +2,7 @@
   "schema": 1,
   "product": "Gian-Proxies",
   "sourceRepository": "RichLogic/Gian-Dev",
-  "sourceCommit": "95e616d17c86da6a4c5de2df1e00e0f0ebe105ad",
+  "sourceCommit": "da1b4a3b6dd4decf2d4addd4da2e9924f0d5a293",
   "workingTree": false,
   "externalPackages": [
     {
@@ -201,17 +201,17 @@
     {
       "source": "catalog/official-source/plugins/grok/assets/logo-dark.png",
       "path": "catalog/official-source/plugins/grok/assets/logo-dark.png",
-      "sha256": "ebf4f635a17d10d6eb46ba680b70142419aa3220f228001a036d311a22ee9d2a"
+      "sha256": "2c645c9b9ab3a2d0669f8ac5cb41edd6e8917093d0f611ebfe99e50b4f2d233e"
     },
     {
       "source": "catalog/official-source/plugins/grok/assets/logo-light.png",
       "path": "catalog/official-source/plugins/grok/assets/logo-light.png",
-      "sha256": "ebf4f635a17d10d6eb46ba680b70142419aa3220f228001a036d311a22ee9d2a"
+      "sha256": "2c645c9b9ab3a2d0669f8ac5cb41edd6e8917093d0f611ebfe99e50b4f2d233e"
     },
     {
       "source": "catalog/official-source/plugins/grok/entry.json",
       "path": "catalog/official-source/plugins/grok/entry.json",
-      "sha256": "c74cebfe4c3cb66cfc0f8bc4dbf4dc29f676cfa9b811f520030b7009a844603a"
+      "sha256": "7c988a851fec9ee9f9846203f2277e17b8b579925de8641c91fc11e670f1e78b"
     },
     {
       "source": "catalog/official-source/plugins/grok/overview.md",
@@ -226,7 +226,7 @@
     {
       "source": "catalog/official-source/plugins/grok/sidecar.json",
       "path": "catalog/official-source/plugins/grok/sidecar.json",
-      "sha256": "5d5c44bd06be7e905454e6e175354d42a520a307217b4c95577c2b06f42da422"
+      "sha256": "69720ac628ad824b84ac77b02253ea633c71e0f11578b0a0c4dc703200c2142e"
     },
     {
       "source": "catalog/official-source/plugins/grok/troubleshooting.md",
@@ -251,7 +251,7 @@
     {
       "source": "catalog/official-source/plugins/kimi/entry.json",
       "path": "catalog/official-source/plugins/kimi/entry.json",
-      "sha256": "7c6bbf6d0978e8bffd551e91bd9a6e8dfd760e5868b2733c805f54663c47f3ac"
+      "sha256": "afa93709deb52f228d720a8672f5ff9b234e1de181af344fe6bc3ba581d6c743"
     },
     {
       "source": "catalog/official-source/plugins/kimi/overview.md",
@@ -266,7 +266,7 @@
     {
       "source": "catalog/official-source/plugins/kimi/sidecar.json",
       "path": "catalog/official-source/plugins/kimi/sidecar.json",
-      "sha256": "87d4a55580e2f95869704f1eb94c94abc797bb550a6b60573444b1b72a70e55b"
+      "sha256": "dd2c3555bb8355e78285c3d7477784032eeac29433bf853c3d4a6d5c4e01a657"
     },
     {
       "source": "catalog/official-source/plugins/kimi/troubleshooting.md",
@@ -516,7 +516,7 @@
     {
       "source": "delivery/proxies/CHANGELOG.md",
       "path": "CHANGELOG.md",
-      "sha256": "435beb7e95debfa3a284a2dd4bbf1d52a185f26cd2389196d09ef5a774c73416"
+      "sha256": "cf234dac6efc65781eb88210bdfcacb3d72d202bb83d2c32c2c9a3c796f90dbe"
     },
     {
       "source": "delivery/proxies/README.md",
@@ -531,7 +531,7 @@
     {
       "source": "delivery/proxies/release-selection.json",
       "path": "release-selection.json",
-      "sha256": "e2c7148d3b88eeb781947290f5f788c169d90adf75f6a050decc2ab8925b83d7"
+      "sha256": "ebc2408867ff7548713f8829c5d12a882bde093e784d989e2e1c2d84da225d2a"
     },
     {
       "source": "delivery/proxies/scripts/catalog-docs-policy.mjs",
@@ -1421,27 +1421,27 @@
     {
       "source": "packages/proxies/grok-proxy/README.md",
       "path": "packages/proxies/grok-proxy/README.md",
-      "sha256": "ba28a96bed04bcc945b7a16116a9f96cbb3e9aff734006cecfb4e47515421b74"
+      "sha256": "e3d7509e4dd392d30eb8fb0e2c298ef76e0d6b9384cec2ea9e51837637a7b432"
     },
     {
       "source": "packages/proxies/grok-proxy/assets/logo-dark.png",
       "path": "packages/proxies/grok-proxy/assets/logo-dark.png",
-      "sha256": "ebf4f635a17d10d6eb46ba680b70142419aa3220f228001a036d311a22ee9d2a"
+      "sha256": "2c645c9b9ab3a2d0669f8ac5cb41edd6e8917093d0f611ebfe99e50b4f2d233e"
     },
     {
       "source": "packages/proxies/grok-proxy/assets/logo-light.png",
       "path": "packages/proxies/grok-proxy/assets/logo-light.png",
-      "sha256": "ebf4f635a17d10d6eb46ba680b70142419aa3220f228001a036d311a22ee9d2a"
+      "sha256": "2c645c9b9ab3a2d0669f8ac5cb41edd6e8917093d0f611ebfe99e50b4f2d233e"
     },
     {
       "source": "packages/proxies/grok-proxy/manifest.json",
       "path": "packages/proxies/grok-proxy/manifest.json",
-      "sha256": "5d5c44bd06be7e905454e6e175354d42a520a307217b4c95577c2b06f42da422"
+      "sha256": "69720ac628ad824b84ac77b02253ea633c71e0f11578b0a0c4dc703200c2142e"
     },
     {
       "source": "packages/proxies/grok-proxy/package.json",
       "path": "packages/proxies/grok-proxy/package.json",
-      "sha256": "f8aa3fa562c4be5bbc8db47d7bbc42c0d078a6ba801fa75e83a630d6d965a2f3"
+      "sha256": "bb140665e64e11d7c3663a0f170dd94f2f89a4b668ece22c64a315b111d2942c"
     },
     {
       "source": "packages/proxies/grok-proxy/scripts/fake-catalog-ui-proxy.mjs",
@@ -1451,12 +1451,12 @@
     {
       "source": "packages/proxies/grok-proxy/src/cli/spawn.ts",
       "path": "packages/proxies/grok-proxy/src/cli/spawn.ts",
-      "sha256": "16cca88fe1e46dc0003c98056071a1edaadb46b2a2332099149ad6fccea4dca4"
+      "sha256": "261148aabfc9d0db8dcc0b3a291695b6cdb683276968b1800805dc1c99b8b6d3"
     },
     {
       "source": "packages/proxies/grok-proxy/src/core/catalog.ts",
       "path": "packages/proxies/grok-proxy/src/core/catalog.ts",
-      "sha256": "d159494b1046896c0fcc9c7893a8efefd95fbc5228b1724a615f384c5fd73c65"
+      "sha256": "1b434075f0e288b1812fea9bdc728e739f43f917bf4d24240cdb681bbcaa99b0"
     },
     {
       "source": "packages/proxies/grok-proxy/src/core/customization.ts",
@@ -1486,7 +1486,7 @@
     {
       "source": "packages/proxies/grok-proxy/src/core/permissions.ts",
       "path": "packages/proxies/grok-proxy/src/core/permissions.ts",
-      "sha256": "d26aeba059d0a06885e173086699bef9ec442df2d5f986f3a1a0dccd28fa80fa"
+      "sha256": "08ae6e692cb2cd67ae67e86397d653967a0ee389fc222a5d4cc073601591695a"
     },
     {
       "source": "packages/proxies/grok-proxy/src/core/service.ts",
@@ -1516,7 +1516,7 @@
     {
       "source": "packages/proxies/grok-proxy/src/protocol/v2-adapter.ts",
       "path": "packages/proxies/grok-proxy/src/protocol/v2-adapter.ts",
-      "sha256": "058b366104152cf87d2e239e02c58f05b7046a408b508d7cc0436f51816febee"
+      "sha256": "5061c2c8eaf58a7fb6d61b64cc1a6d25773fab5924353b49e21e1c9ee1e8528c"
     },
     {
       "source": "packages/proxies/grok-proxy/src/runtime/discover.ts",
@@ -1546,7 +1546,7 @@
     {
       "source": "packages/proxies/grok-proxy/test/catalog.test.ts",
       "path": "packages/proxies/grok-proxy/test/catalog.test.ts",
-      "sha256": "4a3ae3cab2654e505da03478f485373293bb4436b174766bf9de09d529f0255a"
+      "sha256": "5965b38e332bbba81d0a7580480feba80766b92d1123ada20f38ac783ebde769"
     },
     {
       "source": "packages/proxies/grok-proxy/test/customization.test.ts",
@@ -1571,7 +1571,7 @@
     {
       "source": "packages/proxies/grok-proxy/test/fork-capabilities.test.ts",
       "path": "packages/proxies/grok-proxy/test/fork-capabilities.test.ts",
-      "sha256": "def4a768ec2ad82202fc7afbe7c5f8ba72d3fe7392295058a2d5d70881873b40"
+      "sha256": "ae1b4e46388fbb4d011152442189fa3d43b87358c06562b7cae6b614b2425827"
     },
     {
       "source": "packages/proxies/grok-proxy/test/grok-acp-client.test.ts",
@@ -1616,12 +1616,12 @@
     {
       "source": "packages/proxies/grok-proxy/test/protocol-v2-cli.test.ts",
       "path": "packages/proxies/grok-proxy/test/protocol-v2-cli.test.ts",
-      "sha256": "3ea3cbf4e6763445695ead125ed4cbfb3f0340d9cd655d85387281dc1b2c9c53"
+      "sha256": "8fe52c0f293380c83753e78d5d237c81eae262c8bd08b46c1df96e6ea906e5ad"
     },
     {
       "source": "packages/proxies/grok-proxy/test/service.test.ts",
       "path": "packages/proxies/grok-proxy/test/service.test.ts",
-      "sha256": "78662303bbd6bc897d3586bf60a506ec8ab1a55c7473468cbf84d8a5ee523fac"
+      "sha256": "b3148d248ce1bf4618c326fe1863144584d48887c01544199556e5ede70e41a6"
     },
     {
       "source": "packages/proxies/grok-proxy/test/slash-policy.test.ts",
@@ -1651,12 +1651,12 @@
     {
       "source": "packages/proxies/kimi-proxy/manifest.json",
       "path": "packages/proxies/kimi-proxy/manifest.json",
-      "sha256": "9df8227f76d074fb74e6ebc7a685fcb30e590e0695bb9eb8881ae951a75e0b07"
+      "sha256": "dd2c3555bb8355e78285c3d7477784032eeac29433bf853c3d4a6d5c4e01a657"
     },
     {
       "source": "packages/proxies/kimi-proxy/package.json",
       "path": "packages/proxies/kimi-proxy/package.json",
-      "sha256": "7e139e568a24559167c35e8b28cdcf7676f3c08e8106eb3af74c884ccc676d7a"
+      "sha256": "c1845670433f910c236fe2c6ed668ccbc1bb7b60e9ec9d6c6b6fff2886a446a5"
     },
     {
       "source": "packages/proxies/kimi-proxy/scripts/fake-catalog-ui-proxy.mjs",
@@ -1666,7 +1666,7 @@
     {
       "source": "packages/proxies/kimi-proxy/src/cli/spawn.ts",
       "path": "packages/proxies/kimi-proxy/src/cli/spawn.ts",
-      "sha256": "7051b3b68b3942242ef417a76896af227b9536dc0dee2f1c1f6742da7c6c80e9"
+      "sha256": "f51a73584c65eb6ca388ab99befe6a3922abc4c682d694e58ea3f5038c6bc681"
     },
     {
       "source": "packages/proxies/kimi-proxy/src/core/customization.ts",
@@ -1691,17 +1691,17 @@
     {
       "source": "packages/proxies/kimi-proxy/src/core/projector.ts",
       "path": "packages/proxies/kimi-proxy/src/core/projector.ts",
-      "sha256": "7279ee03eee589d7ece16813028da4a4bea668931c0cc7ce04374cbdda21fd78"
+      "sha256": "c25925d2830f52591a9b992cce45c5d4915e951e8a24d23595269d240a66bf66"
     },
     {
       "source": "packages/proxies/kimi-proxy/src/core/replay.ts",
       "path": "packages/proxies/kimi-proxy/src/core/replay.ts",
-      "sha256": "e4307d9c5945d36a7b59f84ff2f0a203f162a7798cbdeaeabfb28831de8598ef"
+      "sha256": "579ada5a72501db77af64b4626412a3c5f8be521bc5aadecdb1960273bb76170"
     },
     {
       "source": "packages/proxies/kimi-proxy/src/core/service.ts",
       "path": "packages/proxies/kimi-proxy/src/core/service.ts",
-      "sha256": "bdfa56e1b6651488762bb59a296b68a3d0d36f2e342fb9e4e5c208f643724478"
+      "sha256": "6a6292c183939dc50e5457236b664ef6f28f3e0a70f4a836f460ed2021258e65"
     },
     {
       "source": "packages/proxies/kimi-proxy/src/core/task-queue.ts",
@@ -1721,7 +1721,7 @@
     {
       "source": "packages/proxies/kimi-proxy/src/protocol/v2-adapter.ts",
       "path": "packages/proxies/kimi-proxy/src/protocol/v2-adapter.ts",
-      "sha256": "39408c2e5061f929d2f29cdac36fbe2911be5558ce5c4949fb931a85c1eab7ac"
+      "sha256": "c3d572357cb1bbbdab3a03dd72b0f1f83302ac53db78f7d96460181de25197e0"
     },
     {
       "source": "packages/proxies/kimi-proxy/src/runtime/discover.ts",
@@ -1866,7 +1866,12 @@
     {
       "source": "packages/proxies/kimi-proxy/test/kimi-proxy.test.ts",
       "path": "packages/proxies/kimi-proxy/test/kimi-proxy.test.ts",
-      "sha256": "29f88cc8f67306f0d881b94c9d7befc30bb4b6c427b7cc4edf4d69c512705e25"
+      "sha256": "ed4304a23c46bcd4b1a824b9b8a3f6624feb927cb33e02ec197a3b32fd2bd24e"
+    },
+    {
+      "source": "packages/proxies/kimi-proxy/test/projector.test.ts",
+      "path": "packages/proxies/kimi-proxy/test/projector.test.ts",
+      "sha256": "28b5fef9c3f7ec09a4817fa336cff7c0820e15313ac8e3524a7ec3f42c2c5859"
     },
     {
       "source": "packages/proxies/kimi-proxy/test/session-store.test.ts",
@@ -2783,17 +2788,17 @@
     {
       "path": "catalog/official-source/plugins/grok/assets/logo-dark.png",
       "mode": 420,
-      "sha256": "ebf4f635a17d10d6eb46ba680b70142419aa3220f228001a036d311a22ee9d2a"
+      "sha256": "2c645c9b9ab3a2d0669f8ac5cb41edd6e8917093d0f611ebfe99e50b4f2d233e"
     },
     {
       "path": "catalog/official-source/plugins/grok/assets/logo-light.png",
       "mode": 420,
-      "sha256": "ebf4f635a17d10d6eb46ba680b70142419aa3220f228001a036d311a22ee9d2a"
+      "sha256": "2c645c9b9ab3a2d0669f8ac5cb41edd6e8917093d0f611ebfe99e50b4f2d233e"
     },
     {
       "path": "catalog/official-source/plugins/grok/entry.json",
       "mode": 420,
-      "sha256": "c74cebfe4c3cb66cfc0f8bc4dbf4dc29f676cfa9b811f520030b7009a844603a"
+      "sha256": "7c988a851fec9ee9f9846203f2277e17b8b579925de8641c91fc11e670f1e78b"
     },
     {
       "path": "catalog/official-source/plugins/grok/overview.md",
@@ -2808,7 +2813,7 @@
     {
       "path": "catalog/official-source/plugins/grok/sidecar.json",
       "mode": 420,
-      "sha256": "5d5c44bd06be7e905454e6e175354d42a520a307217b4c95577c2b06f42da422"
+      "sha256": "69720ac628ad824b84ac77b02253ea633c71e0f11578b0a0c4dc703200c2142e"
     },
     {
       "path": "catalog/official-source/plugins/grok/troubleshooting.md",
@@ -2833,7 +2838,7 @@
     {
       "path": "catalog/official-source/plugins/kimi/entry.json",
       "mode": 420,
-      "sha256": "a785ad2a46289cc8a3095c2f7665dbc6a959bd9aa777edf42c87dc20142bcf3f"
+      "sha256": "afa93709deb52f228d720a8672f5ff9b234e1de181af344fe6bc3ba581d6c743"
     },
     {
       "path": "catalog/official-source/plugins/kimi/overview.md",
@@ -2848,7 +2853,7 @@
     {
       "path": "catalog/official-source/plugins/kimi/sidecar.json",
       "mode": 420,
-      "sha256": "9df8227f76d074fb74e6ebc7a685fcb30e590e0695bb9eb8881ae951a75e0b07"
+      "sha256": "dd2c3555bb8355e78285c3d7477784032eeac29433bf853c3d4a6d5c4e01a657"
     },
     {
       "path": "catalog/official-source/plugins/kimi/troubleshooting.md",
@@ -3078,7 +3083,7 @@
     {
       "path": "CHANGELOG.md",
       "mode": 420,
-      "sha256": "435beb7e95debfa3a284a2dd4bbf1d52a185f26cd2389196d09ef5a774c73416"
+      "sha256": "cf234dac6efc65781eb88210bdfcacb3d72d202bb83d2c32c2c9a3c796f90dbe"
     },
     {
       "path": "LICENSE",
@@ -3943,27 +3948,27 @@
     {
       "path": "packages/proxies/grok-proxy/assets/logo-dark.png",
       "mode": 420,
-      "sha256": "ebf4f635a17d10d6eb46ba680b70142419aa3220f228001a036d311a22ee9d2a"
+      "sha256": "2c645c9b9ab3a2d0669f8ac5cb41edd6e8917093d0f611ebfe99e50b4f2d233e"
     },
     {
       "path": "packages/proxies/grok-proxy/assets/logo-light.png",
       "mode": 420,
-      "sha256": "ebf4f635a17d10d6eb46ba680b70142419aa3220f228001a036d311a22ee9d2a"
+      "sha256": "2c645c9b9ab3a2d0669f8ac5cb41edd6e8917093d0f611ebfe99e50b4f2d233e"
     },
     {
       "path": "packages/proxies/grok-proxy/manifest.json",
       "mode": 420,
-      "sha256": "5d5c44bd06be7e905454e6e175354d42a520a307217b4c95577c2b06f42da422"
+      "sha256": "69720ac628ad824b84ac77b02253ea633c71e0f11578b0a0c4dc703200c2142e"
     },
     {
       "path": "packages/proxies/grok-proxy/package.json",
       "mode": 420,
-      "sha256": "6d266fa79aff70d7939ca700c69858490f3ed06e4ee751a8fa5a1e01b256a619"
+      "sha256": "38b628b6ae8ec370cda6f7d84ee967f4362069ef40dd7d12e0267cd60e87cbd3"
     },
     {
       "path": "packages/proxies/grok-proxy/README.md",
       "mode": 420,
-      "sha256": "ba28a96bed04bcc945b7a16116a9f96cbb3e9aff734006cecfb4e47515421b74"
+      "sha256": "e3d7509e4dd392d30eb8fb0e2c298ef76e0d6b9384cec2ea9e51837637a7b432"
     },
     {
       "path": "packages/proxies/grok-proxy/scripts/fake-catalog-ui-proxy.mjs",
@@ -3973,12 +3978,12 @@
     {
       "path": "packages/proxies/grok-proxy/src/cli/spawn.ts",
       "mode": 420,
-      "sha256": "16cca88fe1e46dc0003c98056071a1edaadb46b2a2332099149ad6fccea4dca4"
+      "sha256": "261148aabfc9d0db8dcc0b3a291695b6cdb683276968b1800805dc1c99b8b6d3"
     },
     {
       "path": "packages/proxies/grok-proxy/src/core/catalog.ts",
       "mode": 420,
-      "sha256": "d159494b1046896c0fcc9c7893a8efefd95fbc5228b1724a615f384c5fd73c65"
+      "sha256": "1b434075f0e288b1812fea9bdc728e739f43f917bf4d24240cdb681bbcaa99b0"
     },
     {
       "path": "packages/proxies/grok-proxy/src/core/customization.ts",
@@ -4008,7 +4013,7 @@
     {
       "path": "packages/proxies/grok-proxy/src/core/permissions.ts",
       "mode": 420,
-      "sha256": "d26aeba059d0a06885e173086699bef9ec442df2d5f986f3a1a0dccd28fa80fa"
+      "sha256": "08ae6e692cb2cd67ae67e86397d653967a0ee389fc222a5d4cc073601591695a"
     },
     {
       "path": "packages/proxies/grok-proxy/src/core/service.ts",
@@ -4038,7 +4043,7 @@
     {
       "path": "packages/proxies/grok-proxy/src/protocol/v2-adapter.ts",
       "mode": 420,
-      "sha256": "058b366104152cf87d2e239e02c58f05b7046a408b508d7cc0436f51816febee"
+      "sha256": "5061c2c8eaf58a7fb6d61b64cc1a6d25773fab5924353b49e21e1c9ee1e8528c"
     },
     {
       "path": "packages/proxies/grok-proxy/src/runtime/discover.ts",
@@ -4068,7 +4073,7 @@
     {
       "path": "packages/proxies/grok-proxy/test/catalog.test.ts",
       "mode": 420,
-      "sha256": "4a3ae3cab2654e505da03478f485373293bb4436b174766bf9de09d529f0255a"
+      "sha256": "5965b38e332bbba81d0a7580480feba80766b92d1123ada20f38ac783ebde769"
     },
     {
       "path": "packages/proxies/grok-proxy/test/customization.test.ts",
@@ -4093,7 +4098,7 @@
     {
       "path": "packages/proxies/grok-proxy/test/fork-capabilities.test.ts",
       "mode": 420,
-      "sha256": "def4a768ec2ad82202fc7afbe7c5f8ba72d3fe7392295058a2d5d70881873b40"
+      "sha256": "ae1b4e46388fbb4d011152442189fa3d43b87358c06562b7cae6b614b2425827"
     },
     {
       "path": "packages/proxies/grok-proxy/test/grok-acp-client.test.ts",
@@ -4138,12 +4143,12 @@
     {
       "path": "packages/proxies/grok-proxy/test/protocol-v2-cli.test.ts",
       "mode": 420,
-      "sha256": "3ea3cbf4e6763445695ead125ed4cbfb3f0340d9cd655d85387281dc1b2c9c53"
+      "sha256": "8fe52c0f293380c83753e78d5d237c81eae262c8bd08b46c1df96e6ea906e5ad"
     },
     {
       "path": "packages/proxies/grok-proxy/test/service.test.ts",
       "mode": 420,
-      "sha256": "78662303bbd6bc897d3586bf60a506ec8ab1a55c7473468cbf84d8a5ee523fac"
+      "sha256": "b3148d248ce1bf4618c326fe1863144584d48887c01544199556e5ede70e41a6"
     },
     {
       "path": "packages/proxies/grok-proxy/test/slash-policy.test.ts",
@@ -4168,12 +4173,12 @@
     {
       "path": "packages/proxies/kimi-proxy/manifest.json",
       "mode": 420,
-      "sha256": "9df8227f76d074fb74e6ebc7a685fcb30e590e0695bb9eb8881ae951a75e0b07"
+      "sha256": "dd2c3555bb8355e78285c3d7477784032eeac29433bf853c3d4a6d5c4e01a657"
     },
     {
       "path": "packages/proxies/kimi-proxy/package.json",
       "mode": 420,
-      "sha256": "e3018293ab12f0cdc7d95247487a6728070e14c997b13fa3e14cc1a800705151"
+      "sha256": "5f137f7d7fd9110b1f5ae968f0e5635db0e45b95386f4841d58cba611e47dd7b"
     },
     {
       "path": "packages/proxies/kimi-proxy/README.md",
@@ -4188,7 +4193,7 @@
     {
       "path": "packages/proxies/kimi-proxy/src/cli/spawn.ts",
       "mode": 420,
-      "sha256": "7051b3b68b3942242ef417a76896af227b9536dc0dee2f1c1f6742da7c6c80e9"
+      "sha256": "f51a73584c65eb6ca388ab99befe6a3922abc4c682d694e58ea3f5038c6bc681"
     },
     {
       "path": "packages/proxies/kimi-proxy/src/core/customization.ts",
@@ -4213,17 +4218,17 @@
     {
       "path": "packages/proxies/kimi-proxy/src/core/projector.ts",
       "mode": 420,
-      "sha256": "7279ee03eee589d7ece16813028da4a4bea668931c0cc7ce04374cbdda21fd78"
+      "sha256": "c25925d2830f52591a9b992cce45c5d4915e951e8a24d23595269d240a66bf66"
     },
     {
       "path": "packages/proxies/kimi-proxy/src/core/replay.ts",
       "mode": 420,
-      "sha256": "e4307d9c5945d36a7b59f84ff2f0a203f162a7798cbdeaeabfb28831de8598ef"
+      "sha256": "579ada5a72501db77af64b4626412a3c5f8be521bc5aadecdb1960273bb76170"
     },
     {
       "path": "packages/proxies/kimi-proxy/src/core/service.ts",
       "mode": 420,
-      "sha256": "bdfa56e1b6651488762bb59a296b68a3d0d36f2e342fb9e4e5c208f643724478"
+      "sha256": "6a6292c183939dc50e5457236b664ef6f28f3e0a70f4a836f460ed2021258e65"
     },
     {
       "path": "packages/proxies/kimi-proxy/src/core/task-queue.ts",
@@ -4243,7 +4248,7 @@
     {
       "path": "packages/proxies/kimi-proxy/src/protocol/v2-adapter.ts",
       "mode": 420,
-      "sha256": "39408c2e5061f929d2f29cdac36fbe2911be5558ce5c4949fb931a85c1eab7ac"
+      "sha256": "c3d572357cb1bbbdab3a03dd72b0f1f83302ac53db78f7d96460181de25197e0"
     },
     {
       "path": "packages/proxies/kimi-proxy/src/runtime/discover.ts",
@@ -4388,7 +4393,12 @@
     {
       "path": "packages/proxies/kimi-proxy/test/kimi-proxy.test.ts",
       "mode": 420,
-      "sha256": "29f88cc8f67306f0d881b94c9d7befc30bb4b6c427b7cc4edf4d69c512705e25"
+      "sha256": "ed4304a23c46bcd4b1a824b9b8a3f6624feb927cb33e02ec197a3b32fd2bd24e"
+    },
+    {
+      "path": "packages/proxies/kimi-proxy/test/projector.test.ts",
+      "mode": 420,
+      "sha256": "28b5fef9c3f7ec09a4817fa336cff7c0820e15313ac8e3524a7ec3f42c2c5859"
     },
     {
       "path": "packages/proxies/kimi-proxy/test/session-store.test.ts",
@@ -5048,7 +5058,7 @@
     {
       "path": "release-selection.json",
       "mode": 420,
-      "sha256": "e2c7148d3b88eeb781947290f5f788c169d90adf75f6a050decc2ab8925b83d7"
+      "sha256": "ebc2408867ff7548713f8829c5d12a882bde093e784d989e2e1c2d84da225d2a"
     },
     {
       "path": "runtimes/deepseek-harness/package-lock.json",

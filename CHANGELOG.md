@@ -1,5 +1,20 @@
 # Gian Proxies Changelog
 
+## Kimi Proxy 0.4.4 - 2026-09-29
+
+- Show assistant prose as its own text stream on each step. Thinking stays reasoning, also split per step, and tool results keep command, file, and search presentation.
+- Enable fork and side chat after a completed turn while the session is idle. Forking from a specific turn stays unavailable.
+- Accept volatile frames that reuse the current sequence, and include the turn prompt id on usage events.
+- This release does not change the Proxy wire protocol or the Kimi Code 2.1.1 Runtime pin.
+
+## Grok Proxy 0.3.7 - 2026-09-29
+
+- Bind model and reasoning effort to the turn. Permission mode stays session-bound.
+- Require `workspace.roots` to include the session directory. The Host may also list the session attachment directory; that path is not added to the sandbox.
+- Hold turn events that arrive before `turn.started`, and drop usage deltas after the turn ends.
+- Refresh the Grok Build logos and show the default permission mode as Default.
+- This release does not change the Proxy wire protocol or the Grok CLI 1.0.41 Runtime pin.
+
 ## Catalog 1.17.0 - 2026-09-28
 
 - Select the published Kimi Proxy 0.4.3 release and its Kimi Code 2.1.1 Runtime.

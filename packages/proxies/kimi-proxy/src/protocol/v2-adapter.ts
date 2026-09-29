@@ -632,15 +632,23 @@ export class KimiProtocolV2Adapter {
   }
 
   private serialize(session: AttachedSession): Record<string, unknown> {
+    const live = this.service.describeSession(session.id);
+    const state = live.state === 'idle'
+      || live.state === 'running'
+      || live.state === 'waiting_interaction'
+      || live.state === 'stale'
+      ? live.state
+      : session.state as 'idle' | 'running' | 'waiting_interaction' | 'stale';
     return {
       id: session.id,
       nativeSession: { id: session.nativeSessionId },
       streamId: session.streamId,
-      state: session.state as 'idle' | 'running' | 'waiting_interaction' | 'stale',
+      state,
       sessionConfig: {},
       ...(session.lastError !== null ? { lastError: session.lastError } : {}),
+      ...(live.availableActions !== undefined ? { availableActions: live.availableActions } : {}),
       createdAt: session.createdAt,
-      updatedAt: session.updatedAt,
+      updatedAt: typeof live.updatedAt === 'string' ? live.updatedAt : session.updatedAt,
     };
   }
 

@@ -7,8 +7,9 @@
  * - Terminal eventIds come from terminalEventIdFor(nativeSessionId,
  *   sourceTurnId, method) — the same function the live projector uses for
  *   turn.completed / turn.failed.
- * - Content ids use `assistant:<prompt_id>` / `thinking:<prompt_id>`, matching
- *   the live delta contentIds.
+ * - Content ids use `assistant:<prompt_id>` / `thinking:<prompt_id>`. Live
+ *   deltas append `:<contentStep>` because a persisted message has no step
+ *   split; replay stays one card per prompt.
  * - Activities are keyed by tool_call_id, matching live tool frames.
  *
  * Replay has NO usage events: Kimi's message store carries no per-message

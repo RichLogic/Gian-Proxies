@@ -34,7 +34,9 @@ test('catalog maps Grok modelState to model, reasoning effort, and permission mo
   );
 
   const options = toV2ConfigOptions(catalog.sessionOptions);
-  assert.ok(options.every(option => option.binding === 'session'));
+  assert.equal(options.find(option => option.id === 'model')?.binding, 'turn');
+  assert.equal(options.find(option => option.id === 'reasoning_effort')?.binding, 'turn');
+  assert.equal(options.find(option => option.id === 'permission_mode')?.binding, 'session');
   assert.equal(options.some(option => 'role' in option), false);
   assert.equal(
     options.find(option => option.id === 'model')?.choices?.[0]?.displayName,
