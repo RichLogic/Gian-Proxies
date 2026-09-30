@@ -1,8 +1,50 @@
 {
   "schemaVersion": 1,
   "pluginId": "kimi",
-  "currentVersion": "0.4.3",
+  "currentVersion": "0.4.4",
   "entries": [
+    {
+      "version": "0.4.4",
+      "firstPublishedAt": "2026-09-30T08:50:47Z",
+      "evidenceCoverage": "detailed",
+      "distributions": [
+        {
+          "repository": "RichLogic/Gian-Proxies",
+          "tag": "proxy-kimi-v0.4.4",
+          "publishedAt": "2026-09-30T08:50:47Z",
+          "releaseUrl": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-kimi-v0.4.4",
+          "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-kimi-v0.4.4/gian-proxy-kimi-0.4.4-darwin-arm64.tar.gz.manifest.json",
+          "manifestSha256": "dd2c3555bb8355e78285c3d7477784032eeac29433bf853c3d4a6d5c4e01a657",
+          "archive": {
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-kimi-v0.4.4/gian-proxy-kimi-0.4.4-darwin-arm64.tar.gz",
+            "sha256": "8056757ef889085c2bbd38bda49b729a3a9a7036e8c2573858bd20565c03b2c5",
+            "size": 157942
+          },
+          "runtimeDeclaration": {
+            "id": "kimi",
+            "versions": [
+              "2.1.1"
+            ],
+            "basis": "verified-declaration"
+          },
+          "companionDeclarations": [],
+          "protocolRange": ">=2.2 <3.0",
+          "manifestSchema": 4,
+          "processScope": "shared"
+        }
+      ],
+      "changes": [
+        {
+          "category": "changed",
+          "text": "按原生 step 分开投影助手文本和思考，工具结果保持命令、文件和搜索呈现；修复复用 durable seq 的 volatile 帧与 Usage 事件身份。已完成 Turn 后的空闲会话支持 Fork 和 Sidechat，指定 Turn 的 Fork 仍不可用。本版不改变 Proxy 线协议，也不改变 Kimi Code 2.1.1 Runtime。",
+          "evidence": [
+            "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-kimi-v0.4.4",
+            "https://github.com/RichLogic/Gian-Proxies/blob/proxy-kimi-v0.4.4/packages/proxies/kimi-proxy/README.md"
+          ]
+        }
+      ],
+      "unknowns": []
+    },
     {
       "version": "0.4.3",
       "firstPublishedAt": "2026-09-28T15:28:15Z",

@@ -1,5 +1,10 @@
 # Gian Proxies Changelog
 
+## Catalog 1.19.0 - 2026-09-30
+
+- Select the published Kimi Proxy 0.4.4 release and its unchanged Kimi Code 2.1.1 Runtime.
+- Retain every other signed Proxy coordinate from Catalog 1.18.0, including Codex Proxy 0.3.3 / Codex CLI 0.159.2. No App release.
+
 ## Catalog 1.18.0 - 2026-09-30
 
 - Select the published Codex Proxy 0.3.3 and its Codex CLI 0.159.2 Runtime.
@@ -10,7 +15,7 @@
 - Target the managed Codex CLI 0.159.2 Runtime with the existing app-server adapter.
 - Retain the gian.proxy wire contract and the previously published Codex Proxy and Runtime for rollback.
 
-## Kimi Proxy 0.4.4 - 2026-09-29
+## Kimi Proxy 0.4.4 - 2026-09-30
 
 - Show assistant prose as its own text stream on each step. Thinking stays reasoning, also split per step, and tool results keep command, file, and search presentation.
 - Enable fork and side chat after a completed turn while the session is idle. Forking from a specific turn stays unavailable.

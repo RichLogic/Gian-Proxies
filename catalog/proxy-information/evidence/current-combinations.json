@@ -1,6 +1,6 @@
 {
-  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.18.0",
-  "sequence": 18,
+  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.19.0",
+  "sequence": 19,
   "sourceId": "gian-official",
   "plugins": [
     {
@@ -44,43 +44,43 @@
         "companions": [],
         "generationId": "codex-0.3.3-runtime-0.159.2",
         "runtime": {
+          "asset": {
+            "sha256": "38aaf6dce63099fd10988948d03bbc6c0474253aef6961fcbe60f8d154b39101",
+            "size": 129522674,
+            "url": "https://github.com/openai/codex/releases/download/rust-v0.159.2/codex-package-aarch64-apple-darwin.tar.gz"
+          },
+          "entryRelativePath": "bin/codex",
+          "format": "tar.gz",
           "kind": "native-binary",
           "runtimeId": "codex",
-          "version": "0.159.2",
-          "asset": {
-            "url": "https://github.com/openai/codex/releases/download/rust-v0.159.2/codex-package-aarch64-apple-darwin.tar.gz",
-            "sha256": "38aaf6dce63099fd10988948d03bbc6c0474253aef6961fcbe60f8d154b39101",
-            "size": 129522674
-          },
-          "format": "tar.gz",
-          "entryRelativePath": "bin/codex"
+          "version": "0.159.2"
         }
       }
     },
     {
       "id": "kimi",
       "displayName": "Kimi Code",
-      "version": "0.4.3",
+      "version": "0.4.4",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "shared",
       "combination": {
         "certificate": {
-          "id": "proxies-e643a988c502fb9c1825b516616b0d68e7bc9beb-36442867052-1",
-          "sha256": "fb1dd946e39d4ca7d11cdf1134660195c8b5cdb55e8e347e1d6d914970ce43c3"
+          "id": "proxies-36c1d9944ef6bcdd0a486ea4618462d203a13b94-36691189212-1",
+          "sha256": "b924c29ab3613bc3ce1c27d4ac14b4740ba70824376260e0ed5c6455a209e005"
         },
         "companions": [],
-        "generationId": "kimi-0.4.3-runtime-2.1.1",
+        "generationId": "kimi-0.4.4-runtime-2.1.1",
         "runtime": {
-          "asset": {
-            "sha256": "8c3bad99571b16abd113ab5d511a98a36b852c0d5493991842a67b8c2bc4ecd0",
-            "size": 62296524,
-            "url": "https://github.com/MoonshotAI/kimi-code/releases/download/%40moonshot-ai/kimi-code%402.1.1/kimi-code-darwin-arm64.tar.gz"
-          },
-          "entryRelativePath": "kimi",
-          "format": "tar.gz",
           "kind": "native-binary",
           "runtimeId": "kimi",
-          "version": "2.1.1"
+          "version": "2.1.1",
+          "asset": {
+            "url": "https://github.com/MoonshotAI/kimi-code/releases/download/%40moonshot-ai/kimi-code%402.1.1/kimi-code-darwin-arm64.tar.gz",
+            "sha256": "8c3bad99571b16abd113ab5d511a98a36b852c0d5493991842a67b8c2bc4ecd0",
+            "size": 62296524
+          },
+          "format": "tar.gz",
+          "entryRelativePath": "kimi"
         }
       }
     },
