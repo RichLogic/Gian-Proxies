@@ -2,7 +2,7 @@
   "schema": 1,
   "product": "Gian-Proxies",
   "sourceRepository": "RichLogic/Gian-Dev",
-  "sourceCommit": "c4a227766fb36fff157a00dfad24a291c204a2be",
+  "sourceCommit": "be5d51ecd56a2d69690e5e76b20e5d5efb864e2c",
   "workingTree": false,
   "externalPackages": [
     {
@@ -531,7 +531,7 @@
     {
       "source": "delivery/proxies/release-selection.json",
       "path": "release-selection.json",
-      "sha256": "e614d76d1a0e711df6b4c67e20dfa3d997e63d957749744b07f2158dd4a819f0"
+      "sha256": "a1cc3bb79d824598c0e1acb09daf20d4588b5cfb895059a0f799ac46cb505af7"
     },
     {
       "source": "delivery/proxies/scripts/catalog-docs-policy.mjs",
@@ -5058,7 +5058,7 @@
     {
       "path": "release-selection.json",
       "mode": 420,
-      "sha256": "e614d76d1a0e711df6b4c67e20dfa3d997e63d957749744b07f2158dd4a819f0"
+      "sha256": "a1cc3bb79d824598c0e1acb09daf20d4588b5cfb895059a0f799ac46cb505af7"
     },
     {
       "path": "runtimes/deepseek-harness/package-lock.json",
