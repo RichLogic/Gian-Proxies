@@ -1,5 +1,10 @@
 # Gian Proxies Changelog
 
+## Codex Proxy 0.3.3 - 2026-09-30
+
+- Target the managed Codex CLI 0.159.2 Runtime with the existing app-server adapter.
+- Retain the gian.proxy wire contract and the previously published Codex Proxy and Runtime for rollback.
+
 ## Kimi Proxy 0.4.4 - 2026-09-29
 
 - Show assistant prose as its own text stream on each step. Thinking stays reasoning, also split per step, and tool results keep command, file, and search presentation.

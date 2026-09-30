@@ -1,5 +1,5 @@
 {
   "schema": 1,
-  "providers": ["kimi", "grok"],
+  "providers": ["codex"],
   "baseCatalogTag": "catalog-v1.17.0"
 }

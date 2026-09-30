@@ -38,12 +38,12 @@ export const upstreamRuntimeCandidates = Object.freeze({
     size: 217254576,
   }),
   codex: Object.freeze({
-    version: '0.156.1',
+    version: '0.159.2',
     format: 'tar.gz',
     entryRelativePath: 'bin/codex',
-    url: 'https://github.com/openai/codex/releases/download/rust-v0.156.1/codex-package-aarch64-apple-darwin.tar.gz',
-    sha256: 'fea42f9625091f011e38f059da974d52e57ba31831648bb1c7f0b1a385fde547',
-    size: 127394863,
+    url: 'https://github.com/openai/codex/releases/download/rust-v0.159.2/codex-package-aarch64-apple-darwin.tar.gz',
+    sha256: '38aaf6dce63099fd10988948d03bbc6c0474253aef6961fcbe60f8d154b39101',
+    size: 129522674,
   }),
   kimi: Object.freeze({
     version: '2.1.1',
