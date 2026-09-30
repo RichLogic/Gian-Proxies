@@ -1,5 +1,10 @@
 # Gian Proxies Changelog
 
+## Catalog 1.18.0 - 2026-09-30
+
+- Select the published Codex Proxy 0.3.3 and its Codex CLI 0.159.2 Runtime.
+- Retain every other signed Proxy coordinate from Catalog 1.17.0. No App release.
+
 ## Codex Proxy 0.3.3 - 2026-09-30
 
 - Target the managed Codex CLI 0.159.2 Runtime with the existing app-server adapter.

@@ -1,6 +1,6 @@
 {
-  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.17.0",
-  "sequence": 17,
+  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.18.0",
+  "sequence": 18,
   "sourceId": "gian-official",
   "plugins": [
     {
@@ -33,27 +33,27 @@
     {
       "id": "codex",
       "displayName": "Codex",
-      "version": "0.3.2",
+      "version": "0.3.3",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "shared",
       "combination": {
         "certificate": {
-          "id": "proxies-4740fab7dc3370cc812984519b5e9509bbcad2c0-35981492220-1",
-          "sha256": "40871590ad311083b3fa678e9eb114b3a3a71e09641afb6b362f5721abf531b3"
+          "id": "proxies-9c16d14d2e40cbfa3d8541779273692dd6bac40e-36684885128-1",
+          "sha256": "d0b7027fc48a58e38086c2c0e4f1b8ba6c9af27679cd09ad32198415606462de"
         },
         "companions": [],
-        "generationId": "codex-0.3.2-runtime-0.156.1",
+        "generationId": "codex-0.3.3-runtime-0.159.2",
         "runtime": {
-          "asset": {
-            "sha256": "fea42f9625091f011e38f059da974d52e57ba31831648bb1c7f0b1a385fde547",
-            "size": 127394863,
-            "url": "https://github.com/openai/codex/releases/download/rust-v0.156.1/codex-package-aarch64-apple-darwin.tar.gz"
-          },
-          "entryRelativePath": "bin/codex",
-          "format": "tar.gz",
           "kind": "native-binary",
           "runtimeId": "codex",
-          "version": "0.156.1"
+          "version": "0.159.2",
+          "asset": {
+            "url": "https://github.com/openai/codex/releases/download/rust-v0.159.2/codex-package-aarch64-apple-darwin.tar.gz",
+            "sha256": "38aaf6dce63099fd10988948d03bbc6c0474253aef6961fcbe60f8d154b39101",
+            "size": 129522674
+          },
+          "format": "tar.gz",
+          "entryRelativePath": "bin/codex"
         }
       }
     },
@@ -71,16 +71,16 @@
         "companions": [],
         "generationId": "kimi-0.4.3-runtime-2.1.1",
         "runtime": {
+          "asset": {
+            "sha256": "8c3bad99571b16abd113ab5d511a98a36b852c0d5493991842a67b8c2bc4ecd0",
+            "size": 62296524,
+            "url": "https://github.com/MoonshotAI/kimi-code/releases/download/%40moonshot-ai/kimi-code%402.1.1/kimi-code-darwin-arm64.tar.gz"
+          },
+          "entryRelativePath": "kimi",
+          "format": "tar.gz",
           "kind": "native-binary",
           "runtimeId": "kimi",
-          "version": "2.1.1",
-          "asset": {
-            "url": "https://github.com/MoonshotAI/kimi-code/releases/download/%40moonshot-ai/kimi-code%402.1.1/kimi-code-darwin-arm64.tar.gz",
-            "sha256": "8c3bad99571b16abd113ab5d511a98a36b852c0d5493991842a67b8c2bc4ecd0",
-            "size": 62296524
-          },
-          "format": "tar.gz",
-          "entryRelativePath": "kimi"
+          "version": "2.1.1"
         }
       }
     },
@@ -125,16 +125,16 @@
         "companions": [],
         "generationId": "zcode-0.4.2-runtime-0.16.9",
         "runtime": {
+          "asset": {
+            "sha256": "265f28aa89462a73daf074573b5312863cd75d21a0b89f810ce90d362753dcc1",
+            "size": 80788064,
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.2/zcode.tar.gz"
+          },
+          "entryRelativePath": "zcode/agent/zcode.cjs",
+          "format": "tar.gz",
           "kind": "native-binary",
           "runtimeId": "zcode",
-          "version": "0.16.9",
-          "asset": {
-            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.2/zcode.tar.gz",
-            "sha256": "265f28aa89462a73daf074573b5312863cd75d21a0b89f810ce90d362753dcc1",
-            "size": 80788064
-          },
-          "format": "tar.gz",
-          "entryRelativePath": "zcode/agent/zcode.cjs"
+          "version": "0.16.9"
         }
       }
     },

@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-28T15:37:25.788Z",
+  "capturedAt": "2026-09-30T08:01:33.821Z",
   "repositories": [
     "RichLogic/Gian",
     "RichLogic/Gian-Proxies"
@@ -1751,6 +1751,38 @@
           "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-kimi-v0.4.3/gian-proxy-kimi-0.4.3-darwin-arm64.tar.gz.sha256",
           "size": 108,
           "digest": "sha256:43adc39afd92038b3295a1c379d81ed6999f51c8a994f22095c298598c87cd69"
+        }
+      ]
+    },
+    {
+      "tag": "proxy-codex-v0.3.3",
+      "date": "2026-09-30T07:54:56Z",
+      "url": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-codex-v0.3.3",
+      "body": "Independent Proxy 0.3.3. Exact hosted artifacts from proxies-9c16d14d2e40cbfa3d8541779273692dd6bac40e-36684885128-1. DSH includes its Bridge. ZCode includes a managed CLI Runtime built from its pinned upstream Git commit. No App or real-provider acceptance is claimed.",
+      "assets": [
+        {
+          "name": "certificate.json",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-codex-v0.3.3/certificate.json",
+          "size": 4358,
+          "digest": "sha256:d0b7027fc48a58e38086c2c0e4f1b8ba6c9af27679cd09ad32198415606462de"
+        },
+        {
+          "name": "gian-proxy-codex-0.3.3-darwin-arm64.tar.gz",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-codex-v0.3.3/gian-proxy-codex-0.3.3-darwin-arm64.tar.gz",
+          "size": 193328,
+          "digest": "sha256:3ecdcef0af8145a284576b79d0d77bc99f3897472cfdaef220b3e59d5efdc870"
+        },
+        {
+          "name": "gian-proxy-codex-0.3.3-darwin-arm64.tar.gz.manifest.json",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-codex-v0.3.3/gian-proxy-codex-0.3.3-darwin-arm64.tar.gz.manifest.json",
+          "size": 978,
+          "digest": "sha256:16f9c9a6ac60dd78c3de2a09c8044acf97c4872dd7b2603ca4f2ebbb58000a31"
+        },
+        {
+          "name": "gian-proxy-codex-0.3.3-darwin-arm64.tar.gz.sha256",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-codex-v0.3.3/gian-proxy-codex-0.3.3-darwin-arm64.tar.gz.sha256",
+          "size": 109,
+          "digest": "sha256:c853d15672c4a5a853744a6c25a5fe6f5690593450b9c696d7d9e89c8bbc35d7"
         }
       ]
     }

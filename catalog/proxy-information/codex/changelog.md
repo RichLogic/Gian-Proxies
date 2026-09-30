@@ -2,7 +2,18 @@
 
 本文件由 changelog.json 的结构化记录投影，按 Proxy 版本倒序。首次发布日期与新仓库分发日期分别记录；未知历史不会用当前版本说明回填。
 
-本次发布组合快照：Proxy **0.3.2**，Runtime **0.156.1**。这是发布目标，不表示当前机器已安装。
+本次发布组合快照：Proxy **0.3.3**，Runtime **0.159.2**。这是发布目标，不表示当前机器已安装。
+
+## 0.3.3
+
+首次公开发布：2026-09-30T07:54:56Z（UTC）。
+
+- [RichLogic/Gian-Proxies 分发](https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-codex-v0.3.3)：2026-09-30T07:54:56Z。
+- 对应 CLI：0.159.2（Manifest 兼容声明，不是本机状态）。
+
+### 变更
+
+- 将受管 Codex CLI 更新至 0.159.2；Proxy 的 app-server 桥接和 gian.proxy 线协议不变。本次发行未运行真实模型 Turn。 [依据1](https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-codex-v0.3.3) [依据2](https://github.com/RichLogic/Gian-Proxies/blob/proxy-codex-v0.3.3/packages/proxies/codex-proxy/README.md)
 
 ## 0.3.2
 
