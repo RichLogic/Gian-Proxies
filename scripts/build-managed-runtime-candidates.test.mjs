@@ -9,20 +9,26 @@ import {
   ZCODE_RUNTIME_ASSET_NAME,
   upstreamRuntimeCandidates,
   validateRuntimeCandidateDefinitions,
+  selectRuntimeProviders,
 } from './build-managed-runtime-candidates.mjs';
 import { assertZcodeSourceBinding, validateZcodeRuntimeSource, zcodeRuntimeSource } from './zcode-runtime-source.mjs';
 import { verifyZcodeRuntimeProtocol } from './verify-zcode-runtime-protocol.mjs';
 import { applyZcodeIntegrationEdits, integrateZcodeEntrypoint } from './zcode-runtime-integration.mjs';
 
-test('managed Runtime candidates pin exact official Claude, Codex, and Kimi assets', () => {
+test('managed Runtime candidates pin exact official Claude, Codex, Kimi, and Grok assets', () => {
   assert.equal(validateRuntimeCandidateDefinitions(), true);
-  assert.deepEqual(Object.keys(upstreamRuntimeCandidates), ['claude', 'codex', 'kimi']);
+  assert.deepEqual(Object.keys(upstreamRuntimeCandidates), ['claude', 'codex', 'kimi', 'grok']);
   assert.equal(upstreamRuntimeCandidates.claude.format, 'raw');
   assert.match(upstreamRuntimeCandidates.claude.url, /^https:\/\/downloads\.claude\.ai\//);
   assert.equal(upstreamRuntimeCandidates.codex.format, 'tar.gz');
   assert.match(upstreamRuntimeCandidates.codex.url, /^https:\/\/github\.com\/openai\/codex\/releases\/download\//);
   assert.equal(upstreamRuntimeCandidates.kimi.format, 'tar.gz');
   assert.equal(upstreamRuntimeCandidates.kimi.entryRelativePath, 'kimi');
+  assert.equal(upstreamRuntimeCandidates.grok.format, 'raw');
+  assert.equal(upstreamRuntimeCandidates.grok.entryRelativePath, 'bin/grok');
+  assert.equal(upstreamRuntimeCandidates.grok.version, '1.0.41');
+  assert.equal(upstreamRuntimeCandidates.grok.publish, true);
+  assert.match(upstreamRuntimeCandidates.grok.url, /^https:\/\/storage\.googleapis\.com\/grok-build-public-artifacts\/cli\/grok-1\.0\.41-macos-aarch64$/);
   assert.match(upstreamRuntimeCandidates.kimi.url, /^https:\/\/github\.com\/MoonshotAI\/kimi-code\/releases\/download\//);
 });
 
@@ -116,4 +122,13 @@ test('the Runtime integration is anchored to reviewed source and owns standalone
   assert.match(integrated, /serializeModelCatalog\(modelSelectionFacade.getView\(preferred\)\)/);
   assert.match(integrated, /return server.handleMessage\(message\)/, 'all native session/reverse traffic keeps the upstream handler');
   assert.throws(() => applyZcodeIntegrationEdits(snippet + '\n' + snippet), /ambiguous/);
+});
+
+
+test('explicit Runtime selection excludes unrelated builds and rejects ambiguous providers', () => {
+  assert.deepEqual(selectRuntimeProviders(['kimi', 'grok']), ['kimi', 'grok']);
+  for (const selection of [[], ['kimi', 'kimi'], ['unknown'], [undefined]]) {
+    assert.throws(() => selectRuntimeProviders(selection), /provider selection/);
+  }
+  assert.deepEqual(selectRuntimeProviders(), ['claude', 'codex', 'kimi', 'grok', 'dsh', 'zcode']);
 });

@@ -1,5 +1,14 @@
 # Gian Proxies Changelog
 
+## Kimi Proxy 0.4.5 - Unreleased
+
+- Materialize native cold Side Chat children before subscribing and reject
+  failed subscription acknowledgements. Keep child events and terminal state
+  bound to the actual child turn.
+- Forward Stop to the native Runtime and settle interrupted turns without
+  requiring Host fencing; preserve follow-up turns and interaction cancellation.
+- Keep the Kimi Code 2.1.1 Runtime pin and gian.proxy wire versions unchanged.
+
 ## Catalog 1.19.0 - 2026-09-30
 
 - Select the published Kimi Proxy 0.4.4 release and its unchanged Kimi Code 2.1.1 Runtime.
@@ -22,11 +31,13 @@
 - Accept volatile frames that reuse the current sequence, and include the turn prompt id on usage events.
 - This release does not change the Proxy wire protocol or the Kimi Code 2.1.1 Runtime pin.
 
-## Grok Proxy 0.3.7 - 2026-09-29
+## Grok Proxy 0.3.7 - Unreleased
 
 - Bind model and reasoning effort to the turn. Permission mode stays session-bound.
 - Require `workspace.roots` to include the session directory. The Host may also list the session attachment directory; that path is not added to the sandbox.
 - Hold turn events that arrive before `turn.started`, and drop usage deltas after the turn ends.
+- Normalize native interaction IDs across tool metadata and interaction events;
+  retain first-turn ordering and configuration validation during model changes.
 - Refresh the Grok Build logos and show the default permission mode as Default.
 - This release does not change the Proxy wire protocol or the Grok CLI 1.0.41 Runtime pin.
 

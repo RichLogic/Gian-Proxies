@@ -23,6 +23,15 @@ Implemented host-facing methods are listed by `initialize`. Process scope is
 plus `requestUserInput`) are advertised. `session.native.delete` and
 `integration.mcp.streamableHttp` are not.
 
+Native rollout replay is chunk-read and disk-paged, including exact pinned Fork
+ancestry. Total history size is not capped at 64 MiB; individual records and
+wire pages remain bounded. Appends reuse the committed read offset, and replay
+cursors retain immutable snapshots through file rewrites or attachment close.
+Derived replay files are private, disposable caches under the plugin data
+directory (or private system temporary storage), never replacements for native
+rollouts. Normal attachment/process shutdown removes them; restart rebuilds
+history rather than trusting a cache left by an unclean exit.
+
 ```sh
 pnpm -F @gian/codex-proxy typecheck
 pnpm -F @gian/codex-proxy test

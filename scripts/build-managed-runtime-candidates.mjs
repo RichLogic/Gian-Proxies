@@ -53,6 +53,15 @@ export const upstreamRuntimeCandidates = Object.freeze({
     sha256: '8c3bad99571b16abd113ab5d511a98a36b852c0d5493991842a67b8c2bc4ecd0',
     size: 62296524,
   }),
+  grok: Object.freeze({
+    version: '1.0.41',
+    format: 'raw',
+    entryRelativePath: 'bin/grok',
+    url: 'https://storage.googleapis.com/grok-build-public-artifacts/cli/grok-1.0.41-macos-aarch64',
+    sha256: '9c844eb13365180787d9ad22b2b3748a024be8e1ed845253cc114781b31c591d',
+    size: 145657952,
+    publish: true,
+  }),
 });
 
 function digest(bytes) {
@@ -112,6 +121,9 @@ async function buildUpstream(provider, candidate, outputDir, workDir) {
     CLAUDE_CONFIG_DIR: join(workDir, 'claude-home'),
     CODEX_HOME: join(workDir, 'codex-home'),
     DISABLE_AUTOUPDATER: '1',
+    GROK_HOME: join(workDir, 'grok-home'),
+    GROK_DISABLE_AUTOUPDATER: '1',
+    GROK_SANDBOX: 'workspace',
   };
   await mkdir(environment.HOME, { recursive: true, mode: 0o700 });
   const entry = await inspectEntry(provider, entryPath, candidate.version, environment);
@@ -124,10 +136,12 @@ async function buildUpstream(provider, candidate, outputDir, workDir) {
     asset: {
       name: basename(assetPath),
       path: assetPath,
-      url: candidate.url,
+      url: candidate.publish
+        ? `https://github.com/RichLogic/Gian-Proxies/releases/download/${proxyReleaseMetadata(provider).tag}/${assetName}`
+        : candidate.url,
       sha256: candidate.sha256,
       size: candidate.size,
-      publish: false,
+      publish: candidate.publish === true,
     },
     candidateBin: entryPath,
   };
@@ -280,8 +294,20 @@ export function validateRuntimeCandidateDefinitions() {
   return true;
 }
 
-export async function buildManagedRuntimeCandidates({ outputDir, githubEnv = null }) {
+export function selectRuntimeProviders(providers = null) {
+  const supported = [...Object.keys(upstreamRuntimeCandidates), 'dsh', 'zcode'];
+  if (providers === null) return supported;
+  if (!Array.isArray(providers) || providers.length === 0
+    || new Set(providers).size !== providers.length
+    || providers.some(provider => !supported.includes(provider))) {
+    throw new Error('Invalid explicit Runtime provider selection.');
+  }
+  return [...providers];
+}
+
+export async function buildManagedRuntimeCandidates({ outputDir, githubEnv = null, providers = null }) {
   validateRuntimeCandidateDefinitions();
+  const selected = selectRuntimeProviders(providers);
   const target = resolve(outputDir);
   await rm(target, { recursive: true, force: true });
   await mkdir(target, { recursive: true, mode: 0o700 });
@@ -289,11 +315,11 @@ export async function buildManagedRuntimeCandidates({ outputDir, githubEnv = nul
   await rm(workDir, { recursive: true, force: true });
   await mkdir(workDir, { recursive: true, mode: 0o700 });
   const candidates = [];
-  for (const [provider, definition] of Object.entries(upstreamRuntimeCandidates)) {
-    candidates.push(await buildUpstream(provider, definition, target, workDir));
+  for (const provider of selected) {
+    if (provider === 'dsh') candidates.push(await buildDsh(target, workDir));
+    else if (provider === 'zcode') candidates.push(await buildZcode(target, workDir));
+    else candidates.push(await buildUpstream(provider, upstreamRuntimeCandidates[provider], target, workDir));
   }
-  candidates.push(await buildDsh(target, workDir));
-  candidates.push(await buildZcode(target, workDir));
   const manifest = {
     schemaVersion: 1,
     platform: 'darwin-arm64',
@@ -304,7 +330,7 @@ export async function buildManagedRuntimeCandidates({ outputDir, githubEnv = nul
   };
   await writeFile(join(target, 'runtime-candidates.json'), `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
   if (githubEnv) {
-    const envNames = { claude: 'CLAUDE_BIN', codex: 'CODEX_BIN', kimi: 'KIMI_BIN', dsh: 'DSH_BIN', zcode: 'ZCODE_BIN' };
+    const envNames = { claude: 'CLAUDE_BIN', codex: 'CODEX_BIN', kimi: 'KIMI_BIN', grok: 'GROK_BIN', dsh: 'DSH_BIN', zcode: 'ZCODE_BIN' };
     const body = candidates.map(candidate => `${envNames[candidate.provider]}=${candidate.candidateBin}`).join('\n');
     await writeFile(resolve(githubEnv), `${body}\n`, { flag: 'a' });
   }
@@ -312,11 +338,15 @@ export async function buildManagedRuntimeCandidates({ outputDir, githubEnv = nul
 }
 
 function parseArgs(argv) {
-  const options = { outputDir: 'artifacts/runtimes', githubEnv: null };
+  const options = { outputDir: 'artifacts/runtimes', githubEnv: null, providers: null };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === '--output') options.outputDir = argv[++index];
     else if (arg === '--github-env') options.githubEnv = argv[++index];
+    else if (arg === '--provider') {
+      options.providers ??= [];
+      options.providers.push(argv[++index]);
+    }
     else throw new Error(`Unknown Runtime candidate argument ${arg}.`);
   }
   if (!options.outputDir) throw new Error('--output requires a path.');

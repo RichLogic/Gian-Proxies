@@ -12,7 +12,9 @@ export interface GrokPermissionSpec {
   description: string;
   isDefault: boolean;
   approval: 'relay' | 'auto' | 'never';
+  /** Not the process sandbox. Sandbox is `sandbox_profile`. */
   workspace: 'workspace-write';
+  /** Not a network grant. Sandbox profiles control that separately. */
   network: 'allow';
   createMeta: { yoloMode: boolean; autoMode: boolean };
   runtime: {
@@ -48,7 +50,7 @@ export const GROK_PERMISSION_SPECS: readonly GrokPermissionSpec[] = [
   {
     id: 'always_approve',
     displayName: 'Always approve',
-    description: 'Skip tool permission prompts. Workspace sandbox stays on.',
+    description: 'Skip tool permission prompts. This does not change the sandbox profile.',
     isDefault: false,
     approval: 'never',
     workspace: 'workspace-write',
