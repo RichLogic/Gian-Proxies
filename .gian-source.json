@@ -2,7 +2,7 @@
   "schema": 1,
   "product": "Gian-Proxies",
   "sourceRepository": "RichLogic/Gian-Dev",
-  "sourceCommit": "54f37c1a365405046d838eaa5a8395815b08b25e",
+  "sourceCommit": "be7a64413754836e5326714324b5d66bdbda348e",
   "workingTree": false,
   "externalPackages": [
     {
@@ -396,7 +396,7 @@
     {
       "source": "catalog/proxy-information/evidence/current-combinations.json",
       "path": "catalog/proxy-information/evidence/current-combinations.json",
-      "sha256": "6b9a135e005e47d02d4e969ad5f2595f90477fdd60d235214866b6c1368ce5c4"
+      "sha256": "975e1e0a31d4ae340556a3f336a1273f4b1a80cb75a3234a46c90de6b61d47eb"
     },
     {
       "source": "catalog/proxy-information/evidence/dsh-bridge-versions.json",
@@ -446,7 +446,7 @@
     {
       "source": "catalog/proxy-information/kimi/basic.md",
       "path": "catalog/proxy-information/kimi/basic.md",
-      "sha256": "8118211a69463336df997f4a18dfdb01517af0d49b77e9cb8921a369a86dfca3"
+      "sha256": "19a7e902969f5f8a2d82e03bfa870e0824fac9d1e924d1e09d8013aa5fd6faf5"
     },
     {
       "source": "catalog/proxy-information/kimi/changelog.json",
@@ -481,7 +481,7 @@
     {
       "source": "catalog/proxy-information/project.test.mjs",
       "path": "catalog/proxy-information/project.test.mjs",
-      "sha256": "b888ac4da89dc13964e399489723f1e465e867faedb2c6f1c634bf3e072facbd"
+      "sha256": "c0005dce9985c1112c6839b312b47e2058fe3550a004751f1074d02e2b9f278b"
     },
     {
       "source": "catalog/proxy-information/validate.mjs",
@@ -3008,7 +3008,7 @@
     {
       "path": "catalog/proxy-information/evidence/current-combinations.json",
       "mode": 420,
-      "sha256": "6b9a135e005e47d02d4e969ad5f2595f90477fdd60d235214866b6c1368ce5c4"
+      "sha256": "975e1e0a31d4ae340556a3f336a1273f4b1a80cb75a3234a46c90de6b61d47eb"
     },
     {
       "path": "catalog/proxy-information/evidence/dsh-bridge-versions.json",
@@ -3063,7 +3063,7 @@
     {
       "path": "catalog/proxy-information/kimi/basic.md",
       "mode": 420,
-      "sha256": "8118211a69463336df997f4a18dfdb01517af0d49b77e9cb8921a369a86dfca3"
+      "sha256": "19a7e902969f5f8a2d82e03bfa870e0824fac9d1e924d1e09d8013aa5fd6faf5"
     },
     {
       "path": "catalog/proxy-information/kimi/changelog.json",
@@ -3098,7 +3098,7 @@
     {
       "path": "catalog/proxy-information/project.test.mjs",
       "mode": 420,
-      "sha256": "b888ac4da89dc13964e399489723f1e465e867faedb2c6f1c634bf3e072facbd"
+      "sha256": "c0005dce9985c1112c6839b312b47e2058fe3550a004751f1074d02e2b9f278b"
     },
     {
       "path": "catalog/proxy-information/README.md",

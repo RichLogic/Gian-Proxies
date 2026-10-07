@@ -1,6 +1,6 @@
 {
-  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.20.0",
-  "sequence": 20,
+  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.21.0",
+  "sequence": 21,
   "sourceId": "gian-official",
   "plugins": [
     {

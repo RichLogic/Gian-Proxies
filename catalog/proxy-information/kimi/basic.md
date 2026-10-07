@@ -14,7 +14,7 @@
 
 ## 当前发布目标快照
 
-这是 Catalog 20 的发布目标，不是本机安装状态：Proxy **0.4.5**，Runtime **2.1.1**。实际坐标和认证证据来自 ../evidence/current-combinations.json；用户机器的当前版本仍以 Host 收据为准。
+这是 Catalog 21 的发布目标，不是本机安装状态：Proxy **0.4.5**，Runtime **2.1.1**。实际坐标和认证证据来自 ../evidence/current-combinations.json；用户机器的当前版本仍以 Host 收据为准。
 
 目标位置样例：
 
