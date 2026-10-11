@@ -1718,5 +1718,30 @@
     "process": {
       "scope": "session"
     }
+  },
+  {
+    "tag": "proxy-claude-v0.3.5",
+    "url": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-claude-v0.3.5",
+    "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-claude-v0.3.5/gian-proxy-claude-0.3.5-darwin-arm64.tar.gz.manifest.json",
+    "digest": "sha256:f2f3bd7deab8060eb26881130f865e306361775dd2bb23da51c341c9523167b9",
+    "assetDigestVerified": true,
+    "schemaVersion": 4,
+    "pluginId": "claude",
+    "pluginVersion": "0.3.5",
+    "protocol": {
+      "name": "gian.proxy",
+      "range": ">=2.2 <3.0"
+    },
+    "runtime": {
+      "kind": "external",
+      "id": "claude",
+      "displayName": "Claude Code",
+      "verifiedVersions": [
+        "2.1.296"
+      ]
+    },
+    "process": {
+      "scope": "session"
+    }
   }
 ]

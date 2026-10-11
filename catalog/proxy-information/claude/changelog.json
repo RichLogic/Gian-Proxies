@@ -1,8 +1,52 @@
 {
   "schemaVersion": 1,
   "pluginId": "claude",
-  "currentVersion": "0.3.4",
+  "currentVersion": "0.3.5",
   "entries": [
+    {
+      "version": "0.3.5",
+      "firstPublishedAt": "2026-10-11T16:22:19Z",
+      "evidenceCoverage": "detailed",
+      "distributions": [
+        {
+          "repository": "RichLogic/Gian-Proxies",
+          "tag": "proxy-claude-v0.3.5",
+          "publishedAt": "2026-10-11T16:22:19Z",
+          "releaseUrl": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-claude-v0.3.5",
+          "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-claude-v0.3.5/gian-proxy-claude-0.3.5-darwin-arm64.tar.gz.manifest.json",
+          "manifestSha256": "f2f3bd7deab8060eb26881130f865e306361775dd2bb23da51c341c9523167b9",
+          "archive": {
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-claude-v0.3.5/gian-proxy-claude-0.3.5-darwin-arm64.tar.gz",
+            "sha256": "5a0208abc7b297e82749e01037fd781e3559cea0d5991e17f386ce7139eef017",
+            "size": 517721
+          },
+          "runtimeDeclaration": {
+            "id": "claude",
+            "versions": [
+              "2.1.296"
+            ],
+            "basis": "verified-declaration"
+          },
+          "companionDeclarations": [],
+          "protocolRange": ">=2.2 <3.0",
+          "manifestSchema": 4,
+          "processScope": "session"
+        }
+      ],
+      "changes": [
+        {
+          "category": "changed",
+          "text": "Fix session-creation effort resolution: apply the default model before checking conditions, omit disabled effort defaults and retain model-specific choices on the live connection. Update the managed Claude Code Runtime to 2.1.296. The wire protocol range is unchanged. Owner-selected direct publication: all tests, Runtime probes and archive self-tests were not run.",
+          "evidence": [
+            "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-claude-v0.3.5",
+            "https://github.com/RichLogic/Gian-Proxies/blob/proxy-claude-v0.3.5/packages/proxies/cc-proxy/src/protocol/v2-adapter.ts"
+          ]
+        }
+      ],
+      "unknowns": [
+        "All tests, Runtime probes and archive self-tests are NOT_RUN by Owner instruction."
+      ]
+    },
     {
       "version": "0.3.4",
       "firstPublishedAt": "2026-10-11T15:03:28Z",

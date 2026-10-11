@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-10-11T15:05:36.592Z",
+  "capturedAt": "2026-10-11T16:24:50.658Z",
   "repositories": [
     "RichLogic/Gian",
     "RichLogic/Gian-Proxies"
@@ -2089,6 +2089,38 @@
           "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-claude-v0.3.4/gian-proxy-claude-0.3.4-darwin-arm64.tar.gz.sha256",
           "size": 110,
           "digest": "sha256:d3952e5beb96ddf711453652f1bebd33025bfb40568a44c140a286482e8f3b5f"
+        }
+      ]
+    },
+    {
+      "tag": "proxy-claude-v0.3.5",
+      "date": "2026-10-11T16:22:19Z",
+      "url": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-claude-v0.3.5",
+      "body": "Claude Proxy 0.3.5: native model metadata and condition-aware model/effort resolution. Owner-selected direct publication; all tests, Runtime probes and archive self-tests NOT_RUN. Declared Claude Code Runtime: 2.1.296. Artifact hashes and source provenance are bound by proxies-e0400802513043dfd8b7d2b7e977fab636733d8f-38154665945-1.",
+      "assets": [
+        {
+          "name": "certificate.json",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-claude-v0.3.5/certificate.json",
+          "size": 4157,
+          "digest": "sha256:3e1f8803def49a32141b9d54e2e5fd2c0a204d3ccb9c21ad842e6b10d890c477"
+        },
+        {
+          "name": "gian-proxy-claude-0.3.5-darwin-arm64.tar.gz",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-claude-v0.3.5/gian-proxy-claude-0.3.5-darwin-arm64.tar.gz",
+          "size": 517721,
+          "digest": "sha256:5a0208abc7b297e82749e01037fd781e3559cea0d5991e17f386ce7139eef017"
+        },
+        {
+          "name": "gian-proxy-claude-0.3.5-darwin-arm64.tar.gz.manifest.json",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-claude-v0.3.5/gian-proxy-claude-0.3.5-darwin-arm64.tar.gz.manifest.json",
+          "size": 799,
+          "digest": "sha256:f2f3bd7deab8060eb26881130f865e306361775dd2bb23da51c341c9523167b9"
+        },
+        {
+          "name": "gian-proxy-claude-0.3.5-darwin-arm64.tar.gz.sha256",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-claude-v0.3.5/gian-proxy-claude-0.3.5-darwin-arm64.tar.gz.sha256",
+          "size": 110,
+          "digest": "sha256:26ce25b8248150dde04bf42aa526f58e1082d5158b36c501ca8da4aa721ebc9b"
         }
       ]
     }
