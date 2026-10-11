@@ -30,20 +30,20 @@ export const ZCODE_RUNTIME_ASSET_NAME = 'zcode.tar.gz';
 
 export const upstreamRuntimeCandidates = Object.freeze({
   claude: Object.freeze({
-    version: '2.1.280',
+    version: '2.1.285',
     format: 'raw',
     entryRelativePath: 'bin/claude',
-    url: 'https://downloads.claude.ai/claude-code-releases/2.1.280/darwin-arm64/claude',
-    sha256: '387a5c5dcdbb815085edf0baf79591f9d8894efe922bceaf3d75b1b08055229d',
-    size: 217254576,
+    url: 'https://downloads.claude.ai/claude-code-releases/2.1.285/darwin-arm64/claude',
+    sha256: '51f09bd1e021d9fa8a1864c179799bd37cb39962a937935c5cf6823398e86db4',
+    size: 223821616,
   }),
   codex: Object.freeze({
-    version: '0.159.2',
+    version: '0.161.0',
     format: 'tar.gz',
     entryRelativePath: 'bin/codex',
-    url: 'https://github.com/openai/codex/releases/download/rust-v0.159.2/codex-package-aarch64-apple-darwin.tar.gz',
-    sha256: '38aaf6dce63099fd10988948d03bbc6c0474253aef6961fcbe60f8d154b39101',
-    size: 129522674,
+    url: 'https://github.com/openai/codex/releases/download/rust-v0.161.0/codex-package-aarch64-apple-darwin.tar.gz',
+    sha256: 'f0feee8537daf8dd6b4e0a36e764549ad14afdbb419d8775aeab9feb20182313',
+    size: 131714490,
   }),
   kimi: Object.freeze({
     version: '2.1.1',
@@ -54,12 +54,12 @@ export const upstreamRuntimeCandidates = Object.freeze({
     size: 62296524,
   }),
   grok: Object.freeze({
-    version: '1.0.41',
+    version: '1.0.46',
     format: 'raw',
     entryRelativePath: 'bin/grok',
-    url: 'https://storage.googleapis.com/grok-build-public-artifacts/cli/grok-1.0.41-macos-aarch64',
-    sha256: '9c844eb13365180787d9ad22b2b3748a024be8e1ed845253cc114781b31c591d',
-    size: 145657952,
+    url: 'https://x.ai/cli/grok-1.0.46-macos-aarch64',
+    sha256: 'e8daa302364c9c3b6a5546d511cfbd1ab5e5d407a9b04282f660665ea405f9f3',
+    size: 150374256,
     publish: true,
   }),
 });
@@ -213,7 +213,7 @@ async function buildZcode(outputDir, workDir) {
   };
 }
 
-async function buildDsh(outputDir, workDir) {
+export async function buildDshRuntimeCandidate(outputDir, workDir) {
   const metadata = proxyReleaseMetadata('dsh');
   const lockedSource = resolve(rootDir, 'runtimes/deepseek-harness');
   const runtimeRoot = join(workDir, 'dsh-runtime');
@@ -316,7 +316,7 @@ export async function buildManagedRuntimeCandidates({ outputDir, githubEnv = nul
   await mkdir(workDir, { recursive: true, mode: 0o700 });
   const candidates = [];
   for (const provider of selected) {
-    if (provider === 'dsh') candidates.push(await buildDsh(target, workDir));
+    if (provider === 'dsh') candidates.push(await buildDshRuntimeCandidate(target, workDir));
     else if (provider === 'zcode') candidates.push(await buildZcode(target, workDir));
     else candidates.push(await buildUpstream(provider, upstreamRuntimeCandidates[provider], target, workDir));
   }

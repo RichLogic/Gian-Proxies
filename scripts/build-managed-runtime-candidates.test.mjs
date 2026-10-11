@@ -26,9 +26,9 @@ test('managed Runtime candidates pin exact official Claude, Codex, Kimi, and Gro
   assert.equal(upstreamRuntimeCandidates.kimi.entryRelativePath, 'kimi');
   assert.equal(upstreamRuntimeCandidates.grok.format, 'raw');
   assert.equal(upstreamRuntimeCandidates.grok.entryRelativePath, 'bin/grok');
-  assert.equal(upstreamRuntimeCandidates.grok.version, '1.0.41');
+  assert.equal(upstreamRuntimeCandidates.grok.version, '1.0.46');
   assert.equal(upstreamRuntimeCandidates.grok.publish, true);
-  assert.match(upstreamRuntimeCandidates.grok.url, /^https:\/\/storage\.googleapis\.com\/grok-build-public-artifacts\/cli\/grok-1\.0\.41-macos-aarch64$/);
+  assert.match(upstreamRuntimeCandidates.grok.url, /^https:\/\/x\.ai\/cli\/grok-1\.0\.46-macos-aarch64$/);
   assert.match(upstreamRuntimeCandidates.kimi.url, /^https:\/\/github\.com\/MoonshotAI\/kimi-code\/releases\/download\//);
 });
 
@@ -38,8 +38,8 @@ test('DeepSeek Harness Runtime has a complete exact npm lock', async () => {
     'utf8',
   ));
   assert.equal(lock.lockfileVersion, 3);
-  assert.equal(lock.packages[''].dependencies['@deepseek-ai/dsh'], '0.1.5-rc.3');
-  assert.equal(lock.packages['node_modules/@deepseek-ai/dsh'].version, '0.1.5-rc.3');
+  assert.equal(lock.packages[''].dependencies['@deepseek-ai/dsh'], '0.2.0-rc.2');
+  assert.equal(lock.packages['node_modules/@deepseek-ai/dsh'].version, '0.2.0-rc.2');
   for (const [path, candidate] of Object.entries(lock.packages)) {
     if (!path || candidate.link) continue;
     assert.match(candidate.resolved, /^https:\/\/registry\.npmjs\.org\//, path);

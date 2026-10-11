@@ -1,6 +1,63 @@
 # Gian Proxies Changelog
 
-## Kimi Proxy 0.4.5 - Unreleased
+## Claude Proxy 0.3.3 - Unreleased
+
+- Target the managed Claude Code 2.1.285 Runtime, up from the 2.1.280 pin
+  published with Claude Proxy 0.3.2.
+- Keep the Claude session across an interrupt and resume it on the next turn
+  with the current model and effort; resume waits for the CLI session init
+  instead of passing an id Claude never created.
+- A CLI exit during an active turn fails the turn with the exit code, signal
+  and streamed length; unexpected exits are retryable, while provider errors
+  such as authentication failure stay not retryable.
+- Discover the model catalog from the wrapper's own HOME and settings; the
+  gian.proxy wire contract is unchanged.
+
+## Codex Proxy 0.3.4 - Unreleased
+
+- Target the managed Codex CLI 0.161.0 Runtime, up from the 0.159.2 pin
+  published with Codex Proxy 0.3.3.
+- Page long native histories through disk with pinned Fork ancestry, stable
+  event identity, immutable cursors and bounded incremental reads; replay
+  failures stay isolated to their attachment generation.
+- Report the actual Proxy package version to the Runtime instead of a stale
+  hardcoded value. The gian.proxy wire contract is unchanged.
+
+## Kimi Proxy 0.4.6 - Unreleased
+
+- Preserve turns across Runtime disconnects: notification counters reset on a
+  new stream binding, event delivery resumes from durable cursors, and only a
+  child process exit is treated as runtime-down.
+- Declare the native cancel action on confirmation prompts, keeping valueless
+  cancellation explicit for input gating. Keep the Kimi Code 2.1.1 Runtime pin
+  and gian.proxy wire versions unchanged.
+
+## Grok Proxy 0.3.8 - Unreleased
+
+- Target the managed Grok CLI 1.0.46 Runtime, up from the 1.0.41 pin published
+  with Grok Proxy 0.3.7.
+- Catalog inspection no longer delays shutdown: successful model metadata
+  inspections are reused, failed cleanup and empty snapshots are retried, and
+  only inspection children are force-stopped — live sessions keep their
+  graceful shutdown.
+- Declare native cancellation action IDs so valueless cancellation stays
+  explicit in the Host/Web input gating. The gian.proxy wire contract is
+  unchanged.
+
+## DeepSeek Harness Proxy 0.3.5 - Unreleased
+
+- Target the DeepSeek Harness 0.2.0-rc.2 Runtime with Bridge 0.1.6, reading
+  session logs as format 4; the published 0.3.3 pinned Runtime 0.1.5-rc.3
+  (0.3.4 was prepared but never published).
+- Add Side Chat with idle-only anchors, a sealed resume reference persisted
+  across Proxy restarts, and a close barrier that terminalizes the active
+  turn; native session.fork with a verified seed prefix and structured
+  attachment/skill input.
+- Replace a saved model the Runtime no longer advertises with the advertised
+  default before turn.start, and carry a reselect notice on the turn. The
+  gian.proxy wire contract is unchanged.
+
+## Kimi Proxy 0.4.5 - 2026-10-07
 
 - Materialize native cold Side Chat children before subscribing and reject
   failed subscription acknowledgements. Keep child events and terminal state
@@ -31,7 +88,7 @@
 - Accept volatile frames that reuse the current sequence, and include the turn prompt id on usage events.
 - This release does not change the Proxy wire protocol or the Kimi Code 2.1.1 Runtime pin.
 
-## Grok Proxy 0.3.7 - Unreleased
+## Grok Proxy 0.3.7 - 2026-10-07
 
 - Bind model and reasoning effort to the turn. Permission mode stays session-bound.
 - Require `workspace.roots` to include the session directory. The Host may also list the session attachment directory; that path is not added to the sandbox.
