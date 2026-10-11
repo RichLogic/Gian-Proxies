@@ -1,8 +1,52 @@
 {
   "schemaVersion": 1,
   "pluginId": "claude",
-  "currentVersion": "0.3.3",
+  "currentVersion": "0.3.4",
   "entries": [
+    {
+      "version": "0.3.4",
+      "firstPublishedAt": "2026-10-11T15:03:28Z",
+      "evidenceCoverage": "detailed",
+      "distributions": [
+        {
+          "repository": "RichLogic/Gian-Proxies",
+          "tag": "proxy-claude-v0.3.4",
+          "publishedAt": "2026-10-11T15:03:28Z",
+          "releaseUrl": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-claude-v0.3.4",
+          "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-claude-v0.3.4/gian-proxy-claude-0.3.4-darwin-arm64.tar.gz.manifest.json",
+          "manifestSha256": "5ada1231924616d27e644129bde89187d8d67ed9f4651055a4fcc6e5ea26cfcf",
+          "archive": {
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-claude-v0.3.4/gian-proxy-claude-0.3.4-darwin-arm64.tar.gz",
+            "sha256": "7e49607147174b2d8d21a350f37486bcd31bcc7215e267098d60da8b55bfee54",
+            "size": 517659
+          },
+          "runtimeDeclaration": {
+            "id": "claude",
+            "versions": [
+              "2.1.285"
+            ],
+            "basis": "verified-declaration"
+          },
+          "companionDeclarations": [],
+          "protocolRange": ">=2.2 <3.0",
+          "manifestSchema": 4,
+          "processScope": "session"
+        }
+      ],
+      "changes": [
+        {
+          "category": "changed",
+          "text": "通过仅含 initialize 的控制握手读取 Claude 原生 /model 目录及每个模型的思考强度，当前默认模型不再遮蔽其余选择；保留现有配置 ID 与网关清单优先级，探测超时和关闭时清理子进程。Claude Code Runtime 仍为 2.1.285，线协议范围不变。Owner 指定直接发布，本次未运行任何测试、Runtime 探测或包自检。",
+          "evidence": [
+            "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-claude-v0.3.4",
+            "https://github.com/RichLogic/Gian-Proxies/blob/proxy-claude-v0.3.4/packages/proxies/cc-proxy/src/runtime/native-model-catalog.ts"
+          ]
+        }
+      ],
+      "unknowns": [
+        "Owner 指定未运行任何测试、Runtime 探测或包自检。"
+      ]
+    },
     {
       "version": "0.3.3",
       "firstPublishedAt": "2026-10-11T05:51:28Z",

@@ -2,7 +2,22 @@
 
 本文件由 changelog.json 的结构化记录投影，按 Proxy 版本倒序。首次发布日期与新仓库分发日期分别记录；未知历史不会用当前版本说明回填。
 
-本次发布组合快照：Proxy **0.3.3**，Runtime **2.1.285**。这是发布目标，不表示当前机器已安装。
+本次发布组合快照：Proxy **0.3.4**，Runtime **2.1.285**。这是发布目标，不表示当前机器已安装。
+
+## 0.3.4
+
+首次公开发布：2026-10-11T15:03:28Z（UTC）。
+
+- [RichLogic/Gian-Proxies 分发](https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-claude-v0.3.4)：2026-10-11T15:03:28Z。
+- 对应 CLI：2.1.285（Manifest 兼容声明，不是本机状态）。
+
+### 变更
+
+- 通过仅含 initialize 的控制握手读取 Claude 原生 /model 目录及每个模型的思考强度，当前默认模型不再遮蔽其余选择；保留现有配置 ID 与网关清单优先级，探测超时和关闭时清理子进程。Claude Code Runtime 仍为 2.1.285，线协议范围不变。Owner 指定直接发布，本次未运行任何测试、Runtime 探测或包自检。 [依据1](https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-claude-v0.3.4) [依据2](https://github.com/RichLogic/Gian-Proxies/blob/proxy-claude-v0.3.4/packages/proxies/cc-proxy/src/runtime/native-model-catalog.ts)
+
+### 历史证据边界
+
+- Owner 指定未运行任何测试、Runtime 探测或包自检。
 
 ## 0.3.3
 
