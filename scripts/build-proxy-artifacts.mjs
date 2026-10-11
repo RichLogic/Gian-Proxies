@@ -239,8 +239,8 @@ export async function main(argv = process.argv.slice(2), options = {}) {
     ? proxyDefinitions.filter(definition => definition.id === requestedPlugin)
     : proxyDefinitions.filter(definition => definition.shipping);
   if (options.ownerAuthorizedNoTests && (selectedDefinitions.length !== 1
-    || selectedDefinitions[0].id !== 'claude' || selectedDefinitions[0].pluginVersion !== '0.3.4')) {
-    throw new Error('The Owner-selected no-test packaging exception is limited to Claude Proxy 0.3.4');
+    || selectedDefinitions[0].id !== 'claude' || !['0.3.4', '0.3.5'].includes(selectedDefinitions[0].pluginVersion))) {
+    throw new Error('The Owner-selected no-test packaging exception is limited to the approved Claude fixes');
   }
   const outputDir = resolve(root, args.get('output') ?? 'artifacts/proxies');
   await mkdir(outputDir, { recursive: true });

@@ -1,5 +1,16 @@
 # Gian Proxies Changelog
 
+## Claude Proxy 0.3.5 - 2026-10-12
+
+- Resolve model defaults before checking conditional effort support, so an
+  effort-only creation draft can use the configured default model.
+- Omit disabled effort defaults and retain the resolved model-specific
+  catalog for validation of the first turn.
+- Target the current official Claude Code 2.1.296 Runtime. The previous
+  2.1.285 Runtime and all existing published artifacts remain immutable.
+- Owner-selected direct publication; all tests, Runtime probes and archive
+  self-tests are NOT_RUN.
+
 ## Claude Proxy 0.3.4 - 2026-10-11
 
 - Read Claude Code's native model catalog through a metadata-only initialize

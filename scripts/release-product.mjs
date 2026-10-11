@@ -31,10 +31,10 @@ const releaseUrl = (tag, name) => `https://github.com/${repository}/releases/dow
 export function validateCertificate(certificate, expected = {}) {
   const ownerDirect = certificate?.releaseMode === 'owner-authorized-no-tests';
   if (ownerDirect && (shipping.length !== 1 || shipping[0].id !== 'claude'
-    || shipping[0].pluginVersion !== '0.3.4' || certificate.status !== 'NOT_RUN'
+    || !['0.3.4', '0.3.5'].includes(shipping[0].pluginVersion) || certificate.status !== 'NOT_RUN'
     || !certificate.authorization?.requestedBy
-    || certificate.authorization.scope !== 'Claude Proxy 0.3.4 without tests')) {
-    throw new Error('Invalid Owner-selected Claude 0.3.4 publication receipt');
+    || certificate.authorization.scope !== `Claude Proxy ${shipping[0].pluginVersion} without tests`)) {
+    throw new Error('Invalid Owner-selected Claude publication receipt');
   }
   if (certificate?.schema !== 1 || certificate.model !== 'standalone-proxy-artifacts-v1'
     || certificate.status !== (ownerDirect ? 'NOT_RUN' : 'PASS')
@@ -169,9 +169,9 @@ async function qualify() {
 /** One explicit Owner exception, limited to this version. Never manufacture
  * passing test evidence, and retain all provenance/byte/signature checks. */
 async function ownerSelectedBuild() {
-  if (shipping.length !== 1 || shipping[0].id !== 'claude' || shipping[0].pluginVersion !== '0.3.4'
+  if (shipping.length !== 1 || shipping[0].id !== 'claude' || !['0.3.4', '0.3.5'].includes(shipping[0].pluginVersion)
     || process.env.GITHUB_EVENT_NAME !== 'workflow_dispatch' || !process.env.GITHUB_ACTOR) {
-    throw new Error('Owner-selected build without tests is limited to Claude Proxy 0.3.4');
+    throw new Error('Owner-selected build without tests is limited to the approved Claude fixes');
   }
   verifySource();
   if (git('status', '--porcelain', '--untracked-files=no')) throw new Error('Publication source is dirty');
@@ -184,8 +184,24 @@ async function ownerSelectedBuild() {
   const inherited = await inheritCatalogExecutables(source, sequence);
   const previous = inherited.previous.plugins.find(plugin => plugin.pluginId === 'claude');
   const metadata = proxyReleaseMetadata('claude');
-  const runtime = previous?.stable.combination?.runtime;
-  if (!runtime || !metadata.runtime.verifiedVersions.includes(runtime.version)) throw new Error('Cannot reuse the unchanged Claude Runtime');
+  let runtime = previous?.stable.combination?.runtime;
+  if (!runtime || !metadata.runtime.verifiedVersions.includes(runtime.version)) {
+    // The Owner also requested the current official CLI. Download and hash
+    // its pinned bytes without executing a Runtime probe or model turn.
+    const { upstreamRuntimeCandidates } = await import('./build-managed-runtime-candidates.mjs');
+    const candidate = upstreamRuntimeCandidates.claude;
+    if (!metadata.runtime.verifiedVersions.includes(candidate.version) || candidate.format !== 'raw'
+      || !candidate.url.startsWith('https://downloads.claude.ai/claude-code-releases/')) {
+      throw new Error('Unapproved direct-publication Claude Runtime coordinate');
+    }
+    const response = await fetch(candidate.url, { signal: AbortSignal.timeout(120000) });
+    if (!response.ok) throw new Error(`Claude Runtime download failed (${response.status})`);
+    const bytes = Buffer.from(await response.arrayBuffer());
+    if (bytes.length !== candidate.size || hash(bytes) !== candidate.sha256) throw new Error('Official Claude Runtime digest mismatch');
+    runtime = { kind: 'native-binary', runtimeId: metadata.runtime.id, version: candidate.version,
+      asset: { url: candidate.url, sha256: candidate.sha256, size: candidate.size },
+      format: candidate.format, entryRelativePath: candidate.entryRelativePath };
+  }
   rmSync(output, { recursive: true, force: true }); mkdirSync(output, { recursive: true });
   await buildArtifacts(['--plugin', 'claude', '--output', 'artifacts/proxies'], { ownerAuthorizedNoTests: true });
   for (const suffix of ['', '.sha256', '.manifest.json']) {
@@ -198,7 +214,7 @@ async function ownerSelectedBuild() {
     runId: process.env.GITHUB_RUN_ID, runAttempt: process.env.GITHUB_RUN_ATTEMPT };
   const certificate = { schema: 1, model: 'standalone-proxy-artifacts-v1', status: 'NOT_RUN',
     releaseMode: 'owner-authorized-no-tests', repository, revision, runner,
-    authorization: { requestedBy: process.env.GITHUB_ACTOR, scope: 'Claude Proxy 0.3.4 without tests' },
+    authorization: { requestedBy: process.env.GITHUB_ACTOR, scope: `Claude Proxy ${metadata.version} without tests` },
     certificateId: `proxies-${revision}-${runner.runId}-${runner.runAttempt}`, completedAt: new Date().toISOString(),
     steps: [...['source', 'build', 'archive-integrity'].map(id => ({ id, status: 'PASS' })),
       ...['proxy-contracts', 'runtime-artifacts', 'archive-self-tests'].map(id => ({ id, status: 'NOT_RUN' }))],
@@ -209,7 +225,7 @@ async function ownerSelectedBuild() {
     exclusions: ['All test execution', 'Runtime probes', 'archive self-tests', 'App/Desktop acceptance', 'real Provider turns'] };
   validateCertificate(certificate);
   put(join(output, 'certificate.json'), certificate);
-  console.log('Built Claude Proxy 0.3.4 for Owner-selected direct publication; all tests NOT_RUN');
+  console.log(`Built Claude Proxy ${metadata.version} for Owner-selected direct publication; all tests NOT_RUN`);
 }
 
 function readCertified(directory) {
@@ -252,7 +268,7 @@ async function publish(directory) {
     if (record.publishRuntime) names.push(record.runtimeAsset);
     publishRelease(record.tag, names.map(name => join(directory, name)),
       certificate.releaseMode === 'owner-authorized-no-tests'
-        ? `Claude Proxy ${record.version}: restore the native /model catalog through a metadata-only initialize handshake. Owner-selected direct publication; all tests, Runtime probes and archive self-tests NOT_RUN. The unchanged Claude Code ${record.runtime.version} Runtime is reused. Artifact hashes and source provenance are bound by ${certificate.certificateId}.`
+        ? `Claude Proxy ${record.version}: native model metadata and condition-aware model/effort resolution. Owner-selected direct publication; all tests, Runtime probes and archive self-tests NOT_RUN. Declared Claude Code Runtime: ${record.runtime.version}. Artifact hashes and source provenance are bound by ${certificate.certificateId}.`
         : `Independent Proxy ${record.version}. Exact hosted artifacts from ${certificate.certificateId}. DSH includes its Bridge. ZCode includes a managed CLI Runtime built from its pinned upstream Git commit. No App or real-provider acceptance is claimed.`);
   }
 }
