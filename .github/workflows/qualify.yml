@@ -30,6 +30,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Qualify the independently buildable product
         env:
+          GH_TOKEN: ${{ github.token }}
           GIAN_RUNNER_ENVIRONMENT: ${{ runner.environment }}
           GIAN_PROXY_OWNER_NO_TESTS: ${{ inputs.owner_no_tests }}
         run: pnpm qualify

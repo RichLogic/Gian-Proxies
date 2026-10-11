@@ -2,7 +2,7 @@
   "schema": 1,
   "product": "Gian-Proxies",
   "sourceRepository": "RichLogic/Gian-Dev",
-  "sourceCommit": "6435520c961341ca466d6186ce353f189f139eb0",
+  "sourceCommit": "bed0fc309c577acbd958f012af4346685f21cc09",
   "workingTree": false,
   "externalPackages": [
     {
@@ -501,7 +501,7 @@
     {
       "source": "delivery/proxies/.github/workflows/qualify.yml",
       "path": ".github/workflows/qualify.yml",
-      "sha256": "942f0646e00ef1d0de27493ec52e4038ebae04cb0ef72a0a558bb1cfc0f00570"
+      "sha256": "028e16c06efa0b5fec8f06829582275f4801f72620c7c34c7c969f4e72ca49ee"
     },
     {
       "source": "delivery/proxies/.github/workflows/release.yml",
@@ -2668,7 +2668,7 @@
     {
       "path": ".github/workflows/qualify.yml",
       "mode": 420,
-      "sha256": "942f0646e00ef1d0de27493ec52e4038ebae04cb0ef72a0a558bb1cfc0f00570"
+      "sha256": "028e16c06efa0b5fec8f06829582275f4801f72620c7c34c7c969f4e72ca49ee"
     },
     {
       "path": ".github/workflows/release.yml",
