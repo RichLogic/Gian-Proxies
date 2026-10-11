@@ -1568,5 +1568,130 @@
     "process": {
       "scope": "session"
     }
+  },
+  {
+    "tag": "proxy-claude-v0.3.3",
+    "url": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-claude-v0.3.3",
+    "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-claude-v0.3.3/gian-proxy-claude-0.3.3-darwin-arm64.tar.gz.manifest.json",
+    "digest": "sha256:9d0658212cd96fc4f209a28b745c80f2ad0dd68cbee64d6ea425942f5a7ae855",
+    "assetDigestVerified": true,
+    "schemaVersion": 4,
+    "pluginId": "claude",
+    "pluginVersion": "0.3.3",
+    "protocol": {
+      "name": "gian.proxy",
+      "range": ">=2.2 <3.0"
+    },
+    "runtime": {
+      "kind": "external",
+      "id": "claude",
+      "displayName": "Claude Code",
+      "verifiedVersions": [
+        "2.1.285"
+      ]
+    },
+    "process": {
+      "scope": "session"
+    }
+  },
+  {
+    "tag": "proxy-codex-v0.3.4",
+    "url": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-codex-v0.3.4",
+    "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-codex-v0.3.4/gian-proxy-codex-0.3.4-darwin-arm64.tar.gz.manifest.json",
+    "digest": "sha256:6a7d94776fd340603dba64125cf324cfcc9e0a174e50c0f89faf060cecd73498",
+    "assetDigestVerified": true,
+    "schemaVersion": 4,
+    "pluginId": "codex",
+    "pluginVersion": "0.3.4",
+    "protocol": {
+      "name": "gian.proxy",
+      "range": ">=2.2 <3.0"
+    },
+    "runtime": {
+      "kind": "external",
+      "id": "codex",
+      "displayName": "Codex CLI",
+      "verifiedVersions": [
+        "0.161.0"
+      ]
+    },
+    "process": {
+      "scope": "shared"
+    }
+  },
+  {
+    "tag": "proxy-kimi-v0.4.6",
+    "url": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-kimi-v0.4.6",
+    "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-kimi-v0.4.6/gian-proxy-kimi-0.4.6-darwin-arm64.tar.gz.manifest.json",
+    "digest": "sha256:5bdc74c96a6f7ec9de90f3361d7782e17b4c1e4dc9676b53a0f44d7710f27279",
+    "assetDigestVerified": true,
+    "schemaVersion": 4,
+    "pluginId": "kimi",
+    "pluginVersion": "0.4.6",
+    "protocol": {
+      "name": "gian.proxy",
+      "range": ">=2.2 <3.0"
+    },
+    "runtime": {
+      "kind": "external",
+      "id": "kimi",
+      "displayName": "Kimi Code",
+      "verifiedVersions": [
+        "2.1.1"
+      ]
+    },
+    "process": {
+      "scope": "shared"
+    }
+  },
+  {
+    "tag": "proxy-grok-v0.3.8",
+    "url": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-grok-v0.3.8",
+    "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.8/gian-proxy-grok-0.3.8-darwin-arm64.tar.gz.manifest.json",
+    "digest": "sha256:2f19e32e2461647f679e2c4aafa077f95f36e1543b6e95440306a3ad8464bbe4",
+    "assetDigestVerified": true,
+    "schemaVersion": 4,
+    "pluginId": "grok",
+    "pluginVersion": "0.3.8",
+    "protocol": {
+      "name": "gian.proxy",
+      "range": ">=2.2 <3.0"
+    },
+    "runtime": {
+      "kind": "external",
+      "id": "grok",
+      "displayName": "Grok CLI",
+      "verifiedVersions": [
+        "1.0.46"
+      ]
+    },
+    "process": {
+      "scope": "session"
+    }
+  },
+  {
+    "tag": "proxy-dsh-v0.3.5",
+    "url": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-dsh-v0.3.5",
+    "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-dsh-v0.3.5/gian-proxy-dsh-0.3.5-darwin-arm64.tar.gz.manifest.json",
+    "digest": "sha256:9f5546cd00b50f0848490ad88493af3af12356f93647ca9191cd7a82c57371b9",
+    "assetDigestVerified": true,
+    "schemaVersion": 4,
+    "pluginId": "ai.deepseek.harness",
+    "pluginVersion": "0.3.5",
+    "protocol": {
+      "name": "gian.proxy",
+      "range": ">=2.2 <3.0"
+    },
+    "runtime": {
+      "kind": "external",
+      "id": "deepseek-harness",
+      "displayName": "DeepSeek Harness",
+      "verifiedVersions": [
+        "0.2.0-rc.2"
+      ]
+    },
+    "process": {
+      "scope": "shared"
+    }
   }
 ]

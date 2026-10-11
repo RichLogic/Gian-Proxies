@@ -1,8 +1,50 @@
 {
   "schemaVersion": 1,
   "pluginId": "claude",
-  "currentVersion": "0.3.2",
+  "currentVersion": "0.3.3",
   "entries": [
+    {
+      "version": "0.3.3",
+      "firstPublishedAt": "2026-10-11T05:51:28Z",
+      "evidenceCoverage": "detailed",
+      "distributions": [
+        {
+          "repository": "RichLogic/Gian-Proxies",
+          "tag": "proxy-claude-v0.3.3",
+          "publishedAt": "2026-10-11T05:51:28Z",
+          "releaseUrl": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-claude-v0.3.3",
+          "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-claude-v0.3.3/gian-proxy-claude-0.3.3-darwin-arm64.tar.gz.manifest.json",
+          "manifestSha256": "9d0658212cd96fc4f209a28b745c80f2ad0dd68cbee64d6ea425942f5a7ae855",
+          "archive": {
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-claude-v0.3.3/gian-proxy-claude-0.3.3-darwin-arm64.tar.gz",
+            "sha256": "837a8a8741c3ccd282d389acfc0f5129440e6cd367d83b9937150de03ca099a2",
+            "size": 516333
+          },
+          "runtimeDeclaration": {
+            "id": "claude",
+            "versions": [
+              "2.1.285"
+            ],
+            "basis": "verified-declaration"
+          },
+          "companionDeclarations": [],
+          "protocolRange": ">=2.2 <3.0",
+          "manifestSchema": 4,
+          "processScope": "session"
+        }
+      ],
+      "changes": [
+        {
+          "category": "changed",
+          "text": "受管 Claude Code 升至 2.1.285；中断后保留并恢复 Claude 会话，Turn 内的 CLI 退出按退出码与信号如实失败；模型目录改从 wrapper 自身 HOME 与 settings 发现。线协议范围不变。本次发行未运行真实模型 Turn。",
+          "evidence": [
+            "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-claude-v0.3.3",
+            "https://github.com/RichLogic/Gian-Proxies/blob/proxy-claude-v0.3.3/packages/proxies/claude-proxy/README.md"
+          ]
+        }
+      ],
+      "unknowns": []
+    },
     {
       "version": "0.3.2",
       "firstPublishedAt": "2026-09-24T09:39:21Z",

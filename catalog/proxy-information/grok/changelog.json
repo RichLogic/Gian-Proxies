@@ -1,8 +1,50 @@
 {
   "schemaVersion": 1,
   "pluginId": "grok",
-  "currentVersion": "0.3.7",
+  "currentVersion": "0.3.8",
   "entries": [
+    {
+      "version": "0.3.8",
+      "firstPublishedAt": "2026-10-11T05:51:45Z",
+      "evidenceCoverage": "detailed",
+      "distributions": [
+        {
+          "repository": "RichLogic/Gian-Proxies",
+          "tag": "proxy-grok-v0.3.8",
+          "publishedAt": "2026-10-11T05:51:45Z",
+          "releaseUrl": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-grok-v0.3.8",
+          "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.8/gian-proxy-grok-0.3.8-darwin-arm64.tar.gz.manifest.json",
+          "manifestSha256": "2f19e32e2461647f679e2c4aafa077f95f36e1543b6e95440306a3ad8464bbe4",
+          "archive": {
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.8/gian-proxy-grok-0.3.8-darwin-arm64.tar.gz",
+            "sha256": "b6dca6e39d7aadd5cf2cfc0d1dd1c098aac4def2455f8957cc92823d5a1ea145",
+            "size": 179414
+          },
+          "runtimeDeclaration": {
+            "id": "grok",
+            "versions": [
+              "1.0.46"
+            ],
+            "basis": "verified-declaration"
+          },
+          "companionDeclarations": [],
+          "protocolRange": ">=2.2 <3.0",
+          "manifestSchema": 4,
+          "processScope": "session"
+        }
+      ],
+      "changes": [
+        {
+          "category": "changed",
+          "text": "受管 Grok CLI 升至 1.0.46；Catalog 探测不再拖慢关闭，失败的清理与空快照会重试，仅探测子进程被强制停止；确认类交互明确声明可省略答案的取消动作。独立包使用公开 Proxy Protocol SDK 1.0.2，线协议范围不变。本次发行未运行真实模型 Turn。",
+          "evidence": [
+            "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-grok-v0.3.8",
+            "https://github.com/RichLogic/Gian-Proxies/blob/proxy-grok-v0.3.8/packages/proxies/grok-proxy/README.md"
+          ]
+        }
+      ],
+      "unknowns": []
+    },
     {
       "version": "0.3.7",
       "firstPublishedAt": "2026-10-07T07:19:09Z",
