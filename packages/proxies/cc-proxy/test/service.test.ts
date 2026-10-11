@@ -671,29 +671,29 @@ test('Claude result usage prefers whole-tree modelUsage over the top-level fallb
   });
 });
 
-test('capabilities discovery does not run claude -p unless explicitly opted in', async () => {
+test('capabilities discovery never submits a prompt or user frame without opting in', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'cc-proxy-billing-safe-'));
   const fakeClaude = join(dir, 'claude');
-  const marker = join(dir, 'print-mode-called');
+  const marker = join(dir, 'paid-turn-requested');
   writeFileSync(fakeClaude, [
-    '#!/bin/sh',
-    `MARKER='${marker}'`,
-    'for arg in "$@"; do',
-    '  if [ "$arg" = "-p" ] || [ "$arg" = "--print" ]; then',
-    '    echo hit > "$MARKER"',
-    '    echo "unexpected print mode" >&2',
-    '    exit 42',
-    '  fi',
-    'done',
-    'if [ "$1" = "--help" ]; then',
-    '  cat <<EOF',
-    'Options:',
-    '  --effort <level>                      Effort level for the current session',
-    '                                        (low, medium, max)',
-    'EOF',
-    '  exit 0',
-    'fi',
-    'exit 0',
+    `#!${process.execPath}`,
+    "const { writeFileSync } = require('node:fs');",
+    "const { createInterface } = require('node:readline');",
+    'if (process.argv.includes("--help")) {',
+    '  console.log("--effort <level> (low, medium, max)");',
+    '  process.exit(0);',
+    '}',
+    `const unsafe = () => { writeFileSync(${JSON.stringify(marker)}, 'hit'); process.exit(42); };`,
+    'if (process.argv.includes("-p")) unsafe();',
+    'const input = createInterface({ input: process.stdin });',
+    'input.on("line", (line) => {',
+    '  const request = JSON.parse(line);',
+    '  if (request.type !== "control_request" || request.request.subtype !== "initialize") unsafe();',
+    '  console.log(JSON.stringify({ type: "control_response", response: {',
+    '    subtype: "error", request_id: request.request_id, error: "initialize unsupported in this fixture"',
+    '  }}));',
+    '});',
+    'input.on("close", () => process.exit(0));',
     '',
   ].join('\n'));
   chmodSync(fakeClaude, 0o755);
@@ -705,7 +705,8 @@ test('capabilities discovery does not run claude -p unless explicitly opted in',
   process.env.CLAUDE_BIN = fakeClaude;
   delete process.env.GIAN_ALLOW_CLAUDE_PRINT_PROBE;
   // Hermetic settings discovery: no CLAUDE_CONFIG_DIR and a tmp HOME with no
-  // ~/.claude/settings.json, so discovery must land on the static alias menu.
+  // ~/.claude/settings.json. The native fixture reports an unsupported
+  // metadata handshake, so discovery must land on the static alias menu.
   delete process.env.CLAUDE_CONFIG_DIR;
   process.env.HOME = dir;
 
@@ -713,7 +714,7 @@ test('capabilities discovery does not run claude -p unless explicitly opted in',
   try {
     await service.initialize();
     const caps = await service.listCapabilities();
-    assert.equal(existsSync(marker), false, 'capabilities.list must not invoke claude print mode');
+    assert.equal(existsSync(marker), false, 'capabilities.list must not submit an inference prompt or user frame');
     // Static alias menu: Default (no --model) + opus/sonnet/haiku aliases.
     assert.equal(caps.models.length, 4);
     assert.equal(caps.models[0]!.id, 'claude-default');

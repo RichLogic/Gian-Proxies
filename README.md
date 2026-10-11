@@ -70,6 +70,15 @@ history entry. Historical snapshots must not be filled with invented hashes.
 
 ## Updates
 
+Claude Proxy 0.3.4 has one explicit Owner-selected direct-publication exception:
+dispatch qualification with `owner_no_tests=true`, then publish the exact
+artifacts and dispatch Catalog publication with the same input. The receipt
+records `status: NOT_RUN`; contracts, Runtime probes, archive self-tests and
+documentation tests are skipped. This exception accepts only the single
+Claude 0.3.4 selection, reuses its Runtime from the signed base Catalog, and
+retains provenance, artifact digests, immutable tags and Catalog signatures.
+It does not claim successful qualification or authorize another version.
+
 Change source in GianDev and export an integrated commit with
 `node scripts/export-proxies.mjs --ref main --output <new-empty-directory>`.
 The exporter uses the platform Ruby YAML parser to retain locked dependency

@@ -1,5 +1,17 @@
 # Gian Proxies Changelog
 
+## Claude Proxy 0.3.4 - 2026-10-11
+
+- Read Claude Code's native model catalog through a metadata-only initialize
+  handshake, including native variants and each model's effort levels.
+- A configured default such as `opus` no longer hides the rest of `/model`.
+  Preserve existing model configuration ids and explicit gateway menus.
+- Bound the discovery process and clean it up on timeout or Proxy shutdown;
+  discovery disables hooks, MCP, tools and transcript persistence and sends
+  no user message.
+- Owner-selected direct publication. Tests, Runtime probes and archive
+  self-tests were not run. Retain the existing Claude Code 2.1.285 Runtime.
+
 ## Claude Proxy 0.3.3 - Unreleased
 
 - Target the managed Claude Code 2.1.285 Runtime, up from the 2.1.280 pin

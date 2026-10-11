@@ -229,7 +229,7 @@ export async function copyManifestReference(definition, packageDir, reference) {
   await copyFile(source, destination);
 }
 
-export async function main(argv = process.argv.slice(2)) {
+export async function main(argv = process.argv.slice(2), options = {}) {
   const args = parseArgs(argv);
   const requestedPlugin = args.get('plugin');
   if (requestedPlugin && !proxyDefinitions.some(definition => definition.id === requestedPlugin)) {
@@ -238,6 +238,10 @@ export async function main(argv = process.argv.slice(2)) {
   const selectedDefinitions = requestedPlugin
     ? proxyDefinitions.filter(definition => definition.id === requestedPlugin)
     : proxyDefinitions.filter(definition => definition.shipping);
+  if (options.ownerAuthorizedNoTests && (selectedDefinitions.length !== 1
+    || selectedDefinitions[0].id !== 'claude' || selectedDefinitions[0].pluginVersion !== '0.3.4')) {
+    throw new Error('The Owner-selected no-test packaging exception is limited to Claude Proxy 0.3.4');
+  }
   const outputDir = resolve(root, args.get('output') ?? 'artifacts/proxies');
   await mkdir(outputDir, { recursive: true });
 
@@ -283,7 +287,7 @@ export async function main(argv = process.argv.slice(2)) {
       for (const reference of references) {
         await copyManifestReference(definition, packageDir, reference);
       }
-      await assertProxySelfTest(proxyEntry, manifest);
+      if (!options.ownerAuthorizedNoTests) await assertProxySelfTest(proxyEntry, manifest);
       const manifestJson = `${JSON.stringify(manifest, null, 2)}\n`;
       await writeFile(join(packageDir, 'manifest.json'), manifestJson);
       await writeFile(manifestAssetPath, manifestJson);

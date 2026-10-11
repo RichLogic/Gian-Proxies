@@ -1,11 +1,7 @@
 {
   "schema": 1,
   "providers": [
-    "claude",
-    "codex",
-    "kimi",
-    "grok",
-    "dsh"
+    "claude"
   ],
-  "baseCatalogTag": "catalog-v1.21.0"
+  "baseCatalogTag": "catalog-v1.22.0"
 }
