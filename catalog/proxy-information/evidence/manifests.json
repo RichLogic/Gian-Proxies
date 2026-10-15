@@ -1743,5 +1743,30 @@
     "process": {
       "scope": "session"
     }
+  },
+  {
+    "tag": "proxy-zcode-v0.4.4",
+    "url": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-zcode-v0.4.4",
+    "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.4/gian-proxy-zcode-0.4.4-darwin-arm64.tar.gz.manifest.json",
+    "digest": "sha256:55541ee2c920bd5d10718c4b267fb182ca493ea42d7f88f97da2b9e67474b315",
+    "assetDigestVerified": true,
+    "schemaVersion": 4,
+    "pluginId": "com.zhipu.zcode",
+    "pluginVersion": "0.4.4",
+    "protocol": {
+      "name": "gian.proxy",
+      "range": ">=2.2 <3.0"
+    },
+    "runtime": {
+      "kind": "external",
+      "id": "zcode",
+      "displayName": "ZCode Runtime",
+      "verifiedVersions": [
+        "0.16.9"
+      ]
+    },
+    "process": {
+      "scope": "shared"
+    }
   }
 ]

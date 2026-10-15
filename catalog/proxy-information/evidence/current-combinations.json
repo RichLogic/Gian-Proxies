@@ -1,6 +1,6 @@
 {
-  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.24.0",
-  "sequence": 24,
+  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.25.0",
+  "sequence": 25,
   "sourceId": "gian-official",
   "plugins": [
     {
@@ -17,16 +17,16 @@
         "companions": [],
         "generationId": "claude-0.3.5-runtime-2.1.296",
         "runtime": {
+          "asset": {
+            "sha256": "c9b5341637becbd423ddffc5b254afb645682a3868cb708bbc6cc0e7bb419937",
+            "size": 240664432,
+            "url": "https://downloads.claude.ai/claude-code-releases/2.1.296/darwin-arm64/claude"
+          },
+          "entryRelativePath": "bin/claude",
+          "format": "raw",
           "kind": "native-binary",
           "runtimeId": "claude",
-          "version": "2.1.296",
-          "asset": {
-            "url": "https://downloads.claude.ai/claude-code-releases/2.1.296/darwin-arm64/claude",
-            "sha256": "c9b5341637becbd423ddffc5b254afb645682a3868cb708bbc6cc0e7bb419937",
-            "size": 240664432
-          },
-          "format": "raw",
-          "entryRelativePath": "bin/claude"
+          "version": "2.1.296"
         }
       }
     },
@@ -114,27 +114,27 @@
     {
       "id": "com.zhipu.zcode",
       "displayName": "ZCode",
-      "version": "0.4.2",
+      "version": "0.4.4",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "shared",
       "combination": {
         "certificate": {
-          "id": "proxies-b49795d20bbdef9bdf6aae7b8d1e7f6d78630c07-36246793247-1",
-          "sha256": "2dff352fab4bfab9b49e807c0b075ec05f89732f405581b3a8945802e6357e2a"
+          "id": "proxies-3a79ac0aef8792c18d1fa0cb611c01ab6148b707-38670029999-1",
+          "sha256": "17e10b364b8c24eba05628fa58a55b9c06bcd1176ec892a3381d367d9038aa5b"
         },
         "companions": [],
-        "generationId": "zcode-0.4.2-runtime-0.16.9",
+        "generationId": "zcode-0.4.4-runtime-0.16.9",
         "runtime": {
-          "asset": {
-            "sha256": "265f28aa89462a73daf074573b5312863cd75d21a0b89f810ce90d362753dcc1",
-            "size": 80788064,
-            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.2/zcode.tar.gz"
-          },
-          "entryRelativePath": "zcode/agent/zcode.cjs",
-          "format": "tar.gz",
           "kind": "native-binary",
           "runtimeId": "zcode",
-          "version": "0.16.9"
+          "version": "0.16.9",
+          "asset": {
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.4/zcode.tar.gz",
+            "sha256": "991f141cb6a062426730b1be25512200ef517b5eb429dcc6b821eb040f34489d",
+            "size": 82758887
+          },
+          "format": "tar.gz",
+          "entryRelativePath": "zcode/agent/zcode.cjs"
         }
       }
     },

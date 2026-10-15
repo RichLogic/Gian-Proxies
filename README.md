@@ -58,12 +58,13 @@ an upstream protocol mismatch blocks publication even when `--version` works.
 Published Runtime archives are copied from qualification, never rebuilt by
 the publisher. Updating the source pin requires a new Proxy release.
 
-The 0.4.1 candidate pins CLI 0.16.9 and includes a versioned integration layer
-for model metadata and standalone authentication. Proxy requests use complete
-model/reasoning selections. The layer's input source hash and resulting source
-digests are checked/recorded; upstream changes require renewed review.
-This source candidate still requires hosted qualification and real-provider
-acceptance before it can be described as a verified usable combination.
+ZCode Proxy 0.4.4 pins reviewed v3.15.1 source aac4755; upstream still reports
+CLI 0.16.9. Its versioned integration provides model metadata and standalone
+authentication, and native MCP form answers retain free text, optional fields
+and indexed identity. Proxy requests use complete model/reasoning selections.
+The input source hash and resulting source digests are checked and recorded;
+upstream changes require renewed review and exact hosted qualification.
+Real-provider acceptance remains separate from artifact qualification.
 Before Catalog publication, capture the newly published release/Manifest and
 Runtime coordinate in `catalog/proxy-information/evidence/` and author its
 history entry. Historical snapshots must not be filled with invented hashes.
