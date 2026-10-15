@@ -2,7 +2,18 @@
 
 本文件由 changelog.json 的结构化记录投影，按 Proxy 版本倒序。首次发布日期与新仓库分发日期分别记录；未知历史不会用当前版本说明回填。
 
-本次发布组合快照：Proxy **0.3.5**，Runtime **2.1.296**。这是发布目标，不表示当前机器已安装。
+本次发布组合快照：Proxy **0.3.6**，Runtime **2.1.300**。这是发布目标，不表示当前机器已安装。
+
+## 0.3.6
+
+首次公开发布：2026-10-15T10:55:19Z（UTC）。
+
+- [RichLogic/Gian-Proxies 分发](https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-claude-v0.3.6)：2026-10-15T10:55:19Z。
+- 对应 CLI：2.1.300（Manifest 兼容声明，不是本机状态）。
+
+### 变更
+
+- 将受管 Claude Code Runtime 更新至 2.1.300（SHA-256 与大小经官方 2.1.300 清单校验）。适配器不变：2.1.297–2.1.300 没有线协议或启动面变更，适配器使用的全部命令行标志均已在新二进制上确认。线协议范围不变。产物经过托管认证；本次发行未运行真实模型 Turn。 [依据1](https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-claude-v0.3.6) [依据2](https://github.com/RichLogic/Gian-Proxies/blob/proxy-claude-v0.3.6/packages/proxies/cc-proxy/src/protocol/v2-adapter.ts)
 
 ## 0.3.5
 

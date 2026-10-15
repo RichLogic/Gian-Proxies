@@ -1,8 +1,50 @@
 {
   "schemaVersion": 1,
   "pluginId": "grok",
-  "currentVersion": "0.3.8",
+  "currentVersion": "0.3.9",
   "entries": [
+    {
+      "version": "0.3.9",
+      "firstPublishedAt": "2026-10-15T10:55:40Z",
+      "evidenceCoverage": "detailed",
+      "distributions": [
+        {
+          "repository": "RichLogic/Gian-Proxies",
+          "tag": "proxy-grok-v0.3.9",
+          "publishedAt": "2026-10-15T10:55:40Z",
+          "releaseUrl": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-grok-v0.3.9",
+          "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.9/gian-proxy-grok-0.3.9-darwin-arm64.tar.gz.manifest.json",
+          "manifestSha256": "13927cc0dbbae99509f48b3229386dbe2a1b05e2bd8d86bc06da0bf7e8581280",
+          "archive": {
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.9/gian-proxy-grok-0.3.9-darwin-arm64.tar.gz",
+            "sha256": "c5bf451ab6fc1330f5a44bf92becdd551bf2fdac73fe553940a59c2742c2fb28",
+            "size": 179419
+          },
+          "runtimeDeclaration": {
+            "id": "grok",
+            "versions": [
+              "1.0.52"
+            ],
+            "basis": "verified-declaration"
+          },
+          "companionDeclarations": [],
+          "protocolRange": ">=2.2 <3.0",
+          "manifestSchema": 4,
+          "processScope": "session"
+        }
+      ],
+      "changes": [
+        {
+          "category": "changed",
+          "text": "将受管 Grok CLI 更新至 1.0.52（x.ai/cli 与官方 GCS 镜像字节完全一致）。新二进制已验证启动标志与 ACP initialize 契约；扩展方法仍按连接惰性确认。已知限制：1.0.46 下复合 Shell 命令在 auto/always_approve 快照下仍弹出原生批准卡片的现象在 1.0.52 上未验证（需要已认证会话），本次不声称修复。线协议范围不变。产物经过托管认证；本次发行未运行真实模型 Turn。",
+          "evidence": [
+            "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-grok-v0.3.9",
+            "https://github.com/RichLogic/Gian-Proxies/blob/proxy-grok-v0.3.9/packages/proxies/grok-proxy/README.md"
+          ]
+        }
+      ],
+      "unknowns": []
+    },
     {
       "version": "0.3.8",
       "firstPublishedAt": "2026-10-11T05:51:45Z",

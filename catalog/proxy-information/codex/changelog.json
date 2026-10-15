@@ -1,8 +1,50 @@
 {
   "schemaVersion": 1,
   "pluginId": "codex",
-  "currentVersion": "0.3.4",
+  "currentVersion": "0.3.5",
   "entries": [
+    {
+      "version": "0.3.5",
+      "firstPublishedAt": "2026-10-15T10:55:23Z",
+      "evidenceCoverage": "detailed",
+      "distributions": [
+        {
+          "repository": "RichLogic/Gian-Proxies",
+          "tag": "proxy-codex-v0.3.5",
+          "publishedAt": "2026-10-15T10:55:23Z",
+          "releaseUrl": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-codex-v0.3.5",
+          "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-codex-v0.3.5/gian-proxy-codex-0.3.5-darwin-arm64.tar.gz.manifest.json",
+          "manifestSha256": "536fc09a3c14d8f1b7ea56a36e449c924b0f7a8b8a86ca2b7d9442ac47ee5f75",
+          "archive": {
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-codex-v0.3.5/gian-proxy-codex-0.3.5-darwin-arm64.tar.gz",
+            "sha256": "ddacc70e29561c0dd527db67b0f1ef71c65e21e8ea133cbc58e4eae4d15c41f3",
+            "size": 197834
+          },
+          "runtimeDeclaration": {
+            "id": "codex",
+            "versions": [
+              "0.162.1"
+            ],
+            "basis": "verified-declaration"
+          },
+          "companionDeclarations": [],
+          "protocolRange": ">=2.2 <3.0",
+          "manifestSchema": 4,
+          "processScope": "shared"
+        }
+      ],
+      "changes": [
+        {
+          "category": "changed",
+          "text": "将受管 Codex CLI 更新至 0.162.1（与官方 rust-v0.162.1 GitHub 资产摘要一致）。上游 0.162.x 对 app-server 桥接面均为增量改动，适配器与 gian.proxy 线协议不变。产物经过托管认证；本次发行未运行真实模型 Turn。",
+          "evidence": [
+            "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-codex-v0.3.5",
+            "https://github.com/RichLogic/Gian-Proxies/blob/proxy-codex-v0.3.5/packages/proxies/codex-proxy/README.md"
+          ]
+        }
+      ],
+      "unknowns": []
+    },
     {
       "version": "0.3.4",
       "firstPublishedAt": "2026-10-11T05:51:31Z",
