@@ -125,6 +125,19 @@ test('the Runtime integration is anchored to reviewed source and owns standalone
 });
 
 
+test('the reviewed native ZCode entrypoint retains routing and MCP wiring after integration', () => {
+  const original = readFileSync(new URL(
+    '../packages/proxies/zcode-proxy/test/fixtures/upstream/zcode-protocol-entrypoint.ts.txt', import.meta.url,
+  ), 'utf8');
+  const integrated = integrateZcodeEntrypoint(original);
+  assert.match(integrated, /startProcessProviderRegistryRuntime\(runtimeEnv, \{ standalone: \{\} \}\)/);
+  assert.match(integrated, /providerRuntimeHeadersPort: activeProviderRegistryRuntime.providerRuntimeHeadersPort/);
+  assert.match(integrated, /serializeModelCatalog\(modelSelectionFacade.getView\(preferred\)\)/);
+  assert.match(integrated, /resolveProcessProviderEndpointRoutingPort/);
+  assert.match(integrated, /elicitationServer = server;/);
+  assert.match(integrated, /return server.handleMessage\(message\)/);
+});
+
 test('explicit Runtime selection excludes unrelated builds and rejects ambiguous providers', () => {
   assert.deepEqual(selectRuntimeProviders(['kimi', 'grok']), ['kimi', 'grok']);
   for (const selection of [[], ['kimi', 'kimi'], ['unknown'], [undefined]]) {
