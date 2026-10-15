@@ -1377,6 +1377,24 @@ test('interrupt resumes the same Claude session instead of exiting 0', async () 
       "  console.log('                                        (low, high)');",
       '  process.exit(0);',
       '}',
+      // The native model-catalog discovery probe (--input-format stream-json +
+      // an initialize control frame) is metadata-only: answer it without
+      // touching the argv log or the session marker, so only real turn spawns
+      // count there.
+      "if (args.includes('--input-format')) {",
+      "  const rl = require(\"node:readline\").createInterface({ input: process.stdin });",
+      "  rl.on(\"line\", (line) => {",
+      '    try {',
+      '      const request = JSON.parse(line);',
+      "      if (request.type === \"control_request\" && request.request?.subtype === \"initialize\") {",
+      "        process.stdout.write(JSON.stringify({ type: \"control_response\", response: { subtype: \"success\", request_id: request.request_id, response: { models: [",
+      "          { value: \"opus\", displayName: \"Opus\", description: \"Opus model\", supportsEffort: true, supportedEffortLevels: [\"low\", \"high\"] },",
+      "        ] } } }) + \"\\n\");",
+      '      }',
+      '    } catch { /* ignore malformed probe input */ }',
+      '  });',
+      "  rl.on(\"close\", () => process.exit(0));",
+      '} else {',
       'const log = process.env.CLAUDE_ARGV_LOG;',
       "if (log) fs.appendFileSync(log, args.join('\\0') + '\\n');",
       "fs.writeSync(1, JSON.stringify({ type: 'system', subtype: 'init', model: 'opus' }) + '\\n');",
@@ -1392,6 +1410,7 @@ test('interrupt resumes the same Claude session instead of exiting 0', async () 
       '  process.exit(0);',
       '}',
       'setInterval(() => undefined, 1000);',
+      '}',
       '',
     ].join('\n'));
     chmodSync(fake, 0o755);
@@ -1474,12 +1493,30 @@ test('interrupt before Claude init keeps --session-id for the next turn', async 
       "  console.log('                                        (low, high)');",
       '  process.exit(0);',
       '}',
+      // Same metadata-only discovery-probe branch as the companion test: the
+      // native catalog handshake must not create the boot marker or an argv
+      // record; only real turn spawns may.
+      "if (args.includes('--input-format')) {",
+      "  const rl = require(\"node:readline\").createInterface({ input: process.stdin });",
+      "  rl.on(\"line\", (line) => {",
+      '    try {',
+      '      const request = JSON.parse(line);',
+      "      if (request.type === \"control_request\" && request.request?.subtype === \"initialize\") {",
+      "        process.stdout.write(JSON.stringify({ type: \"control_response\", response: { subtype: \"success\", request_id: request.request_id, response: { models: [",
+      "          { value: \"opus\", displayName: \"Opus\", description: \"Opus model\", supportsEffort: true, supportedEffortLevels: [\"low\", \"high\"] },",
+      "        ] } } }) + \"\\n\");",
+      '      }',
+      '    } catch { /* ignore malformed probe input */ }',
+      '  });',
+      "  rl.on(\"close\", () => process.exit(0));",
+      '} else {',
       'const log = process.env.CLAUDE_ARGV_LOG;',
       "if (log) fs.appendFileSync(log, args.join('\\0') + '\\n');",
       "process.on('SIGTERM', () => { setTimeout(() => process.exit(0), 50); });",
       'const marker = process.env.CLAUDE_SESSION_MARKER;',
       "if (marker) fs.writeFileSync(marker, '1');",
       'setInterval(() => undefined, 1000);',
+      '}',
       '',
     ].join('\n'));
     chmodSync(fake, 0o755);

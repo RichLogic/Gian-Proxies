@@ -1,5 +1,51 @@
 # Gian Proxies Changelog
 
+## Claude Proxy 0.3.6 - 2026-10-15
+
+- Target the current official Claude Code 2.1.300 Runtime, up from 2.1.296;
+  the darwin-arm64 checksum and size match the official 2.1.300 manifest.
+- Review the upstream 2.1.297–2.1.300 changelog: no wire-protocol or
+  spawn-surface changes affect the adapter; `--effort`, `--permission-mode`,
+  `--output-format stream-json`, `--session-id`/`--resume` and
+  `--no-session-persistence` are all present on the new binary.
+- The gian.proxy wire contract is unchanged. The previous 2.1.296 Runtime
+  and all existing published artifacts remain immutable.
+
+## Codex Proxy 0.3.5 - 2026-10-15
+
+- Target the managed Codex CLI 0.162.1 Runtime, up from the 0.161.0 pin
+  published with Codex Proxy 0.3.4; the archive SHA-256 matches the official
+  `rust-v0.162.1` GitHub asset metadata.
+- Upstream 0.162.0/0.162.1 changes are additive for the app-server surface
+  the Proxy bridges; the adapter and the gian.proxy wire contract are
+  unchanged.
+
+## Kimi Proxy 0.4.7 - 2026-10-15
+
+- Target the Kimi Code CLI 2.2.0 Runtime, up from the 2.1.1 pin published
+  with Kimi Proxy 0.4.6; the archive SHA-256 matches the official
+  `@moonshot-ai/kimi-code@2.2.0` GitHub asset metadata.
+- The published server-api reference diff from 2.1.1 to 2.2.0 is purely
+  additive (new Remote Control endpoints, optional request fields), and a
+  live 2.2.0 `/openapi.json` + `/asyncapi.json` probe confirmed every REST
+  route and WebSocket message type this Proxy uses. The adapter and the
+  gian.proxy wire contract are unchanged.
+
+## Grok Proxy 0.3.9 - 2026-10-15
+
+- Target the managed Grok CLI 1.0.52 Runtime, up from the 1.0.46 pin
+  published with Grok Proxy 0.3.8; the bytes are identical from `x.ai/cli`
+  and the official GCS mirror.
+- Verify the spawn surface on the new binary (`agent stdio`, `--no-leader`,
+  `--deny`, `--disallowed-tools`, `GROK_SANDBOX`) and the ACP initialize
+  contract (`grokShell`, model/reasoning catalog); extension methods stay
+  lazily confirmed per attach.
+- Known limitation: native approval cards observed for compound shell
+  commands under 1.0.46 despite `auto`/`always_approve` snapshots remain
+  unverified on 1.0.52 — the permission wire path requires an authenticated
+  session, which this release does not exercise. No behavior fix is claimed.
+- The gian.proxy wire contract is unchanged.
+
 ## Claude Proxy 0.3.5 - 2026-10-12
 
 - Resolve model defaults before checking conditional effort support, so an
@@ -23,7 +69,7 @@
 - Owner-selected direct publication. Tests, Runtime probes and archive
   self-tests were not run. Retain the existing Claude Code 2.1.285 Runtime.
 
-## Claude Proxy 0.3.3 - Unreleased
+## Claude Proxy 0.3.3 - 2026-10-11
 
 - Target the managed Claude Code 2.1.285 Runtime, up from the 2.1.280 pin
   published with Claude Proxy 0.3.2.
@@ -36,7 +82,7 @@
 - Discover the model catalog from the wrapper's own HOME and settings; the
   gian.proxy wire contract is unchanged.
 
-## Codex Proxy 0.3.4 - Unreleased
+## Codex Proxy 0.3.4 - 2026-10-11
 
 - Target the managed Codex CLI 0.161.0 Runtime, up from the 0.159.2 pin
   published with Codex Proxy 0.3.3.
@@ -46,7 +92,7 @@
 - Report the actual Proxy package version to the Runtime instead of a stale
   hardcoded value. The gian.proxy wire contract is unchanged.
 
-## Kimi Proxy 0.4.6 - Unreleased
+## Kimi Proxy 0.4.6 - 2026-10-11
 
 - Preserve turns across Runtime disconnects: notification counters reset on a
   new stream binding, event delivery resumes from durable cursors, and only a
@@ -55,7 +101,7 @@
   cancellation explicit for input gating. Keep the Kimi Code 2.1.1 Runtime pin
   and gian.proxy wire versions unchanged.
 
-## Grok Proxy 0.3.8 - Unreleased
+## Grok Proxy 0.3.8 - 2026-10-11
 
 - Target the managed Grok CLI 1.0.46 Runtime, up from the 1.0.41 pin published
   with Grok Proxy 0.3.7.
@@ -67,7 +113,7 @@
   explicit in the Host/Web input gating. The gian.proxy wire contract is
   unchanged.
 
-## DeepSeek Harness Proxy 0.3.5 - Unreleased
+## DeepSeek Harness Proxy 0.3.5 - 2026-10-11
 
 - Target the DeepSeek Harness 0.2.0-rc.2 Runtime with Bridge 0.1.6, reading
   session logs as format 4; the published 0.3.3 pinned Runtime 0.1.5-rc.3

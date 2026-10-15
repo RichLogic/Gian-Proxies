@@ -1,7 +1,10 @@
 {
   "schema": 1,
   "providers": [
-    "zcode"
+    "claude",
+    "codex",
+    "kimi",
+    "grok"
   ],
-  "baseCatalogTag": "catalog-v1.24.0"
+  "baseCatalogTag": "catalog-v1.25.0"
 }
