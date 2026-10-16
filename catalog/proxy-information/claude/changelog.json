@@ -1,8 +1,50 @@
 {
   "schemaVersion": 1,
   "pluginId": "claude",
-  "currentVersion": "0.3.6",
+  "currentVersion": "0.3.7",
   "entries": [
+    {
+      "version": "0.3.7",
+      "firstPublishedAt": "2026-10-16T18:19:53Z",
+      "evidenceCoverage": "detailed",
+      "distributions": [
+        {
+          "repository": "RichLogic/Gian-Proxies",
+          "tag": "proxy-claude-v0.3.7",
+          "publishedAt": "2026-10-16T18:19:53Z",
+          "releaseUrl": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-claude-v0.3.7",
+          "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-claude-v0.3.7/gian-proxy-claude-0.3.7-darwin-arm64.tar.gz.manifest.json",
+          "manifestSha256": "1a284b23f7075e404405a27d3d00e0a7f87ee3af96ea3e6160fdbbf49d196cdd",
+          "archive": {
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-claude-v0.3.7/gian-proxy-claude-0.3.7-darwin-arm64.tar.gz",
+            "sha256": "6146ff0d398e8413344d0f22ed55560ee1ec34fc6a080ec2a608a96df06a98e5",
+            "size": 517721
+          },
+          "runtimeDeclaration": {
+            "id": "claude",
+            "versions": [
+              "2.1.301"
+            ],
+            "basis": "verified-declaration"
+          },
+          "companionDeclarations": [],
+          "protocolRange": ">=2.2 <3.0",
+          "manifestSchema": 4,
+          "processScope": "session"
+        }
+      ],
+      "changes": [
+        {
+          "category": "changed",
+          "text": "将受管 Claude Code Runtime 更新至 2.1.301（2026-10-15 已晋升至 /latest、npm latest 与 GitHub latest；SHA-256 与大小经官方清单校验）。上游 2.1.301 变更不涉及线协议或启动面，全部相关命令行标志已在新二进制上复验。线协议范围不变。产物经过托管认证；本次发行未运行真实模型 Turn。",
+          "evidence": [
+            "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-claude-v0.3.7",
+            "https://github.com/RichLogic/Gian-Proxies/blob/proxy-claude-v0.3.7/packages/proxies/cc-proxy/src/protocol/v2-adapter.ts"
+          ]
+        }
+      ],
+      "unknowns": []
+    },
     {
       "version": "0.3.6",
       "firstPublishedAt": "2026-10-15T10:55:19Z",

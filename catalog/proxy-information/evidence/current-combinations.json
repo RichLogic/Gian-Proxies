@@ -1,29 +1,29 @@
 {
-  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.26.0",
-  "sequence": 26,
+  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.27.0",
+  "sequence": 27,
   "sourceId": "gian-official",
   "plugins": [
     {
       "id": "claude",
       "displayName": "Claude Code",
-      "version": "0.3.6",
+      "version": "0.3.7",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "session",
       "combination": {
         "certificate": {
-          "id": "proxies-48200a523e9fc1795ec21b2bd3d6497b19f1d286-38723045600-1",
-          "sha256": "3922c4e32b49e9fd5c9126aa4af2ef5dd857c7d2749cba677704961ff124051a"
+          "id": "proxies-d2cb7a9f9585f35b377a85c15b55d475fda6b6b6-38945911476-1",
+          "sha256": "be4dff60a5d0596e6e0e6675cc022c4b082a9665d74b4523e325c7e1bda7fba6"
         },
         "companions": [],
-        "generationId": "claude-0.3.6-runtime-2.1.300",
+        "generationId": "claude-0.3.7-runtime-2.1.301",
         "runtime": {
           "kind": "native-binary",
           "runtimeId": "claude",
-          "version": "2.1.300",
+          "version": "2.1.301",
           "asset": {
-            "url": "https://downloads.claude.ai/claude-code-releases/2.1.300/darwin-arm64/claude",
-            "sha256": "475517caa611e3318a2f298fa071287ec98955538df78c58f709ecc01e5ae2d3",
-            "size": 249556880
+            "url": "https://downloads.claude.ai/claude-code-releases/2.1.301/darwin-arm64/claude",
+            "sha256": "1f04c69e1c24e4d0a716a863af0aad8fc64d49a499334c29701f073700276b99",
+            "size": 250541840
           },
           "format": "raw",
           "entryRelativePath": "bin/claude"
@@ -33,24 +33,24 @@
     {
       "id": "codex",
       "displayName": "Codex",
-      "version": "0.3.5",
+      "version": "0.3.6",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "shared",
       "combination": {
         "certificate": {
-          "id": "proxies-48200a523e9fc1795ec21b2bd3d6497b19f1d286-38723045600-1",
-          "sha256": "3922c4e32b49e9fd5c9126aa4af2ef5dd857c7d2749cba677704961ff124051a"
+          "id": "proxies-d2cb7a9f9585f35b377a85c15b55d475fda6b6b6-38945911476-1",
+          "sha256": "be4dff60a5d0596e6e0e6675cc022c4b082a9665d74b4523e325c7e1bda7fba6"
         },
         "companions": [],
-        "generationId": "codex-0.3.5-runtime-0.162.1",
+        "generationId": "codex-0.3.6-runtime-0.163.0",
         "runtime": {
           "kind": "native-binary",
           "runtimeId": "codex",
-          "version": "0.162.1",
+          "version": "0.163.0",
           "asset": {
-            "url": "https://github.com/openai/codex/releases/download/rust-v0.162.1/codex-package-aarch64-apple-darwin.tar.gz",
-            "sha256": "88e37ccddf5a0f4ea9dc1be13c66a2a94f9c2d1a04f3ace9053d71b3939e885d",
-            "size": 132224844
+            "url": "https://github.com/openai/codex/releases/download/rust-v0.163.0/codex-package-aarch64-apple-darwin.tar.gz",
+            "sha256": "b0344fc2e41f15e0071147e5869008047b8ff4bf2c4a8897975d3bae3f103b34",
+            "size": 133412281
           },
           "format": "tar.gz",
           "entryRelativePath": "bin/codex"
@@ -71,16 +71,16 @@
         "companions": [],
         "generationId": "kimi-0.4.7-runtime-2.2.0",
         "runtime": {
+          "asset": {
+            "sha256": "034b37fee68e242b8d1800470c502d5870602fb54e1597d99d20d9e9f3fa8f59",
+            "size": 62493391,
+            "url": "https://github.com/MoonshotAI/kimi-code/releases/download/%40moonshot-ai/kimi-code%402.2.0/kimi-code-darwin-arm64.tar.gz"
+          },
+          "entryRelativePath": "kimi",
+          "format": "tar.gz",
           "kind": "native-binary",
           "runtimeId": "kimi",
-          "version": "2.2.0",
-          "asset": {
-            "url": "https://github.com/MoonshotAI/kimi-code/releases/download/%40moonshot-ai/kimi-code%402.2.0/kimi-code-darwin-arm64.tar.gz",
-            "sha256": "034b37fee68e242b8d1800470c502d5870602fb54e1597d99d20d9e9f3fa8f59",
-            "size": 62493391
-          },
-          "format": "tar.gz",
-          "entryRelativePath": "kimi"
+          "version": "2.2.0"
         }
       }
     },
@@ -141,24 +141,24 @@
     {
       "id": "grok",
       "displayName": "Grok Build",
-      "version": "0.3.9",
+      "version": "0.3.10",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "session",
       "combination": {
         "certificate": {
-          "id": "proxies-48200a523e9fc1795ec21b2bd3d6497b19f1d286-38723045600-1",
-          "sha256": "3922c4e32b49e9fd5c9126aa4af2ef5dd857c7d2749cba677704961ff124051a"
+          "id": "proxies-d2cb7a9f9585f35b377a85c15b55d475fda6b6b6-38945911476-1",
+          "sha256": "be4dff60a5d0596e6e0e6675cc022c4b082a9665d74b4523e325c7e1bda7fba6"
         },
         "companions": [],
-        "generationId": "grok-0.3.9-runtime-1.0.52",
+        "generationId": "grok-0.3.10-runtime-1.0.60",
         "runtime": {
           "kind": "native-binary",
           "runtimeId": "grok",
-          "version": "1.0.52",
+          "version": "1.0.60",
           "asset": {
-            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.9/grok-1.0.52-darwin-arm64",
-            "sha256": "c2caa9895dd763297a75e8fb6077e175d9c5304c53903e52cff8891a1384bbb9",
-            "size": 172237072
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.10/grok-1.0.60-darwin-arm64",
+            "sha256": "980fad1dcb3770101cf05ce1b53fceea2c4706a6957a4fb9000a1c053a1c0252",
+            "size": 174911872
           },
           "format": "raw",
           "entryRelativePath": "bin/grok"
