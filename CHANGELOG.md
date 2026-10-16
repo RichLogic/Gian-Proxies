@@ -1,5 +1,43 @@
 # Gian Proxies Changelog
 
+## Claude Proxy 0.3.7 - 2026-10-17
+
+- Target the current official Claude Code 2.1.301 Runtime, promoted to the
+  /latest channel, npm latest and GitHub latest on 2026-10-15; the
+  darwin-arm64 checksum and size match the official 2.1.301 manifest.
+- Review the upstream 2.1.301 changelog: no wire-protocol or spawn-surface
+  changes affect the adapter; the flag surface was re-verified on the new
+  binary. The gian.proxy wire contract is unchanged.
+
+## Codex Proxy 0.3.6 - 2026-10-17
+
+- Target the managed Codex CLI 0.163.0 Runtime (first stable of the 0.163
+  line, published 2026-10-15), up from 0.162.1; the archive SHA-256 matches
+  the official `rust-v0.163.0` GitHub asset metadata.
+- Protocol review against exact old/new app-server schema files: every
+  Proxy-used surface is additive-only (optional `excludedThreadIds`,
+  `retain`, read-state notifications, response-item fields); ServerRequest
+  is byte-identical and no method the Proxy calls was removed or changed
+  (unrelated realtime voice enums also changed; the Proxy does not use
+  them). Live no-credential `initialize` handshakes succeed identically on
+  0.162.1 and 0.163.0.
+- The gian.proxy wire contract is unchanged.
+
+## Grok Proxy 0.3.10 - 2026-10-17
+
+- Target the managed Grok CLI 1.0.60 Runtime, promoted to stable on x.ai/cli,
+  the official GCS mirror and npm `@xai-official/grok` latest; bytes from
+  x.ai and GCS are identical.
+- Verify the spawn surface and the ACP initialize contract on the new binary
+  (`agentVersion` 1.0.60, `grokShell`, unchanged capability shape);
+  version-specific upstream notes for 1.0.53–1.0.60 are NOT_OBSERVED in the
+  accessible official changelog, which currently shows 1.0.52 as its latest
+  entry — recorded honestly instead of blocking the promoted stable channel.
+- Known limitation unchanged: native approval cards under
+  auto/always_approve snapshots remain unverified — the permission wire path
+  requires an authenticated session, which this release does not exercise.
+- The gian.proxy wire contract is unchanged.
+
 ## Claude Proxy 0.3.6 - 2026-10-15
 
 - Target the current official Claude Code 2.1.300 Runtime, up from 2.1.296;

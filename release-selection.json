@@ -3,8 +3,7 @@
   "providers": [
     "claude",
     "codex",
-    "kimi",
     "grok"
   ],
-  "baseCatalogTag": "catalog-v1.25.0"
+  "baseCatalogTag": "catalog-v1.26.0"
 }
