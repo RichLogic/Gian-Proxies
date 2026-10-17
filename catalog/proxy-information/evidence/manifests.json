@@ -1943,5 +1943,55 @@
     "process": {
       "scope": "session"
     }
+  },
+  {
+    "tag": "proxy-claude-v0.3.8",
+    "url": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-claude-v0.3.8",
+    "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-claude-v0.3.8/gian-proxy-claude-0.3.8-darwin-arm64.tar.gz.manifest.json",
+    "digest": "sha256:0ac5a28e7f361745c296f88bb04087e29ded3a0dd032346919f880ac1f4b878f",
+    "assetDigestVerified": true,
+    "schemaVersion": 4,
+    "pluginId": "claude",
+    "pluginVersion": "0.3.8",
+    "protocol": {
+      "name": "gian.proxy",
+      "range": ">=2.2 <3.0"
+    },
+    "runtime": {
+      "kind": "external",
+      "id": "claude",
+      "displayName": "Claude Code",
+      "verifiedVersions": [
+        "2.1.302"
+      ]
+    },
+    "process": {
+      "scope": "session"
+    }
+  },
+  {
+    "tag": "proxy-grok-v0.3.11",
+    "url": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-grok-v0.3.11",
+    "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.11/gian-proxy-grok-0.3.11-darwin-arm64.tar.gz.manifest.json",
+    "digest": "sha256:e151359dc4ffb8a9196248c468a48be6a9cf9437e9fc0b087bd30e698fa23312",
+    "assetDigestVerified": true,
+    "schemaVersion": 4,
+    "pluginId": "grok",
+    "pluginVersion": "0.3.11",
+    "protocol": {
+      "name": "gian.proxy",
+      "range": ">=2.2 <3.0"
+    },
+    "runtime": {
+      "kind": "external",
+      "id": "grok",
+      "displayName": "Grok CLI",
+      "verifiedVersions": [
+        "1.0.62"
+      ]
+    },
+    "process": {
+      "scope": "session"
+    }
   }
 ]

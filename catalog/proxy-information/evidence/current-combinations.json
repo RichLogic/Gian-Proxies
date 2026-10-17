@@ -1,29 +1,29 @@
 {
-  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.27.0",
-  "sequence": 27,
+  "catalog": "https://github.com/RichLogic/Gian-Proxies/releases/tag/catalog-v1.28.0",
+  "sequence": 28,
   "sourceId": "gian-official",
   "plugins": [
     {
       "id": "claude",
       "displayName": "Claude Code",
-      "version": "0.3.7",
+      "version": "0.3.8",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "session",
       "combination": {
         "certificate": {
-          "id": "proxies-d2cb7a9f9585f35b377a85c15b55d475fda6b6b6-38945911476-1",
-          "sha256": "be4dff60a5d0596e6e0e6675cc022c4b082a9665d74b4523e325c7e1bda7fba6"
+          "id": "proxies-c8542bcef573a30a88a96b310346a12d6845bece-39056722814-1",
+          "sha256": "938f61e07b9f7ac0efecb38104c0edbea69eea0d71e84c23bf1f241d8f54a829"
         },
         "companions": [],
-        "generationId": "claude-0.3.7-runtime-2.1.301",
+        "generationId": "claude-0.3.8-runtime-2.1.302",
         "runtime": {
           "kind": "native-binary",
           "runtimeId": "claude",
-          "version": "2.1.301",
+          "version": "2.1.302",
           "asset": {
-            "url": "https://downloads.claude.ai/claude-code-releases/2.1.301/darwin-arm64/claude",
-            "sha256": "1f04c69e1c24e4d0a716a863af0aad8fc64d49a499334c29701f073700276b99",
-            "size": 250541840
+            "url": "https://downloads.claude.ai/claude-code-releases/2.1.302/darwin-arm64/claude",
+            "sha256": "5262ce9de86243fed0d21edc39b271555d56780d0112e2b194439fe1c6662d37",
+            "size": 267956720
           },
           "format": "raw",
           "entryRelativePath": "bin/claude"
@@ -44,16 +44,16 @@
         "companions": [],
         "generationId": "codex-0.3.6-runtime-0.163.0",
         "runtime": {
+          "asset": {
+            "sha256": "b0344fc2e41f15e0071147e5869008047b8ff4bf2c4a8897975d3bae3f103b34",
+            "size": 133412281,
+            "url": "https://github.com/openai/codex/releases/download/rust-v0.163.0/codex-package-aarch64-apple-darwin.tar.gz"
+          },
+          "entryRelativePath": "bin/codex",
+          "format": "tar.gz",
           "kind": "native-binary",
           "runtimeId": "codex",
-          "version": "0.163.0",
-          "asset": {
-            "url": "https://github.com/openai/codex/releases/download/rust-v0.163.0/codex-package-aarch64-apple-darwin.tar.gz",
-            "sha256": "b0344fc2e41f15e0071147e5869008047b8ff4bf2c4a8897975d3bae3f103b34",
-            "size": 133412281
-          },
-          "format": "tar.gz",
-          "entryRelativePath": "bin/codex"
+          "version": "0.163.0"
         }
       }
     },
@@ -141,24 +141,24 @@
     {
       "id": "grok",
       "displayName": "Grok Build",
-      "version": "0.3.10",
+      "version": "0.3.11",
       "protocolRange": ">=2.2 <3.0",
       "processScope": "session",
       "combination": {
         "certificate": {
-          "id": "proxies-d2cb7a9f9585f35b377a85c15b55d475fda6b6b6-38945911476-1",
-          "sha256": "be4dff60a5d0596e6e0e6675cc022c4b082a9665d74b4523e325c7e1bda7fba6"
+          "id": "proxies-c8542bcef573a30a88a96b310346a12d6845bece-39056722814-1",
+          "sha256": "938f61e07b9f7ac0efecb38104c0edbea69eea0d71e84c23bf1f241d8f54a829"
         },
         "companions": [],
-        "generationId": "grok-0.3.10-runtime-1.0.60",
+        "generationId": "grok-0.3.11-runtime-1.0.62",
         "runtime": {
           "kind": "native-binary",
           "runtimeId": "grok",
-          "version": "1.0.60",
+          "version": "1.0.62",
           "asset": {
-            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.10/grok-1.0.60-darwin-arm64",
-            "sha256": "980fad1dcb3770101cf05ce1b53fceea2c4706a6957a4fb9000a1c053a1c0252",
-            "size": 174911872
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-grok-v0.3.11/grok-1.0.62-darwin-arm64",
+            "sha256": "ec434e831afdcfce87780f2815fd732b1df8a4a8de96a491716ad75d13605a4e",
+            "size": 175577200
           },
           "format": "raw",
           "entryRelativePath": "bin/grok"
