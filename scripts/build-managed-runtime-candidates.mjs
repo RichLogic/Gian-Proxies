@@ -30,12 +30,12 @@ export const ZCODE_RUNTIME_ASSET_NAME = 'zcode.tar.gz';
 
 export const upstreamRuntimeCandidates = Object.freeze({
   claude: Object.freeze({
-    version: '2.1.301',
+    version: '2.1.302',
     format: 'raw',
     entryRelativePath: 'bin/claude',
-    url: 'https://downloads.claude.ai/claude-code-releases/2.1.301/darwin-arm64/claude',
-    sha256: '1f04c69e1c24e4d0a716a863af0aad8fc64d49a499334c29701f073700276b99',
-    size: 250541840,
+    url: 'https://downloads.claude.ai/claude-code-releases/2.1.302/darwin-arm64/claude',
+    sha256: '5262ce9de86243fed0d21edc39b271555d56780d0112e2b194439fe1c6662d37',
+    size: 267956720,
   }),
   codex: Object.freeze({
     version: '0.163.0',
@@ -54,12 +54,12 @@ export const upstreamRuntimeCandidates = Object.freeze({
     size: 62493391,
   }),
   grok: Object.freeze({
-    version: '1.0.60',
+    version: '1.0.62',
     format: 'raw',
     entryRelativePath: 'bin/grok',
-    url: 'https://x.ai/cli/grok-1.0.60-macos-aarch64',
-    sha256: '980fad1dcb3770101cf05ce1b53fceea2c4706a6957a4fb9000a1c053a1c0252',
-    size: 174911872,
+    url: 'https://x.ai/cli/grok-1.0.62-macos-aarch64',
+    sha256: 'ec434e831afdcfce87780f2815fd732b1df8a4a8de96a491716ad75d13605a4e',
+    size: 175577200,
     publish: true,
   }),
 });

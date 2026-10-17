@@ -2,8 +2,7 @@
   "schema": 1,
   "providers": [
     "claude",
-    "codex",
     "grok"
   ],
-  "baseCatalogTag": "catalog-v1.26.0"
+  "baseCatalogTag": "catalog-v1.27.0"
 }

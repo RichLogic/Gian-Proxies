@@ -1,5 +1,30 @@
 # Gian Proxies Changelog
 
+## Claude Proxy 0.3.8 - 2026-10-18
+
+- Target the current official Claude Code 2.1.302 Runtime, promoted to the
+  /latest channel, npm latest and GitHub latest on 2026-10-16; the
+  darwin-arm64 checksum and size match the official 2.1.302 manifest.
+- Review the upstream 2.1.302 changelog: no wire-protocol or spawn-surface
+  changes affect the adapter; the flag surface was re-verified on the new
+  binary. The gian.proxy wire contract is unchanged.
+
+## Grok Proxy 0.3.11 - 2026-10-18
+
+- Target the managed Grok CLI 1.0.62 Runtime, promoted to stable on x.ai/cli,
+  the official GCS mirror and npm `@xai-official/grok` latest; bytes from
+  x.ai and GCS are identical.
+- Verify the spawn surface and the ACP initialize contract on the new binary
+  (`agentVersion` 1.0.62, `grokShell`, unchanged capability shape; raw
+  handshake evidence preserved). Per-version upstream notes for
+  1.0.53–1.0.62 are NOT_OBSERVED in the accessible official changelog, whose
+  latest entry remains 1.0.52 — recorded honestly instead of blocking the
+  promoted stable channel.
+- Known limitation unchanged: native approval cards under
+  auto/always_approve snapshots remain unverified — the permission wire path
+  requires an authenticated session, which this release does not exercise.
+- The gian.proxy wire contract is unchanged.
+
 ## Claude Proxy 0.3.7 - 2026-10-17
 
 - Target the current official Claude Code 2.1.301 Runtime, promoted to the
