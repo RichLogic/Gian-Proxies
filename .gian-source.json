@@ -2,7 +2,7 @@
   "schema": 1,
   "product": "Gian-Proxies",
   "sourceRepository": "RichLogic/Gian-Dev",
-  "sourceCommit": "f32246a102f21cb943a6368019e01c2917a9f2de",
+  "sourceCommit": "9e97bd41f86e741c6c798d991fe174b4d0554d7e",
   "workingTree": false,
   "externalPackages": [
     {
@@ -261,7 +261,7 @@
     {
       "source": "catalog/official-source/plugins/io.gian.antigravity/setup.md",
       "path": "catalog/official-source/plugins/io.gian.antigravity/setup.md",
-      "sha256": "c97f771467b3026f53d4c3be7f95dc16c0d5d05690259aae243b2c8fa3544b3c"
+      "sha256": "d44dedc3baba8cb843852649d5db051c37b20f1d7855c7d726b3396094e4bd45"
     },
     {
       "source": "catalog/official-source/plugins/io.gian.antigravity/sidecar.json",
@@ -696,7 +696,7 @@
     {
       "source": "packages/proxies/antigravity-proxy/src/runtime/cli-models.ts",
       "path": "packages/proxies/antigravity-proxy/src/runtime/cli-models.ts",
-      "sha256": "3b99a9f8003d76c71412870fe708aa1fa5f8e68dcb67e9304367d5d1f5562255"
+      "sha256": "66eea39bf664ac996df8395bfe03cdeceed5afdb6aad761dca8dee83f34c386c"
     },
     {
       "source": "packages/proxies/antigravity-proxy/src/runtime/discover.ts",
@@ -801,7 +801,7 @@
     {
       "source": "packages/proxies/antigravity-proxy/test/runtime-cli-models.test.ts",
       "path": "packages/proxies/antigravity-proxy/test/runtime-cli-models.test.ts",
-      "sha256": "06910da66eccf45a35008e14bfda1240c41404a9ef3c1629d038ed1b8f2936c5"
+      "sha256": "1c8e78a345960e1c9b250b37a38b6faa6b02117dc7c03208009a42b9125b2e02"
     },
     {
       "source": "packages/proxies/antigravity-proxy/test/runtime-discover.test.ts",
@@ -3228,7 +3228,7 @@
     {
       "path": "catalog/official-source/plugins/io.gian.antigravity/setup.md",
       "mode": 420,
-      "sha256": "c97f771467b3026f53d4c3be7f95dc16c0d5d05690259aae243b2c8fa3544b3c"
+      "sha256": "d44dedc3baba8cb843852649d5db051c37b20f1d7855c7d726b3396094e4bd45"
     },
     {
       "path": "catalog/official-source/plugins/io.gian.antigravity/sidecar.json",
@@ -3593,7 +3593,7 @@
     {
       "path": "packages/proxies/antigravity-proxy/src/runtime/cli-models.ts",
       "mode": 420,
-      "sha256": "3b99a9f8003d76c71412870fe708aa1fa5f8e68dcb67e9304367d5d1f5562255"
+      "sha256": "66eea39bf664ac996df8395bfe03cdeceed5afdb6aad761dca8dee83f34c386c"
     },
     {
       "path": "packages/proxies/antigravity-proxy/src/runtime/discover.ts",
@@ -3698,7 +3698,7 @@
     {
       "path": "packages/proxies/antigravity-proxy/test/runtime-cli-models.test.ts",
       "mode": 420,
-      "sha256": "06910da66eccf45a35008e14bfda1240c41404a9ef3c1629d038ed1b8f2936c5"
+      "sha256": "1c8e78a345960e1c9b250b37a38b6faa6b02117dc7c03208009a42b9125b2e02"
     },
     {
       "path": "packages/proxies/antigravity-proxy/test/runtime-discover.test.ts",
