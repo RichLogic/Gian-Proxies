@@ -2,7 +2,7 @@
   "schema": 1,
   "product": "Gian-Proxies",
   "sourceRepository": "RichLogic/Gian-Dev",
-  "sourceCommit": "048bbcabd6a320d7e00df078fd8304999443f66d",
+  "sourceCommit": "0a78b0433d4df48660cac838c63096f8e10c4555",
   "workingTree": false,
   "externalPackages": [
     {
@@ -831,7 +831,7 @@
     {
       "source": "packages/proxies/antigravity-proxy/test/stdio.test.ts",
       "path": "packages/proxies/antigravity-proxy/test/stdio.test.ts",
-      "sha256": "ecf0292a1bcbe58f765e87beb3ac6f50d3be3451cf97f7f45db4021e71a2e3c5"
+      "sha256": "b5fce7c49b1cc1bc2f885a333199d73c299e8a186509b2aaa8f6953ef4d7bca1"
     },
     {
       "source": "packages/proxies/antigravity-proxy/tsconfig.json",
@@ -3718,7 +3718,7 @@
     {
       "path": "packages/proxies/antigravity-proxy/test/stdio.test.ts",
       "mode": 420,
-      "sha256": "ecf0292a1bcbe58f765e87beb3ac6f50d3be3451cf97f7f45db4021e71a2e3c5"
+      "sha256": "b5fce7c49b1cc1bc2f885a333199d73c299e8a186509b2aaa8f6953ef4d7bca1"
     },
     {
       "path": "packages/proxies/antigravity-proxy/tsconfig.json",
