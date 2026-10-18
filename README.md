@@ -6,7 +6,8 @@ source export, not a copy of private Git history.
 
 ## Contents
 
-- Claude, Codex, Kimi, Grok, DSH and ZCode shipping Proxies, each independently versioned.
+- Claude, Codex, Kimi, Grok, DSH and ZCode shipping Proxies, plus the
+  Antigravity 0.0.1 candidate, each independently versioned.
 - Release versions come from each Proxy package on GianDev main. Export does
   not assign a repository-wide version or automatically bump Proxy versions.
 - DSH Proxy includes its exact Bridge rather than relying on an App-bundled copy.
@@ -24,8 +25,17 @@ by `pnpm build` builds the standalone product. No Provider credentials are neede
 publish. Its signed base Catalog is verified against the existing pinned key;
 unselected Proxies retain their complete immutable executable and certificate
 coordinates. A subset release never rebuilds, retags or republishes an excluded
-Proxy. The final Catalog must preserve the plugin set and every excluded stable
-tuple exactly. Update the selection in GianDev before exporting source.
+Proxy. The final Catalog must retain every base plugin and every excluded stable
+tuple exactly. A new plugin may be added only when it is explicitly selected,
+has complete Catalog source, and matches actual PASS-qualified artifacts and
+shipping metadata. A failed or NOT_RUN qualification cannot admit an addition.
+Update the selection in GianDev before exporting source.
+
+This batch selects only Antigravity 0.0.1 against signed `catalog-v1.28.0`.
+All base28 plugins, excluded executable URLs, documentation and localizations
+are retained from the verified signed bundle. Later standalone releases of
+other Proxies are not implicitly selected. Antigravity's official ACP Runtime
+remains 1.3.0; the Proxy version is not its upstream version.
 
 1. Dispatch **Qualify Proxy Artifacts** on main. The hosted macOS ARM64 workflow
    verifies source provenance, compiles, exercises Proxy contracts with fake

@@ -17,8 +17,10 @@ import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 
 import { proxyReleaseMetadata } from './proxy-release-metadata.mjs';
+import { shippingProxyIds } from './build-proxy-artifacts.mjs';
 import { stageZcodeRuntime } from './build-zcode-runtime.mjs';
 import { validateZcodeRuntimeSource, zcodeRuntimeSource } from './zcode-runtime-source.mjs';
+import { buildAntigravityRuntimeCandidate } from './build-antigravity-runtime.mjs';
 
 const execFileAsync = promisify(execFile);
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -295,14 +297,24 @@ export function validateRuntimeCandidateDefinitions() {
 }
 
 export function selectRuntimeProviders(providers = null) {
-  const supported = [...Object.keys(upstreamRuntimeCandidates), 'dsh', 'zcode'];
-  if (providers === null) return supported;
+  const supported = [...Object.keys(upstreamRuntimeCandidates), 'dsh', 'zcode', 'antigravity'];
+  if (providers === null) return supported.filter(provider => shippingProxyIds.includes(provider));
   if (!Array.isArray(providers) || providers.length === 0
     || new Set(providers).size !== providers.length
     || providers.some(provider => !supported.includes(provider))) {
     throw new Error('Invalid explicit Runtime provider selection.');
   }
   return [...providers];
+}
+
+export function withPublishedRuntimeAsset(candidate) {
+  const metadata = proxyReleaseMetadata(candidate.provider);
+  if (!metadata.runtime.verifiedVersions.includes(candidate.version) || candidate.asset.name !== basename(candidate.asset.name)
+    || !/^[a-f0-9]{64}$/.test(candidate.asset.sha256) || !Number.isSafeInteger(candidate.asset.size) || candidate.asset.size <= 0) {
+    throw new Error('Published Runtime candidate identity is invalid.');
+  }
+  return { ...candidate, asset: { ...candidate.asset, publish: true,
+    url: `https://github.com/RichLogic/Gian-Proxies/releases/download/${metadata.tag}/${candidate.asset.name}` } };
 }
 
 export async function buildManagedRuntimeCandidates({ outputDir, githubEnv = null, providers = null }) {
@@ -316,7 +328,13 @@ export async function buildManagedRuntimeCandidates({ outputDir, githubEnv = nul
   await mkdir(workDir, { recursive: true, mode: 0o700 });
   const candidates = [];
   for (const provider of selected) {
-    if (provider === 'dsh') candidates.push(await buildDshRuntimeCandidate(target, workDir));
+    if (provider === 'antigravity') {
+      const candidate = await buildAntigravityRuntimeCandidate(target, workDir);
+      const entry = await readFile(candidate.candidateBin);
+      candidates.push({ ...withPublishedRuntimeAsset(candidate), probe: { kind: 'proxy' },
+        entry: { version: candidate.version, sha256: digest(entry), size: entry.length } });
+    }
+    else if (provider === 'dsh') candidates.push(await buildDshRuntimeCandidate(target, workDir));
     else if (provider === 'zcode') candidates.push(await buildZcode(target, workDir));
     else candidates.push(await buildUpstream(provider, upstreamRuntimeCandidates[provider], target, workDir));
   }
@@ -330,7 +348,7 @@ export async function buildManagedRuntimeCandidates({ outputDir, githubEnv = nul
   };
   await writeFile(join(target, 'runtime-candidates.json'), `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
   if (githubEnv) {
-    const envNames = { claude: 'CLAUDE_BIN', codex: 'CODEX_BIN', kimi: 'KIMI_BIN', grok: 'GROK_BIN', dsh: 'DSH_BIN', zcode: 'ZCODE_BIN' };
+    const envNames = { claude: 'CLAUDE_BIN', codex: 'CODEX_BIN', kimi: 'KIMI_BIN', grok: 'GROK_BIN', dsh: 'DSH_BIN', zcode: 'ZCODE_BIN', antigravity: 'ANTIGRAVITY_BIN' };
     const body = candidates.map(candidate => `${envNames[candidate.provider]}=${candidate.candidateBin}`).join('\n');
     await writeFile(resolve(githubEnv), `${body}\n`, { flag: 'a' });
   }

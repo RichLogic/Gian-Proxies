@@ -140,8 +140,9 @@ test('the reviewed native ZCode entrypoint retains routing and MCP wiring after 
 
 test('explicit Runtime selection excludes unrelated builds and rejects ambiguous providers', () => {
   assert.deepEqual(selectRuntimeProviders(['kimi', 'grok']), ['kimi', 'grok']);
+  assert.deepEqual(selectRuntimeProviders(['antigravity']), ['antigravity']);
   for (const selection of [[], ['kimi', 'kimi'], ['unknown'], [undefined]]) {
     assert.throws(() => selectRuntimeProviders(selection), /provider selection/);
   }
-  assert.deepEqual(selectRuntimeProviders(), ['claude', 'codex', 'kimi', 'grok', 'dsh', 'zcode']);
+  assert.deepEqual(selectRuntimeProviders(), ['claude', 'codex', 'kimi', 'grok', 'dsh', 'zcode', 'antigravity']);
 });

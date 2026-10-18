@@ -63,6 +63,9 @@ export async function discoverProxyDefinitions(repoRoot = root) {
       || !ACCEPTANCE_SETUPS.has(release.realAcceptance.setup)
       || (release.realAcceptance.proxyBinaryArg !== undefined
         && !/^--[a-z][a-z0-9-]+$/.test(release.realAcceptance.proxyBinaryArg))
+      || (release.runtimeQualification !== undefined
+        && (!canonicalRelativePath(release.runtimeQualification.module)
+          || !/^[A-Za-z_][A-Za-z0-9_]*$/.test(release.runtimeQualification.export ?? '')))
     ) {
       throw new Error(`${directory} has invalid package.json gianProxy metadata`);
     }
@@ -86,6 +89,7 @@ export async function discoverProxyDefinitions(repoRoot = root) {
       sourceEntry: join(proxiesDir, directory, packageMetadata.main),
       bundlePackages: release.bundlePackages ?? [],
       shipping: release.shipping,
+      runtimeQualification: release.runtimeQualification ?? null,
       realAcceptance: release.realAcceptance,
       displayName: manifest.displayName,
       processScope: manifest.process.scope,

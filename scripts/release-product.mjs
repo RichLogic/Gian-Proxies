@@ -9,7 +9,7 @@ import { proxyDefinitions, assertProxySelfTest, main as buildArtifacts } from '.
 import { proxyReleaseMetadata } from './proxy-release-metadata.mjs';
 import { assertZcodeSourceBinding } from './zcode-runtime-source.mjs';
 import { verifySource } from './verify-source.mjs';
-import { assertSameCatalogExecutables, assertSelectedCatalogExecutables, selectReleaseDefinitions } from './catalog-docs-policy.mjs';
+import { assertSameCatalogExecutables, assertSelectedCatalogExecutables, assertSelectedCatalogPlan, assertQualifiedRuntime, certifiedStable, retainedCatalogContent, selectedCatalogRecords, selectReleaseDefinitions } from './catalog-docs-policy.mjs';
 
 const repository = 'RichLogic/Gian-Proxies';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -62,6 +62,7 @@ export function validateCertificate(certificate, expected = {}) {
     if (!record || record.pluginId !== metadata.pluginId || record.version !== metadata.version
       || record.tag !== metadata.tag || !isDeepStrictEqual(record.manifest, definition.manifest)
       || !metadata.runtime.verifiedVersions.includes(record.runtime.version)) throw new Error(`Certificate metadata mismatch: ${definition.id}`);
+    assertQualifiedRuntime(record, definition, certificate);
     if (definition.id === 'zcode') {
       assertZcodeSourceBinding({ ...record.runtime, source: record.runtimeSource });
       if (record.runtime.kind !== 'native-binary' || record.publishRuntime !== true
@@ -110,7 +111,8 @@ async function qualify() {
   });
   await step('build', build);
   await step('proxy-contracts', async () => {
-    command(process.execPath, ['--test', 'scripts/build-managed-runtime-candidates.test.mjs', 'scripts/proxy-release-metadata.test.mjs']);
+    command(process.execPath, ['--test', 'scripts/build-managed-runtime-candidates.test.mjs', 'scripts/proxy-release-metadata.test.mjs',
+      'scripts/catalog-docs-policy.test.mjs', 'scripts/runtime-qualification.test.mjs']);
     for (const definition of shipping) command('pnpm', ['--filter', definition.packageName, 'test']);
     command('pnpm', ['--filter', '@gian/dsh-bridge', 'test']);
     command('pnpm', ['--filter', '@gian/proxy-catalog-contract', 'test']);
@@ -287,6 +289,8 @@ function authorizeCatalogPublication(sequence, issuedAt) {
 
 async function catalog(directory, sequence, issuedAt) {
   const certificate = readCertified(directory);
+  const certificateBytes = readFileSync(join(directory, 'certificate.json'));
+  const proof = { certificate, definitions: shipping, certificateBytes, certificateSha256: hash(certificateBytes) };
   const tag = authorizeCatalogPublication(sequence, issuedAt);
   command('pnpm', ['--filter', '@gian/shared', 'build']);
   command('pnpm', ['--filter', '@gian/proxy-catalog-contract', 'build']);
@@ -294,11 +298,12 @@ async function catalog(directory, sequence, issuedAt) {
   const source = join(root, 'output/catalog-source');
   rmSync(source, { recursive: true, force: true });
   cpSync(join(root, 'catalog/official-source'), source, { recursive: true });
-  const inherited = await inheritCatalogExecutables(source, sequence);
+  const inherited = await inheritCatalogExecutables(source, sequence, proof);
   const { projectInformation } = await import('../catalog/proxy-information/project.mjs');
-  const catalogRecords = inherited.previous.plugins.map(plugin => certificate.proxies.find(record => record.pluginId === plugin.pluginId)
-    ?? { pluginId: plugin.pluginId, version: plugin.stable.pluginVersion, runtime: plugin.stable.combination.runtime });
-  const { localizations } = projectInformation(source, catalogRecords);
+  const catalogRecords = selectedCatalogRecords(inherited.previous, certificate.proxies);
+  const { localizations } = projectInformation(source, catalogRecords, {
+    selectedIds: certificate.proxies.map(record => record.pluginId), inheritedLocalizations: inherited.localizations,
+  });
   for (const record of certificate.proxies) {
     const release = JSON.parse(gh('api', `repos/${repository}/releases/tags/${record.tag}`));
     if (release.draft || release.prerelease) throw new Error('Catalog cannot reference a draft Proxy');
@@ -307,15 +312,9 @@ async function catalog(directory, sequence, issuedAt) {
       const local = asset(join(directory, name));
       if (!remote || remote.size !== local.size || remote.digest !== `sha256:${local.sha256}`) throw new Error(`Catalog source asset differs: ${name}`);
     }
-    const coordinate = name => { const a = asset(join(directory, name)); return { url: releaseUrl(record.tag, name), size: a.size, sha256: a.sha256 }; };
     const entryPath = join(source, 'plugins', record.pluginId, 'entry.json');
     const entry = json(entryPath);
-    entry.channels.stable = { pluginVersion: record.version, manifest: coordinate(`${record.archive}.manifest.json`),
-      artifacts: { 'darwin-arm64': coordinate(record.archive) }, combination: {
-        generationId: `${record.provider}-${record.version}-runtime-${record.runtime.version}`,
-        certificate: { id: certificate.certificateId, sha256: hash(readFileSync(join(directory, 'certificate.json'))) },
-        runtime: record.runtime, companions: [],
-      } };
+    entry.channels.stable = certifiedStable(record, certificate, proof.certificateSha256);
     put(entryPath, entry);
     put(join(source, 'plugins', record.pluginId, 'sidecar.json'), record.manifest);
   }
@@ -327,7 +326,7 @@ async function catalog(directory, sequence, issuedAt) {
     allowedArtifactRepositories: inherited.repositories,
     allowedRuntimeAssetPrefixes: [...policy.runtimeAssetPrefixes, `https://github.com/${repository}/releases/download/`],
   });
-  assertSelectedCatalogExecutables(inherited.previous, bundle.index, certificate.proxies.map(record => record.pluginId));
+  assertSelectedCatalogExecutables(inherited.previous, bundle.index, certificate.proxies.map(record => record.pluginId), proof);
   await writeCompiledCatalogBundle(join(root, 'output/catalog-bundle'), bundle.files);
   const { stageOfficialCatalogRelease } = await import('./stage-official-catalog-release.mjs');
   const target = join(root, 'output/catalog-release');
@@ -336,8 +335,8 @@ async function catalog(directory, sequence, issuedAt) {
     `Signed official Catalog sequence ${sequence}. Updated selected Proxy/Runtime combinations from ${certificate.certificateId}; excluded Proxies retain exact signed coordinates from ${releaseSelection.baseCatalogTag}. No App release.`, true);
 }
 
-async function inheritCatalogExecutables(source, sequence) {
-  const { verifyCatalogBundleFiles, parseGitHubReleaseAssetUrl } = await import('../packages/proxy-catalog-contract/dist/src/index.js');
+async function inheritCatalogExecutables(source, sequence, proof) {
+  const { verifyCatalogBundleFiles, parseGitHubReleaseAssetUrl, readCatalogLocalizations } = await import('../packages/proxy-catalog-contract/dist/src/index.js');
   const { officialCatalogSourcePolicy } = await import('../packages/shared/dist/index.js');
   const policy = officialCatalogSourcePolicy();
   const temporary = mkdtempSync(join(tmpdir(), 'gian-catalog-base-'));
@@ -349,6 +348,9 @@ async function inheritCatalogExecutables(source, sequence) {
     if (files.size !== readdirSync(temporary).length) throw new Error('Duplicate base Catalog asset path');
     const previous = verifyCatalogBundleFiles({ files, pinnedPublicKeys: policy.pinnedPublicKeys, expectedSourceId: policy.sourceId });
     if (`catalog-v1.${previous.sequence}.0` !== releaseSelection.baseCatalogTag || previous.sequence >= sequence) throw new Error('Signed base Catalog identity mismatch');
+    // Reject an unauthorized addition before touching the temporary base copy.
+    if (proof) assertSelectedCatalogPlan(previous, sequence, proof);
+    const retained = retainedCatalogContent(previous, files, shipping.map(definition => definition.pluginId), readCatalogLocalizations(files, previous));
     const repositories = [...new Set([...policy.artifactRepositories, repository])];
     for (const plugin of previous.plugins) {
       const stable = plugin.stable;
@@ -366,6 +368,20 @@ async function inheritCatalogExecutables(source, sequence) {
       const entryPath = join(source, 'plugins', plugin.pluginId, 'entry.json');
       const entry = json(entryPath);
       entry.channels.stable = { pluginVersion: stable.pluginVersion, manifest: stable.manifest, artifacts: stable.artifacts, combination: stable.combination };
+      const content = retained.plugins.find(item => item.pluginId === plugin.pluginId);
+      if (content) {
+        Object.assign(entry, { displayName: content.displayName, tagline: content.tagline, featuredOrder: content.featuredOrder });
+        for (const [key, bytes] of Object.entries(content.documents)) {
+          writeFileSync(join(dirname(entryPath), entry.documentation[key]), bytes);
+        }
+        for (const [key, image] of Object.entries(content.branding)) {
+          const field = key === 'light' ? 'logoLight' : 'logoDark';
+          const path = entry.branding[field].path;
+          mkdirSync(dirname(join(dirname(entryPath), path)), { recursive: true });
+          writeFileSync(join(dirname(entryPath), path), image.bytes);
+          entry.branding[field] = { path, mediaType: image.ref.mediaType };
+        }
+      }
       put(entryPath, entry);
       const sidecarPath = join(source, 'plugins', plugin.pluginId, 'sidecar.json');
       command('gh', ['release', 'download', manifestRelease.coordinate.tag, '--repo', manifestRelease.coordinate.repository,
@@ -373,7 +389,7 @@ async function inheritCatalogExecutables(source, sequence) {
       const bytes = readFileSync(sidecarPath);
       if (bytes.length !== stable.manifest.size || hash(bytes) !== stable.manifest.sha256) throw new Error('Base Manifest bytes changed');
     }
-    return { previous, repositories };
+    return { previous, repositories, localizations: retained.localizations };
   } finally { rmSync(temporary, { recursive: true, force: true }); }
 }
 

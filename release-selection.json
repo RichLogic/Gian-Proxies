@@ -1,8 +1,7 @@
 {
   "schema": 1,
   "providers": [
-    "claude",
-    "grok"
+    "antigravity"
   ],
-  "baseCatalogTag": "catalog-v1.27.0"
+  "baseCatalogTag": "catalog-v1.28.0"
 }

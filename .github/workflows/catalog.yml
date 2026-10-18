@@ -45,7 +45,7 @@ jobs:
       - run: node scripts/verify-source.mjs
       - name: Validate and check documentation projection
         if: ${{ !inputs.owner_no_tests }}
-        run: node --test catalog/proxy-information/project.test.mjs
+        run: node --test catalog/proxy-information/project.test.mjs scripts/catalog-docs-policy.test.mjs scripts/runtime-qualification.test.mjs
       - name: Authenticate and download the qualification
         id: source
         env:

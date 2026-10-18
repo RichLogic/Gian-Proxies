@@ -1,5 +1,6 @@
 {
   "packages": [
+    "packages/proxies/antigravity-proxy",
     "packages/proxies/cc-proxy",
     "packages/proxies/codex-proxy",
     "packages/proxies/dsh-bridge",
