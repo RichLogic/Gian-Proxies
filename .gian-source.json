@@ -2,7 +2,7 @@
   "schema": 1,
   "product": "Gian-Proxies",
   "sourceRepository": "RichLogic/Gian-Dev",
-  "sourceCommit": "fd6bc01224597213e32ae615cbc171e9de69bdd6",
+  "sourceCommit": "f32246a102f21cb943a6368019e01c2917a9f2de",
   "workingTree": false,
   "externalPackages": [
     {
@@ -591,7 +591,7 @@
     {
       "source": "delivery/proxies/scripts/release-product.mjs",
       "path": "scripts/release-product.mjs",
-      "sha256": "e581da7776050225729e0f6f2a0be712bc4031b594b2dd3713398bfdefe22480"
+      "sha256": "0ba7e28469f6d5c766e8ad8c443de67c06b2395189138202417d75ff0a1a6296"
     },
     {
       "source": "delivery/proxies/scripts/runtime-qualification.test.mjs",
@@ -637,6 +637,11 @@
       "source": "packages/proxies/antigravity-proxy/package.json",
       "path": "packages/proxies/antigravity-proxy/package.json",
       "sha256": "2d986adc3a6d932ae6d16b91f8fcecd5a814fe01a461982c7b11580896b71d37"
+    },
+    {
+      "source": "packages/proxies/antigravity-proxy/scripts/fake-catalog-ui-proxy.mjs",
+      "path": "packages/proxies/antigravity-proxy/scripts/fake-catalog-ui-proxy.mjs",
+      "sha256": "6e208ed81abf573b96a4fbe01ac934c104269cb977bd1650a31b8101acd61d98"
     },
     {
       "source": "packages/proxies/antigravity-proxy/src/cli/spawn.ts",
@@ -2896,7 +2901,12 @@
     {
       "source": "scripts/build-antigravity-runtime.mjs",
       "path": "scripts/build-antigravity-runtime.mjs",
-      "sha256": "0dcf294e83c2203f08ea06d8f84fca0a18c4039ad905b2db7640d4ee60cbf951"
+      "sha256": "e94228e4f55e6ef29b5cefadd687c6cfa09cda9401c1b090d496246c5bccb83f"
+    },
+    {
+      "source": "scripts/build-antigravity-runtime.test.mjs",
+      "path": "scripts/build-antigravity-runtime.test.mjs",
+      "sha256": "653c2059e1058f57e68860d17ebef459349014ac885465aab73024b5bdb554d2"
     },
     {
       "source": "scripts/build-managed-runtime-candidates.mjs",
@@ -3524,6 +3534,11 @@
       "path": "packages/proxies/antigravity-proxy/README.md",
       "mode": 420,
       "sha256": "b0c05bed83337a341105e51c3e58d2d105e5d0980ad803c1c9e487ca0de47e7a"
+    },
+    {
+      "path": "packages/proxies/antigravity-proxy/scripts/fake-catalog-ui-proxy.mjs",
+      "mode": 420,
+      "sha256": "6e208ed81abf573b96a4fbe01ac934c104269cb977bd1650a31b8101acd61d98"
     },
     {
       "path": "packages/proxies/antigravity-proxy/src/cli/spawn.ts",
@@ -5798,7 +5813,12 @@
     {
       "path": "scripts/build-antigravity-runtime.mjs",
       "mode": 420,
-      "sha256": "0dcf294e83c2203f08ea06d8f84fca0a18c4039ad905b2db7640d4ee60cbf951"
+      "sha256": "e94228e4f55e6ef29b5cefadd687c6cfa09cda9401c1b090d496246c5bccb83f"
+    },
+    {
+      "path": "scripts/build-antigravity-runtime.test.mjs",
+      "mode": 420,
+      "sha256": "653c2059e1058f57e68860d17ebef459349014ac885465aab73024b5bdb554d2"
     },
     {
       "path": "scripts/build-managed-runtime-candidates.mjs",
@@ -5853,7 +5873,7 @@
     {
       "path": "scripts/release-product.mjs",
       "mode": 420,
-      "sha256": "e581da7776050225729e0f6f2a0be712bc4031b594b2dd3713398bfdefe22480"
+      "sha256": "0ba7e28469f6d5c766e8ad8c443de67c06b2395189138202417d75ff0a1a6296"
     },
     {
       "path": "scripts/runtime-qualification.test.mjs",
