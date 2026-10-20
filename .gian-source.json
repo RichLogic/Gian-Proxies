@@ -2,7 +2,7 @@
   "schema": 1,
   "product": "Gian-Proxies",
   "sourceRepository": "RichLogic/Gian-Dev",
-  "sourceCommit": "66747beb4827da58aca371fd1fb4a888909faeb7",
+  "sourceCommit": "2d745e4d6b1ad1e89c4ac85096ffdbc21c2436c2",
   "workingTree": false,
   "externalPackages": [
     {
@@ -251,7 +251,7 @@
     {
       "source": "catalog/official-source/plugins/io.gian.antigravity/entry.json",
       "path": "catalog/official-source/plugins/io.gian.antigravity/entry.json",
-      "sha256": "9a9e6fe6d200d26effb0dc68111ce43ab70488b9919888aa23f553f8381b3cab"
+      "sha256": "3e7ebcb0f5bad48026e761f7d885f19f084fa33e93d7cf41ab91bb61aa882b3f"
     },
     {
       "source": "catalog/official-source/plugins/io.gian.antigravity/overview.md",
@@ -266,7 +266,7 @@
     {
       "source": "catalog/official-source/plugins/io.gian.antigravity/sidecar.json",
       "path": "catalog/official-source/plugins/io.gian.antigravity/sidecar.json",
-      "sha256": "7550efa73d8880dd416260fbe8ffddf07c2a2cc9b0039299600837ca617e45e2"
+      "sha256": "7d1b28addb4a976c760ecabfb500a4d76048b2de0f07ca56cdcfa43addcd7423"
     },
     {
       "source": "catalog/official-source/plugins/io.gian.antigravity/troubleshooting.md",
@@ -556,7 +556,7 @@
     {
       "source": "delivery/proxies/CHANGELOG.md",
       "path": "CHANGELOG.md",
-      "sha256": "edd6ba8726eb5939dc9273249b09620ee7b07211895079cb084f8d0c543dbf28"
+      "sha256": "8b9dcb9a98a1644a70a33c14ce01e5fb85c0b5ea1ffb3a2b6fe102e49d23768e"
     },
     {
       "source": "delivery/proxies/README.md",
@@ -2676,7 +2676,7 @@
     {
       "source": "packages/proxy-catalog-contract/test/official-source.test.ts",
       "path": "packages/proxy-catalog-contract/test/official-source.test.ts",
-      "sha256": "6a4cf26ebd12e453b08eca6a31d81cdc20bb8587b5f383901d58d08b537e0498"
+      "sha256": "0ab169e568f78d91320541e9c9a371b325941719aa4f39d81e204aebc796790f"
     },
     {
       "source": "packages/proxy-catalog-contract/tsconfig.json",
@@ -3508,7 +3508,7 @@
     {
       "path": "CHANGELOG.md",
       "mode": 420,
-      "sha256": "edd6ba8726eb5939dc9273249b09620ee7b07211895079cb084f8d0c543dbf28"
+      "sha256": "8b9dcb9a98a1644a70a33c14ce01e5fb85c0b5ea1ffb3a2b6fe102e49d23768e"
     },
     {
       "path": "LICENSE",
@@ -5578,7 +5578,7 @@
     {
       "path": "packages/proxy-catalog-contract/test/official-source.test.ts",
       "mode": 420,
-      "sha256": "6a4cf26ebd12e453b08eca6a31d81cdc20bb8587b5f383901d58d08b537e0498"
+      "sha256": "0ab169e568f78d91320541e9c9a371b325941719aa4f39d81e204aebc796790f"
     },
     {
       "path": "packages/proxy-catalog-contract/tsconfig.json",

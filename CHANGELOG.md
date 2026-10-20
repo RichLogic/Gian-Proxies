@@ -28,7 +28,10 @@
 
 - Target `@deepseek-ai/dsh` 0.2.1-rc.2, now the npm `latest` dist-tag
   (published 2026-10-17); the `next` channel coincides and `alpha` stays
-  separate. The Bridge peer range `^0.2.0-rc.2` already admits it.
+  separate. The bundled Bridge moves to 0.1.7: npm semver treats prerelease
+  tuples strictly (`^0.2.0-rc.2` does NOT satisfy 0.2.1-rc.2), so the Bridge
+  peer range now explicitly admits both RC lines (`^0.2.0-rc.2 ||
+  0.2.1-rc.2`), covered by a real-semver regression test.
 - Exact npm package-payload comparison of the bridge-used surfaces:
   `SESSION_FORMAT_VERSION` stays 4 (no data migration),
   KNOWN_SESSION_EVENT_TYPES only gains `job/registered`, `job/settled` and
