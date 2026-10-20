@@ -66,13 +66,13 @@
   {
     "pluginId": "com.zhipu.zcode",
     "runtimeId": "zcode",
-    "version": "0.16.9",
+    "version": "0.17.0",
     "format": "tar.gz",
     "entryRelativePath": "zcode/agent/zcode.cjs",
     "asset": {
-      "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.4/zcode.tar.gz",
-      "sha256": "991f141cb6a062426730b1be25512200ef517b5eb429dcc6b821eb040f34489d",
-      "size": 82758887
+      "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.5/zcode.tar.gz",
+      "sha256": "fd77c791764cc606f1d850b7fa4eb26acf68e34615997b1eaa1b070035cf176f",
+      "size": 83398781
     }
   },
   {

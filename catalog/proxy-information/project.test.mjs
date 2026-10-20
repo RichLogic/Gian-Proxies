@@ -12,7 +12,7 @@ const current = JSON.parse(readFileSync(join(root, 'evidence/current-combination
 const certified = current.plugins.map(p => ({ pluginId: p.id, version: p.version, runtime: p.combination.runtime }));
 
 test('authored histories remain complete and their Markdown projection matches', () => {
-  assert.deepEqual(validateReview(), { proxies: 7, versions: 83, distributions: 86, metadataOnly: 28 });
+  assert.deepEqual(validateReview(), { proxies: 7, versions: 84, distributions: 87, metadataOnly: 28 });
 });
 
 test('v1 tutorial concatenation preserves all nine chapters byte for byte', () => {

@@ -1,8 +1,50 @@
 {
   "schemaVersion": 1,
   "pluginId": "com.zhipu.zcode",
-  "currentVersion": "0.4.4",
+  "currentVersion": "0.4.5",
   "entries": [
+    {
+      "version": "0.4.5",
+      "firstPublishedAt": "2026-10-20T01:35:37Z",
+      "evidenceCoverage": "detailed",
+      "distributions": [
+        {
+          "repository": "RichLogic/Gian-Proxies",
+          "tag": "proxy-zcode-v0.4.5",
+          "publishedAt": "2026-10-20T01:35:37Z",
+          "releaseUrl": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-zcode-v0.4.5",
+          "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.5/gian-proxy-zcode-0.4.5-darwin-arm64.tar.gz.manifest.json",
+          "manifestSha256": "37c30ee591c08a92cbbcea3e32fabd024a69d2eca7e03cdbfe6ec21b5d0e3a3d",
+          "archive": {
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.5/gian-proxy-zcode-0.4.5-darwin-arm64.tar.gz",
+            "sha256": "4c2304205387431ed975bb251f42b55aba90d7e48855c41e3806b21b646d83cc",
+            "size": 143238
+          },
+          "runtimeDeclaration": {
+            "id": "zcode",
+            "versions": [
+              "0.17.0"
+            ],
+            "basis": "verified-declaration"
+          },
+          "companionDeclarations": [],
+          "protocolRange": ">=2.2 <3.0",
+          "manifestSchema": 4,
+          "processScope": "shared"
+        }
+      ],
+      "changes": [
+        {
+          "category": "changed",
+          "text": "托管 Runtime 更新至已审查的 App 源码 3.16.1 / CLI 0.17.0（固定提交 0a1fc56），保留哈希约束的独立认证和模型目录集成。隔离数据库验证覆盖旧迁移校验和、合成历史保留、表备份恢复及再次升级；上游恢复保留新增结构，备份不可用时会提示并继续迁移。移除 0.17.0 严格 session/list schema 已删除的 includeArchived 字段，修复原生历史列表；修正原生软删除的能力说明，Gian 关闭会话仍仅解除连接，不调用原生删除。产物通过托管认证；本次未运行真实模型 Turn。",
+          "evidence": [
+            "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-zcode-v0.4.5",
+            "https://github.com/RichLogic/Gian-Proxies/blob/proxy-zcode-v0.4.5/packages/proxies/zcode-proxy/README.md"
+          ]
+        }
+      ],
+      "unknowns": []
+    },
     {
       "version": "0.4.4",
       "firstPublishedAt": "2026-10-15T02:24:58Z",
