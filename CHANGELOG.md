@@ -6,6 +6,8 @@
 - Preserve hash-bound standalone authentication and model-catalog integration.
 - Review additive protocol fields and new SQLite migrations; isolated native
   migration contracts and synthetic old/new history/restore checks pass.
+- Fix native history listing by omitting `includeArchived`, removed from the
+  strict 0.17.0 schema; preserve a native source fixture and regression.
 - Correct unsupported native-delete explanations for upstream soft deletion;
   Gian session.close continues to detach without deleting native history.
 - No new optional capabilities or real Provider-turn claims.

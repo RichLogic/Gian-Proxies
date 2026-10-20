@@ -2,7 +2,7 @@
   "schema": 1,
   "product": "Gian-Proxies",
   "sourceRepository": "RichLogic/Gian-Dev",
-  "sourceCommit": "36d3dd04170e3b974e9c9e72c11e4499d807a845",
+  "sourceCommit": "736caf09f878e53e325bf9f437f21afec3d9461e",
   "workingTree": false,
   "externalPackages": [
     {
@@ -581,7 +581,7 @@
     {
       "source": "delivery/proxies/CHANGELOG.md",
       "path": "CHANGELOG.md",
-      "sha256": "951798177b6255bd222cac98abee0c2b8c28fb8ae0128debfa0dd5a368bc9683"
+      "sha256": "abd87f43feaf079a9bfc346bfe1fb6390a35271c67fa60311b4ad809a227fc1a"
     },
     {
       "source": "delivery/proxies/README.md",
@@ -2251,7 +2251,7 @@
     {
       "source": "packages/proxies/zcode-proxy/README.md",
       "path": "packages/proxies/zcode-proxy/README.md",
-      "sha256": "1a99230f536761fae837643007a1f768e622de87dfe4b436e5dfb1dd74c4a883"
+      "sha256": "356bd8ed36ccc5a018b35a811d11d0213452f0b82e70611f8e8e73c0486aa090"
     },
     {
       "source": "packages/proxies/zcode-proxy/assets/generate.mjs",
@@ -2466,7 +2466,7 @@
     {
       "source": "packages/proxies/zcode-proxy/src/adapter.ts",
       "path": "packages/proxies/zcode-proxy/src/adapter.ts",
-      "sha256": "319b113d7d00c3b3b0c17069a204eb4d820b2176dc1c0f92aaaefedebca5f8c7"
+      "sha256": "f705a31c2d50ac73cca71b6ea49e9187732d466a26ad33eb1a1c523a3421dedf"
     },
     {
       "source": "packages/proxies/zcode-proxy/src/attachments.ts",
@@ -2541,7 +2541,7 @@
     {
       "source": "packages/proxies/zcode-proxy/test/catalog.test.ts",
       "path": "packages/proxies/zcode-proxy/test/catalog.test.ts",
-      "sha256": "b6eac1852e743ecdc845ded40304b73ac9f216c78a4a1773a3be11d0e2fc83b3"
+      "sha256": "beb6d4352cf0eaa59e95395f47b20abc29aec20bab552d7aa67dcb7cd2cfef12"
     },
     {
       "source": "packages/proxies/zcode-proxy/test/customization.test.ts",
@@ -2551,7 +2551,7 @@
     {
       "source": "packages/proxies/zcode-proxy/test/fixtures/fake-app-server.mjs",
       "path": "packages/proxies/zcode-proxy/test/fixtures/fake-app-server.mjs",
-      "sha256": "132e9b090fca513359d5926991a60e93e455bccb2d6ac3ab0e09487065b9f046"
+      "sha256": "530857ca82b9b062b6878978f40e695ea12a48a37813832b575cd2c1d7977d34"
     },
     {
       "source": "packages/proxies/zcode-proxy/test/fixtures/synthetic-zcode-config.mjs",
@@ -2571,12 +2571,17 @@
     {
       "source": "packages/proxies/zcode-proxy/test/fixtures/upstream/README.md",
       "path": "packages/proxies/zcode-proxy/test/fixtures/upstream/README.md",
-      "sha256": "0ac7f8bee2129acc95f1710683e3676bbd1a5c8a9fda20e0b551bff582a0e369"
+      "sha256": "073b9737d8eb08eefa35f7c248f460919863194a560e06e788b04786305c8519"
     },
     {
       "source": "packages/proxies/zcode-proxy/test/fixtures/upstream/zcode-protocol-entrypoint.ts.txt",
       "path": "packages/proxies/zcode-proxy/test/fixtures/upstream/zcode-protocol-entrypoint.ts.txt",
       "sha256": "e45d5cdc4f9f90640ef93d89e4b87aa0e40c2a459946b954daa772b7d5594d9d"
+    },
+    {
+      "source": "packages/proxies/zcode-proxy/test/fixtures/upstream/zcode-session-list-params.ts.txt",
+      "path": "packages/proxies/zcode-proxy/test/fixtures/upstream/zcode-session-list-params.ts.txt",
+      "sha256": "f0ddda8730c2378946344136d21f22857602f8aa1330b6cfe94e5030271468f2"
     },
     {
       "source": "packages/proxies/zcode-proxy/test/harness.ts",
@@ -2946,7 +2951,7 @@
     {
       "source": "scripts/build-managed-runtime-candidates.test.mjs",
       "path": "scripts/build-managed-runtime-candidates.test.mjs",
-      "sha256": "e56ac84c30f1adda39c120aacc21956af0f5635c8f6b49c7b62869bc44d2237e"
+      "sha256": "3fa6bf499b660ca1a249ff84206a31f1afe166b4ee297e18e013fd9594ec5906"
     },
     {
       "source": "scripts/build-proxy-artifacts.mjs",
@@ -2986,7 +2991,7 @@
     {
       "source": "scripts/verify-zcode-runtime-protocol.mjs",
       "path": "scripts/verify-zcode-runtime-protocol.mjs",
-      "sha256": "42ec147cc3f69c97b846522bb33b22b1194eb70e2c0338dd997fbaf37f77c551"
+      "sha256": "7d529c6ef2698dd3a41be8cc41a58f73514ee78cc4764d297bb6e4f1f0f679b1"
     },
     {
       "source": "scripts/zcode-runtime-integration.mjs",
@@ -3558,7 +3563,7 @@
     {
       "path": "CHANGELOG.md",
       "mode": 420,
-      "sha256": "951798177b6255bd222cac98abee0c2b8c28fb8ae0128debfa0dd5a368bc9683"
+      "sha256": "abd87f43feaf079a9bfc346bfe1fb6390a35271c67fa60311b4ad809a227fc1a"
     },
     {
       "path": "LICENSE",
@@ -5383,7 +5388,7 @@
     {
       "path": "packages/proxies/zcode-proxy/README.md",
       "mode": 420,
-      "sha256": "1a99230f536761fae837643007a1f768e622de87dfe4b436e5dfb1dd74c4a883"
+      "sha256": "356bd8ed36ccc5a018b35a811d11d0213452f0b82e70611f8e8e73c0486aa090"
     },
     {
       "path": "packages/proxies/zcode-proxy/scripts/fake-catalog-ui-proxy.mjs",
@@ -5393,7 +5398,7 @@
     {
       "path": "packages/proxies/zcode-proxy/src/adapter.ts",
       "mode": 420,
-      "sha256": "319b113d7d00c3b3b0c17069a204eb4d820b2176dc1c0f92aaaefedebca5f8c7"
+      "sha256": "f705a31c2d50ac73cca71b6ea49e9187732d466a26ad33eb1a1c523a3421dedf"
     },
     {
       "path": "packages/proxies/zcode-proxy/src/attachments.ts",
@@ -5468,7 +5473,7 @@
     {
       "path": "packages/proxies/zcode-proxy/test/catalog.test.ts",
       "mode": 420,
-      "sha256": "b6eac1852e743ecdc845ded40304b73ac9f216c78a4a1773a3be11d0e2fc83b3"
+      "sha256": "beb6d4352cf0eaa59e95395f47b20abc29aec20bab552d7aa67dcb7cd2cfef12"
     },
     {
       "path": "packages/proxies/zcode-proxy/test/customization.test.ts",
@@ -5478,7 +5483,7 @@
     {
       "path": "packages/proxies/zcode-proxy/test/fixtures/fake-app-server.mjs",
       "mode": 493,
-      "sha256": "132e9b090fca513359d5926991a60e93e455bccb2d6ac3ab0e09487065b9f046"
+      "sha256": "530857ca82b9b062b6878978f40e695ea12a48a37813832b575cd2c1d7977d34"
     },
     {
       "path": "packages/proxies/zcode-proxy/test/fixtures/synthetic-zcode-config.mjs",
@@ -5498,12 +5503,17 @@
     {
       "path": "packages/proxies/zcode-proxy/test/fixtures/upstream/README.md",
       "mode": 420,
-      "sha256": "0ac7f8bee2129acc95f1710683e3676bbd1a5c8a9fda20e0b551bff582a0e369"
+      "sha256": "073b9737d8eb08eefa35f7c248f460919863194a560e06e788b04786305c8519"
     },
     {
       "path": "packages/proxies/zcode-proxy/test/fixtures/upstream/zcode-protocol-entrypoint.ts.txt",
       "mode": 420,
       "sha256": "e45d5cdc4f9f90640ef93d89e4b87aa0e40c2a459946b954daa772b7d5594d9d"
+    },
+    {
+      "path": "packages/proxies/zcode-proxy/test/fixtures/upstream/zcode-session-list-params.ts.txt",
+      "mode": 420,
+      "sha256": "f0ddda8730c2378946344136d21f22857602f8aa1330b6cfe94e5030271468f2"
     },
     {
       "path": "packages/proxies/zcode-proxy/test/harness.ts",
@@ -5888,7 +5898,7 @@
     {
       "path": "scripts/build-managed-runtime-candidates.test.mjs",
       "mode": 420,
-      "sha256": "e56ac84c30f1adda39c120aacc21956af0f5635c8f6b49c7b62869bc44d2237e"
+      "sha256": "3fa6bf499b660ca1a249ff84206a31f1afe166b4ee297e18e013fd9594ec5906"
     },
     {
       "path": "scripts/build-proxy-artifacts.mjs",
@@ -5958,7 +5968,7 @@
     {
       "path": "scripts/verify-zcode-runtime-protocol.mjs",
       "mode": 420,
-      "sha256": "42ec147cc3f69c97b846522bb33b22b1194eb70e2c0338dd997fbaf37f77c551"
+      "sha256": "7d529c6ef2698dd3a41be8cc41a58f73514ee78cc4764d297bb6e4f1f0f679b1"
     },
     {
       "path": "scripts/zcode-runtime-integration.mjs",

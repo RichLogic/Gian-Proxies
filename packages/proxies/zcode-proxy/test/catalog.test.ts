@@ -382,3 +382,17 @@ test('provider selection resolves only that Provider models and its Thinking voc
     await harness.close();
   }
 });
+
+
+test('native history list follows the strict CLI 0.17.0 parameter schema', async () => {
+  const harness = startHarness({ scenario: { list: [{ sessionId: 'persisted-history', title: 'History', status: 'idle', sessionKind: 'interactive' }] } });
+  try {
+    await initialize(harness);
+    const response = await harness.request('session.native.list', { cwd: '/tmp/history-workspace', limit: 10 });
+    assert.equal(response.kind, 'result', JSON.stringify(response.payload));
+    const result = (response.payload as { result: { sessions: Array<{ id: string }> } }).result;
+    assert.equal(result.sessions[0]?.id, 'persisted-history');
+    const request = harness.fakeLog().find(entry => entry.method === 'session/list');
+    assert.deepEqual(request?.params, { limit: 500, workspace: { workspacePath: '/tmp/history-workspace', workspaceKey: '/tmp/history-workspace' } });
+  } finally { await harness.close(); }
+});

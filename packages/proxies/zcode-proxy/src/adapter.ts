@@ -1666,7 +1666,6 @@ export class ZcodeV2Adapter {
     const cwd = typeof params.cwd === 'string' && params.cwd !== '' ? params.cwd : null;
     const list = await this.transport.request('session/list', {
       limit: 500,
-      includeArchived: false,
       ...(cwd !== null ? { workspace: { workspacePath: cwd, workspaceKey: cwd } } : {}),
     }, 20_000) as { sessions?: InnerSessionSummary[] } | null;
     const summaries = (list?.sessions ?? []).filter((session) => {

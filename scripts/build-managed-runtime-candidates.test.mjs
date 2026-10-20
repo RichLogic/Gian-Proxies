@@ -89,7 +89,7 @@ test('ZCode qualification rejects an upstream catalog method removal despite a v
   const root = await mkdtemp(join(tmpdir(), 'zcode-protocol-check-'));
   t.after(() => rm(root, { recursive: true, force: true }));
   const entry = join(root, 'zcode.cjs');
-  const fixture = reply => `
+  const fixture = (reply, history = { result: { sessions: [] } }) => `
     const readline = require('node:readline');
     if (process.argv.includes('--version')) { console.log('0.16.9'); process.exit(0); }
     const input = readline.createInterface({ input: process.stdin });
@@ -97,7 +97,8 @@ test('ZCode qualification rejects an upstream catalog method removal despite a v
       const request = JSON.parse(line);
       if (request.method === 'workspace/readState') process.exit(2);
       const answer = request.method === 'workspace/readPresentation'
-        ? { result: { mode: 'build', slashCommands: [] } } : ${JSON.stringify(reply)};
+        ? { result: { mode: 'build', slashCommands: [] } }
+        : request.method === 'session/list' ? ${JSON.stringify(history)} : ${JSON.stringify(reply)};
       console.log(JSON.stringify({ id: request.id, ...answer }));
     });
   `;
@@ -107,6 +108,8 @@ test('ZCode qualification rejects an upstream catalog method removal despite a v
   await assert.rejects(verifyZcodeRuntimeProtocol(entry, root, root), /gian\/modelCatalog contract/);
   await writeFile(entry, fixture({ result: { schemaVersion: 99, models: [] } }));
   await assert.rejects(verifyZcodeRuntimeProtocol(entry, root, root), /incompatible schema/);
+  await writeFile(entry, fixture({ result: { schemaVersion: 1, models: [] } }, { result: {} }));
+  await assert.rejects(verifyZcodeRuntimeProtocol(entry, root, root), /native history list.*incompatible schema/);
 });
 
 test('the Runtime integration is anchored to reviewed source and owns standalone authentication', () => {

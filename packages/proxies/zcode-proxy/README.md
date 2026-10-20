@@ -88,6 +88,9 @@ types leak into Host/Web.
   protocol-entrypoint hash guard and standalone authentication/model integration.
 - Review additive history-first, initialization and reconciliation fields; this
   Proxy retains its existing subscription mode and does not adopt new capabilities.
+- Remove the obsolete `includeArchived` request field from `session/list`;
+  CLI 0.17.0 rejects unknown fields. A strict native-schema fixture covers
+  history listing, and hosted qualification probes the actual list response.
 - Correct native-delete explanations for upstream soft deletion; detach never
   calls the native close/delete methods.
 - Isolated source checks preserve historical migration checksums and synthetic

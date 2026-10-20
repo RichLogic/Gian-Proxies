@@ -7,3 +7,8 @@ Upstream license: Apache-2.0, https://github.com/zai-org/ZCode/blob/0a1fc56d279f
 
 The Runtime integration test transforms these exact bytes through the production
 overlay; the source lock owns its SHA-256. Keep the fixture byte-for-byte original.
+
+`zcode-session-list-params.ts.txt` is the unmodified list-parameter declaration
+from the same commit's `packages/shared/src/zcode-protocol/index.ts`. Its strict
+object removes `includeArchived`; the fake Runtime rejects that obsolete key,
+and the native-history regression exercises the actual Proxy request.
