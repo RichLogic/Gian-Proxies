@@ -1,9 +1,7 @@
 {
   "schema": 1,
   "providers": [
-    "claude",
-    "antigravity",
-    "dsh"
+    "zcode"
   ],
-  "baseCatalogTag": "catalog-v1.29.0"
+  "baseCatalogTag": "catalog-v1.30.0"
 }

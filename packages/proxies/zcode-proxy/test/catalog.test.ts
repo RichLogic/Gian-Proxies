@@ -122,7 +122,7 @@ test('catalog.list reads Registry metadata and presentation without creating a s
     assert.equal(capabilities['event.plan'], 1);
     assert.equal(capabilities['event.diff'], 1);
     assert.equal(capabilities['sidechat'], undefined, 'side chats are not a semantic Gian Side Chat');
-    assert.equal(capabilities['session.native.delete'], undefined, 'deleteSession is a close upstream');
+    assert.equal(capabilities['session.native.delete'], undefined, 'upstream soft deletion is not exposed by this Proxy');
 
     const catalog = await harness.request('catalog.list', {});
     const result = (catalog.payload as { result: Record<string, unknown> }).result;

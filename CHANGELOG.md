@@ -1,5 +1,15 @@
 # Gian Proxies Changelog
 
+## ZCode Proxy 0.4.5 - 2026-10-20
+
+- Pin reviewed App-source 3.16.1 / CLI 0.17.0 at immutable source `0a1fc56`.
+- Preserve hash-bound standalone authentication and model-catalog integration.
+- Review additive protocol fields and new SQLite migrations; isolated native
+  migration contracts and synthetic old/new history/restore checks pass.
+- Correct unsupported native-delete explanations for upstream soft deletion;
+  Gian session.close continues to detach without deleting native history.
+- No new optional capabilities or real Provider-turn claims.
+
 ## Claude Proxy 0.3.9 - 2026-10-20
 
 - Target the current official Claude Code 2.1.303 Runtime, promoted to the

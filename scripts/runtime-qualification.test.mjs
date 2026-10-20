@@ -20,19 +20,14 @@ test('the real standalone verifier imports without Host and retains the package-
   assert.ok(existsSync(new URL('./build-antigravity-runtime.mjs', builderUrl)));
 });
 
-test('this batch selects Claude, Antigravity and DSH on signed base Catalog 29, preserving other candidates without publishing them', () => {
+test('this batch selects only ZCode on signed base Catalog 30 and preserves the other released tuples', () => {
   const selection = JSON.parse(readFileSync(new URL('../release-selection.json', import.meta.url), 'utf8'));
-  assert.deepEqual(selection, { schema: 1, providers: ['claude', 'antigravity', 'dsh'], baseCatalogTag: 'catalog-v1.29.0' });
+  assert.deepEqual(selection, { schema: 1, providers: ['zcode'], baseCatalogTag: 'catalog-v1.30.0' });
   const selected = selectReleaseDefinitions(proxyDefinitions, selection);
-  assert.deepEqual(selected.map(item => item.id), ['claude', 'antigravity', 'dsh']);
-  assert.deepEqual(selectRuntimeProviders(selected.map(item => item.id)), ['claude', 'antigravity', 'dsh']);
-  assert.equal(selected[0].pluginVersion, '0.3.9');
-  assert.deepEqual(selected[0].runtime.verifiedCliVersions, ['2.1.303']);
-  assert.equal(selected[1].pluginVersion, '0.0.2');
-  assert.deepEqual(selected[1].runtime.verifiedCliVersions, ['1.4.1']);
-  assert.equal(selected[1].runtimeQualification.export, 'probeAntigravityRuntime');
-  assert.equal(selected[2].pluginVersion, '0.3.6');
-  assert.deepEqual(selected[2].runtime.verifiedCliVersions, ['0.2.1-rc.2']);
+  assert.deepEqual(selected.map(item => item.id), ['zcode']);
+  assert.deepEqual(selectRuntimeProviders(selected.map(item => item.id)), ['zcode']);
+  assert.equal(selected[0].pluginVersion, '0.4.5');
+  assert.deepEqual(selected[0].runtime.verifiedCliVersions, ['0.17.0']);
   for (const id of ['claude', 'codex', 'kimi', 'grok', 'dsh', 'zcode', 'antigravity']) assert.ok(proxyDefinitions.some(item => item.id === id));
 });
 
