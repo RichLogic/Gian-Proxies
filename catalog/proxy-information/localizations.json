@@ -58,5 +58,15 @@
       "displayName": "Grok Build",
       "tagline": "在 Gian 中使用 xAI Grok Build 开展编码会话。"
     }
+  },
+  "io.gian.antigravity": {
+    "en": {
+      "displayName": "Antigravity",
+      "tagline": "Google Antigravity ACP sessions in Gian."
+    },
+    "zh-CN": {
+      "displayName": "Antigravity",
+      "tagline": "在 Gian 中使用 Google Antigravity ACP 会话。"
+    }
   }
 }

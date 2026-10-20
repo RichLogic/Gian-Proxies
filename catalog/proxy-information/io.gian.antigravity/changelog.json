@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "pluginId": "io.gian.antigravity",
+  "currentVersion": "0.0.2",
+  "entries": [
+    {
+      "version": "0.0.2",
+      "firstPublishedAt": "2026-10-20T01:01:11Z",
+      "evidenceCoverage": "detailed",
+      "distributions": [
+        {
+          "repository": "RichLogic/Gian-Proxies",
+          "tag": "proxy-antigravity-v0.0.2",
+          "publishedAt": "2026-10-20T01:01:11Z",
+          "releaseUrl": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-antigravity-v0.0.2",
+          "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-antigravity-v0.0.2/gian-proxy-antigravity-0.0.2-darwin-arm64.tar.gz.manifest.json",
+          "manifestSha256": "7d1b28addb4a976c760ecabfb500a4d76048b2de0f07ca56cdcfa43addcd7423",
+          "archive": {
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-antigravity-v0.0.2/gian-proxy-antigravity-0.0.2-darwin-arm64.tar.gz",
+            "sha256": "0fa3ed12e077c36af7984c5bdefddd29465847960fdf91117e3ad5bc435784f0",
+            "size": 152529
+          },
+          "runtimeDeclaration": {
+            "id": "antigravity-acp",
+            "versions": [
+              "1.4.1"
+            ],
+            "basis": "verified-declaration"
+          },
+          "companionDeclarations": [],
+          "protocolRange": ">=2.2 <3.0",
+          "manifestSchema": 4,
+          "processScope": "shared"
+        }
+      ],
+      "changes": [
+        {
+          "category": "changed",
+          "text": "将上游 Antigravity ACP Runtime 更新至 1.4.1（ACP registry 当前版本；官方 dl.google.com ZIP 通过严格成对校验与字节固定）。ACP initialize 契约复验：核心会话/输入/MCP/认证能力不变；1.4.1 新增可选 _meta.antigravity（tier、systemPrompt.append）元数据，未采纳为 Gian 能力。线协议范围不变。产物经过托管认证；本次发行未运行真实模型 Turn。",
+          "evidence": [
+            "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-antigravity-v0.0.2",
+            "https://github.com/RichLogic/Gian-Proxies/blob/proxy-antigravity-v0.0.2/packages/proxies/antigravity-proxy/README.md"
+          ]
+        }
+      ],
+      "unknowns": []
+    },
+    {
+      "version": "0.0.1",
+      "firstPublishedAt": "2026-10-18T11:46:36Z",
+      "evidenceCoverage": "detailed",
+      "distributions": [
+        {
+          "repository": "RichLogic/Gian-Proxies",
+          "tag": "proxy-antigravity-v0.0.1",
+          "publishedAt": "2026-10-18T11:46:36Z",
+          "releaseUrl": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-antigravity-v0.0.1",
+          "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-antigravity-v0.0.1/gian-proxy-antigravity-0.0.1-darwin-arm64.tar.gz.manifest.json",
+          "manifestSha256": "1a9cd780d24c14e1c9250c4e97ebae6d61bf25463e4c9c293604bdbf05a9ab4a",
+          "archive": {
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-antigravity-v0.0.1/gian-proxy-antigravity-0.0.1-darwin-arm64.tar.gz",
+            "sha256": "55900ae96cf3eec8ff901d5d65ea4c9971d08a31ab149368622da255fb0497cf",
+            "size": 152529
+          },
+          "runtimeDeclaration": {
+            "id": "antigravity-acp",
+            "versions": [
+              "1.3.0"
+            ],
+            "basis": "verified-declaration"
+          },
+          "companionDeclarations": [],
+          "protocolRange": ">=2.2 <3.0",
+          "manifestSchema": 4,
+          "processScope": "shared"
+        }
+      ],
+      "changes": [
+        {
+          "category": "added",
+          "text": "首次收录：接入 Google 官方 Antigravity ACP Server 1.3.0，支持文本 Turn、原生工具批准、取消、上下文占用与分离/恢复；Fork、Side Chat、原生历史重放、多媒体输入与计费令牌总量不在本次范围。产物经过托管认证；产物认证明确不含真实 Provider Turn 验收。",
+          "evidence": [
+            "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-antigravity-v0.0.1",
+            "https://github.com/RichLogic/Gian-Proxies/blob/proxy-antigravity-v0.0.1/packages/proxies/antigravity-proxy/README.md"
+          ]
+        }
+      ],
+      "unknowns": []
+    }
+  ],
+  "withdrawnVersions": []
+}

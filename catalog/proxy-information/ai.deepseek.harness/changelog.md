@@ -2,7 +2,18 @@
 
 本文件由 changelog.json 的结构化记录投影，按 Proxy 版本倒序。首次发布日期与新仓库分发日期分别记录；未知历史不会用当前版本说明回填。
 
-本次发布组合快照：Proxy **0.3.5**，Runtime **0.2.0-rc.2**。这是发布目标，不表示当前机器已安装。
+本次发布组合快照：Proxy **0.3.6**，Runtime **0.2.1-rc.2**。这是发布目标，不表示当前机器已安装。
+
+## 0.3.6
+
+首次公开发布：2026-10-20T01:01:21Z（UTC）。
+
+- [RichLogic/Gian-Proxies 分发](https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-dsh-v0.3.6)：2026-10-20T01:01:21Z。
+- 对应 CLI：0.2.1-rc.2（Manifest 兼容声明，不是本机状态）。 Bridge：0.1.7（当前归档对应的源码包）。
+
+### 变更
+
+- 将受管 DeepSeek Harness 更新至 0.2.1-rc.2（npm latest 已晋升；上游标签 dsh-v0.2.1-rc.2）。精确 npm 包比对：SESSION_FORMAT_VERSION 仍为 4（无数据迁移），KNOWN_SESSION_EVENT_TYPES 仅新增 job/registered、job/settled、working-directory/change（未知持久事件已走通用活动路径），cordis 仅补丁级变化。随包 Bridge 升级至 0.1.7（对等依赖范围显式同时接纳 0.2.0 与 0.2.1 RC）。产物经过托管认证；本次发行未运行真实模型 Turn。 [依据1](https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-dsh-v0.3.6) [依据2](https://github.com/RichLogic/Gian-Proxies/blob/proxy-dsh-v0.3.6/packages/proxies/dsh-proxy/README.md)
 
 ## 0.3.5
 
