@@ -1,5 +1,42 @@
 # Gian Proxies Changelog
 
+## Claude Proxy 0.3.9 - 2026-10-20
+
+- Target the current official Claude Code 2.1.303 Runtime, promoted to the
+  /latest channel, npm latest and GitHub latest; the darwin-arm64 checksum
+  and size match the official 2.1.303 manifest. Upstream 2.1.303 is a
+  bug-fix/reliability entry with no wire-protocol or spawn-surface changes;
+  the nine selected startup flags the adapter spawns or parses were
+  re-verified on the new binary.
+- The gian.proxy wire contract is unchanged.
+
+## Antigravity Proxy 0.0.2 - 2026-10-20
+
+- Target the upstream Antigravity ACP Runtime 1.4.1, the current version in
+  the official ACP registry; the darwin-arm64 ZIP from dl.google.com passes
+  the strict production pair validation (exact server+harness members,
+  pinned SHA-256/size).
+- A bounded no-credential ACP initialize on the new pair reports
+  `agentInfo.name` antigravity-acp and version 1.4.1; the core
+  session/prompt/MCP/auth capabilities are unchanged, while 1.4.1 newly
+  advertises optional `_meta.antigravity` metadata (`tier`,
+  `systemPrompt.append`) that is not adopted or verified as a Gian
+  capability. Deeper surface facts remain 1.3.0-researched and are labeled
+  as such. The gian.proxy wire contract is unchanged.
+
+## DeepSeek Harness Proxy 0.3.6 - 2026-10-20
+
+- Target `@deepseek-ai/dsh` 0.2.1-rc.2, now the npm `latest` dist-tag
+  (published 2026-10-17); the `next` channel coincides and `alpha` stays
+  separate. The Bridge peer range `^0.2.0-rc.2` already admits it.
+- Exact npm package-payload comparison of the bridge-used surfaces:
+  `SESSION_FORMAT_VERSION` stays 4 (no data migration),
+  KNOWN_SESSION_EVENT_TYPES only gains `job/registered`, `job/settled` and
+  `working-directory/change` (unknown durable events already project through
+  the generic activity path), and cordis moves patch-only. Un-reverified
+  behavior comments keep their historical 0.2.0-rc.2 citations.
+- The gian.proxy wire contract is unchanged.
+
 ## Claude Proxy 0.3.8 - 2026-10-18
 
 - Target the current official Claude Code 2.1.302 Runtime, promoted to the
