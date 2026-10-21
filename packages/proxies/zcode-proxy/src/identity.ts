@@ -7,7 +7,7 @@ export const PLUGIN_NAME = 'ZCode';
 export const PLUGIN_VERSION = packageInfo.version;
 
 /** Inner wire facts for the open-source ZCode CLI 0.17.0
- *  (github.com/zai-org/ZCode @ 0a1fc56d279fd1001f78387bd81aec1c26767411). */
+ *  (github.com/zai-org/ZCode @ 3c5b227649371507ddc4eb46ac5133afe6db1cab). */
 export const INNER_PROTOCOL_NAME = 'ZCode Protocol';
 export const INNER_PROTOCOL_VERSION = 1;
 export const VERIFIED_CLI_VERSIONS = ['0.17.0'] as const;

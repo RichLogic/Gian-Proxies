@@ -9,7 +9,7 @@ types leak into Host/Web.
 ## Runtime baseline: open-source ZCode CLI 0.17.0
 
 - Upstream repository `https://github.com/zai-org/ZCode`, commit
-  `0a1fc56d279fd1001f78387bd81aec1c26767411`, CLI `0.17.0`
+  `3c5b227649371507ddc4eb46ac5133afe6db1cab`, CLI `0.17.0`
   (`runtime.verifiedVersions` / `src/identity.ts`). All capability claims
   below retain their original baseline references where noted; the current
   upgrade review covers the protocol, standalone authentication, model selection,
@@ -81,6 +81,17 @@ types leak into Host/Web.
 | MCP tool-level detail | `mcp/list` returns statuses + `toolCount` only; no protocol method returns a server's tool list (`McpPort.listTools` is in-process only, `mcp.port.ts:308`). |
 | `session.create.forkBoundaries` (capability) | Fork boundaries are resolved live from the conversation projection at fork time; the create-time boundary list has no upstream source. |
 | Model marketplace beyond observed snapshots | 0.16.9 deliberately keeps the provider registry out of read/setModel snapshots (`session-mapper.ts:215` comment); `catalog.list` before any session therefore shows only the presentation-backed approval mode, and model choices grow from real runtime snapshots. The proxy does not parse `~/.zcode/cli/config.json` to invent a marketplace. |
+
+## Changes in Proxy 0.4.6
+
+- Pin reviewed App-source 3.16.2 at `3c5b227`; upstream CLI remains 0.17.0.
+  The dependency lock, protocol entrypoint, and migration source are unchanged.
+- Review temporary Bash output preparation/fallback/cancellation, nonblocking
+  plugin metadata reads, workflow quota handling and read-only workflow children.
+  Gian continues to offer only interactive/fork history for adoption.
+- Keep the strict history-list request fix and all existing capability boundaries.
+  Selected native transport and Bash lifecycle source regressions pass; exact
+  hosted artifact qualification remains required before publication.
 
 ## Changes in Proxy 0.4.5
 

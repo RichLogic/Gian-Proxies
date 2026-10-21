@@ -1,5 +1,14 @@
 # Gian Proxies Changelog
 
+## ZCode Proxy 0.4.6 - 2026-10-21
+
+- Update the managed Runtime source to reviewed App-source 3.16.2 at
+  `3c5b227`; its CLI version remains 0.17.0. Keep the immutable dependency
+  lock and hash-bound standalone integration.
+- Review temporary Bash output lifecycle/fallback, plugin-read concurrency,
+  workflow quota handling and read-only workflow child sessions. No new
+  Gian capabilities are advertised; the existing strict history-list fix stays.
+
 ## Claude Proxy 0.3.10 - 2026-10-21
 
 - Target the current official Claude Code 2.1.304 Runtime, promoted to the
