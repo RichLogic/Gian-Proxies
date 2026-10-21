@@ -20,14 +20,14 @@ test('the real standalone verifier imports without Host and retains the package-
   assert.ok(existsSync(new URL('./build-antigravity-runtime.mjs', builderUrl)));
 });
 
-test('this batch selects only ZCode on signed base Catalog 30 and preserves the other released tuples', () => {
+test('this batch selects only Claude on signed base Catalog 31 and preserves the other released tuples', () => {
   const selection = JSON.parse(readFileSync(new URL('../release-selection.json', import.meta.url), 'utf8'));
-  assert.deepEqual(selection, { schema: 1, providers: ['zcode'], baseCatalogTag: 'catalog-v1.30.0' });
+  assert.deepEqual(selection, { schema: 1, providers: ['claude'], baseCatalogTag: 'catalog-v1.31.0' });
   const selected = selectReleaseDefinitions(proxyDefinitions, selection);
-  assert.deepEqual(selected.map(item => item.id), ['zcode']);
-  assert.deepEqual(selectRuntimeProviders(selected.map(item => item.id)), ['zcode']);
-  assert.equal(selected[0].pluginVersion, '0.4.5');
-  assert.deepEqual(selected[0].runtime.verifiedCliVersions, ['0.17.0']);
+  assert.deepEqual(selected.map(item => item.id), ['claude']);
+  assert.deepEqual(selectRuntimeProviders(selected.map(item => item.id)), ['claude']);
+  assert.equal(selected[0].pluginVersion, '0.3.10');
+  assert.deepEqual(selected[0].runtime.verifiedCliVersions, ['2.1.304']);
   for (const id of ['claude', 'codex', 'kimi', 'grok', 'dsh', 'zcode', 'antigravity']) assert.ok(proxyDefinitions.some(item => item.id === id));
 });
 

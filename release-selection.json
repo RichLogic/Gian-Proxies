@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "providers": [
-    "zcode"
+    "claude"
   ],
-  "baseCatalogTag": "catalog-v1.30.0"
+  "baseCatalogTag": "catalog-v1.31.0"
 }

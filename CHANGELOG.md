@@ -1,5 +1,16 @@
 # Gian Proxies Changelog
 
+## Claude Proxy 0.3.10 - 2026-10-21
+
+- Target the current official Claude Code 2.1.304 Runtime, promoted to the
+  /latest and /stable channels, npm latest and GitHub latest on
+  2026-10-19; the darwin-arm64 checksum and size match the official 2.1.304
+  manifest. No documented headless spawn/wire compatibility changes were
+  found in the official 2.1.304 changelog; the nine selected startup flags
+  the adapter spawns or parses were verified on the new binary.
+  Authenticated wire/Provider turns are NOT_RUN.
+- The gian.proxy wire contract is unchanged.
+
 ## ZCode Proxy 0.4.5 - 2026-10-20
 
 - Pin reviewed App-source 3.16.1 / CLI 0.17.0 at immutable source `0a1fc56`.
