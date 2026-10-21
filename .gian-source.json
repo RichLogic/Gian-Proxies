@@ -2,7 +2,7 @@
   "schema": 1,
   "product": "Gian-Proxies",
   "sourceRepository": "RichLogic/Gian-Dev",
-  "sourceCommit": "946226f8fde9758473c51d6393edc2e86919f069",
+  "sourceCommit": "4cc09cb657dd51bec29ce3a4afd95090c3118c1c",
   "workingTree": false,
   "externalPackages": [
     {
@@ -361,12 +361,12 @@
     {
       "source": "catalog/proxy-information/claude/changelog.json",
       "path": "catalog/proxy-information/claude/changelog.json",
-      "sha256": "ac35d238473fe2487a96226592adfff9284f59ac6f474f66f18741a45a48b30f"
+      "sha256": "93d88135c6a06b2488fb1c5edd0e704368acaccc19a4d80fdb63e2c56c1894ef"
     },
     {
       "source": "catalog/proxy-information/claude/changelog.md",
       "path": "catalog/proxy-information/claude/changelog.md",
-      "sha256": "c69a1b54f8bc3ed255b26bd97006d7ca924518f63e8a9c314c323b7eb89a634a"
+      "sha256": "d8cf23ec5cce6a49c76e071f959c5d4420570c3f4f0b4af0c6bb442c5f1c8732"
     },
     {
       "source": "catalog/proxy-information/claude/tutorial.en.md",
@@ -436,7 +436,7 @@
     {
       "source": "catalog/proxy-information/evidence/current-combinations.json",
       "path": "catalog/proxy-information/evidence/current-combinations.json",
-      "sha256": "bf3c29b81205c33b5ce5063bec45dc8f57e269401e15a8959663640cb46224a9"
+      "sha256": "1f6e4017db5dd480feae9bbc0403381d9acf10e26680412b33c1ee8a09aae19b"
     },
     {
       "source": "catalog/proxy-information/evidence/dsh-bridge-versions.json",
@@ -446,12 +446,12 @@
     {
       "source": "catalog/proxy-information/evidence/manifests.json",
       "path": "catalog/proxy-information/evidence/manifests.json",
-      "sha256": "f04a8508a393fc47b539e1495424a88007aa11621e28df56ae4d6e9955c99ca7"
+      "sha256": "567daefb18a5970344b0271ef77262d0b0a77db2b9ea45997b87aa1f94f476a5"
     },
     {
       "source": "catalog/proxy-information/evidence/releases.json",
       "path": "catalog/proxy-information/evidence/releases.json",
-      "sha256": "ee8d58d4f20620eb2a942c3469f5b07b9ac9ed5927a314d73cde1f929111e598"
+      "sha256": "8d7286dc13725f35719dd75a02b9c22d8a79015fdfd056d35a4c8e7f6af59c10"
     },
     {
       "source": "catalog/proxy-information/grok/basic.md",
@@ -481,7 +481,7 @@
     {
       "source": "catalog/proxy-information/history-copy.en.json",
       "path": "catalog/proxy-information/history-copy.en.json",
-      "sha256": "493261fb04a53e1294e40967e52ea197ed649510b64db44471385a00c23e55e7"
+      "sha256": "b1a9c0c96dbc3fe9f22cffdf3a2040b704bc079f1e88e1dcc8ac9d4883958ee7"
     },
     {
       "source": "catalog/proxy-information/io.gian.antigravity/basic.md",
@@ -546,7 +546,7 @@
     {
       "source": "catalog/proxy-information/project.test.mjs",
       "path": "catalog/proxy-information/project.test.mjs",
-      "sha256": "fb9e3bfb24668e5cdb35293e77b31527e4c8389893fc7d5e71807b25609ded64"
+      "sha256": "0c541b61417e5d09762c015e02ccb123d39a3e8de1b5b34efaedfb144b75d65c"
     },
     {
       "source": "catalog/proxy-information/validate.mjs",
@@ -3358,12 +3358,12 @@
     {
       "path": "catalog/proxy-information/claude/changelog.json",
       "mode": 420,
-      "sha256": "ac35d238473fe2487a96226592adfff9284f59ac6f474f66f18741a45a48b30f"
+      "sha256": "93d88135c6a06b2488fb1c5edd0e704368acaccc19a4d80fdb63e2c56c1894ef"
     },
     {
       "path": "catalog/proxy-information/claude/changelog.md",
       "mode": 420,
-      "sha256": "c69a1b54f8bc3ed255b26bd97006d7ca924518f63e8a9c314c323b7eb89a634a"
+      "sha256": "d8cf23ec5cce6a49c76e071f959c5d4420570c3f4f0b4af0c6bb442c5f1c8732"
     },
     {
       "path": "catalog/proxy-information/claude/tutorial.en.md",
@@ -3433,7 +3433,7 @@
     {
       "path": "catalog/proxy-information/evidence/current-combinations.json",
       "mode": 420,
-      "sha256": "bf3c29b81205c33b5ce5063bec45dc8f57e269401e15a8959663640cb46224a9"
+      "sha256": "1f6e4017db5dd480feae9bbc0403381d9acf10e26680412b33c1ee8a09aae19b"
     },
     {
       "path": "catalog/proxy-information/evidence/dsh-bridge-versions.json",
@@ -3443,7 +3443,7 @@
     {
       "path": "catalog/proxy-information/evidence/manifests.json",
       "mode": 420,
-      "sha256": "f04a8508a393fc47b539e1495424a88007aa11621e28df56ae4d6e9955c99ca7"
+      "sha256": "567daefb18a5970344b0271ef77262d0b0a77db2b9ea45997b87aa1f94f476a5"
     },
     {
       "path": "catalog/proxy-information/evidence/README.md",
@@ -3453,7 +3453,7 @@
     {
       "path": "catalog/proxy-information/evidence/releases.json",
       "mode": 420,
-      "sha256": "ee8d58d4f20620eb2a942c3469f5b07b9ac9ed5927a314d73cde1f929111e598"
+      "sha256": "8d7286dc13725f35719dd75a02b9c22d8a79015fdfd056d35a4c8e7f6af59c10"
     },
     {
       "path": "catalog/proxy-information/grok/basic.md",
@@ -3483,7 +3483,7 @@
     {
       "path": "catalog/proxy-information/history-copy.en.json",
       "mode": 420,
-      "sha256": "493261fb04a53e1294e40967e52ea197ed649510b64db44471385a00c23e55e7"
+      "sha256": "b1a9c0c96dbc3fe9f22cffdf3a2040b704bc079f1e88e1dcc8ac9d4883958ee7"
     },
     {
       "path": "catalog/proxy-information/io.gian.antigravity/basic.md",
@@ -3548,7 +3548,7 @@
     {
       "path": "catalog/proxy-information/project.test.mjs",
       "mode": 420,
-      "sha256": "fb9e3bfb24668e5cdb35293e77b31527e4c8389893fc7d5e71807b25609ded64"
+      "sha256": "0c541b61417e5d09762c015e02ccb123d39a3e8de1b5b34efaedfb144b75d65c"
     },
     {
       "path": "catalog/proxy-information/README.md",
