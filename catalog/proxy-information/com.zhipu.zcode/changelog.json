@@ -1,8 +1,50 @@
 {
   "schemaVersion": 1,
   "pluginId": "com.zhipu.zcode",
-  "currentVersion": "0.4.5",
+  "currentVersion": "0.4.6",
   "entries": [
+    {
+      "version": "0.4.6",
+      "firstPublishedAt": "2026-10-21T05:17:04Z",
+      "evidenceCoverage": "detailed",
+      "distributions": [
+        {
+          "repository": "RichLogic/Gian-Proxies",
+          "tag": "proxy-zcode-v0.4.6",
+          "publishedAt": "2026-10-21T05:17:04Z",
+          "releaseUrl": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-zcode-v0.4.6",
+          "manifestUrl": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.6/gian-proxy-zcode-0.4.6-darwin-arm64.tar.gz.manifest.json",
+          "manifestSha256": "3e836d6c07a528277f2f394bc60a91f96d74c3336639047b85600ccaa429137d",
+          "archive": {
+            "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.6/gian-proxy-zcode-0.4.6-darwin-arm64.tar.gz",
+            "sha256": "9f0e08feb638fd4989f520b2a1bc74dce5b033f32fb1b936b8bb79b9bd9daae1",
+            "size": 143241
+          },
+          "runtimeDeclaration": {
+            "id": "zcode",
+            "versions": [
+              "0.17.0"
+            ],
+            "basis": "verified-declaration"
+          },
+          "companionDeclarations": [],
+          "protocolRange": ">=2.2 <3.0",
+          "manifestSchema": 4,
+          "processScope": "shared"
+        }
+      ],
+      "changes": [
+        {
+          "category": "changed",
+          "text": "托管 Runtime 源码更新至已审查的 App 源码 3.16.2（固定提交 3c5b227），CLI 版本仍为 0.17.0。依赖锁、协议入口和数据库迁移源码保持不变。吸收上游 Bash 临时输出的准备、回退、取消与保留修复，插件读取并发改进和工作流子会话只读限制；保持现有历史列表修复与 Gian 能力边界。针对性源码回归通过，产物经托管认证；本次未运行真实模型 Turn。",
+          "evidence": [
+            "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-zcode-v0.4.6",
+            "https://github.com/RichLogic/Gian-Proxies/blob/proxy-zcode-v0.4.6/packages/proxies/zcode-proxy/README.md"
+          ]
+        }
+      ],
+      "unknowns": []
+    },
     {
       "version": "0.4.5",
       "firstPublishedAt": "2026-10-20T01:35:37Z",

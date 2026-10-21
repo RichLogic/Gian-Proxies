@@ -2,7 +2,18 @@
 
 本文件由 changelog.json 的结构化记录投影，按 Proxy 版本倒序。首次发布日期与新仓库分发日期分别记录；未知历史不会用当前版本说明回填。
 
-本次发布组合快照：Proxy **0.4.5**，Runtime **0.17.0**。这是发布目标，不表示当前机器已安装。
+本次发布组合快照：Proxy **0.4.6**，Runtime **0.17.0**。这是发布目标，不表示当前机器已安装。
+
+## 0.4.6
+
+首次公开发布：2026-10-21T05:17:04Z（UTC）。
+
+- [RichLogic/Gian-Proxies 分发](https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-zcode-v0.4.6)：2026-10-21T05:17:04Z。
+- 对应 CLI：0.17.0（Manifest 兼容声明，不是本机状态）。
+
+### 变更
+
+- 托管 Runtime 源码更新至已审查的 App 源码 3.16.2（固定提交 3c5b227），CLI 版本仍为 0.17.0。依赖锁、协议入口和数据库迁移源码保持不变。吸收上游 Bash 临时输出的准备、回退、取消与保留修复，插件读取并发改进和工作流子会话只读限制；保持现有历史列表修复与 Gian 能力边界。针对性源码回归通过，产物经托管认证；本次未运行真实模型 Turn。 [依据1](https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-zcode-v0.4.6) [依据2](https://github.com/RichLogic/Gian-Proxies/blob/proxy-zcode-v0.4.6/packages/proxies/zcode-proxy/README.md)
 
 ## 0.4.5
 

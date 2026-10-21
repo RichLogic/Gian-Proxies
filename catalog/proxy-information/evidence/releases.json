@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-10-21T04:54:36.160Z",
+  "capturedAt": "2026-10-21T05:17:51.638Z",
   "repositories": [
     "RichLogic/Gian",
     "RichLogic/Gian-Proxies"
@@ -2681,6 +2681,44 @@
           "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-claude-v0.3.10/gian-proxy-claude-0.3.10-darwin-arm64.tar.gz.sha256",
           "size": 111,
           "digest": "sha256:60c522461fce949b37073b79073767fe6aae5d10cd6d84e7027c75feb2daf512"
+        }
+      ]
+    },
+    {
+      "tag": "proxy-zcode-v0.4.6",
+      "date": "2026-10-21T05:17:04Z",
+      "url": "https://github.com/RichLogic/Gian-Proxies/releases/tag/proxy-zcode-v0.4.6",
+      "body": "Independent Proxy 0.4.6. Exact hosted artifacts from proxies-2685370084127805daed36a955bdcffcb5a4cb64-39547555145-1. DSH includes its Bridge. ZCode includes a managed CLI Runtime built from its pinned upstream Git commit. No App or real-provider acceptance is claimed.",
+      "assets": [
+        {
+          "name": "certificate.json",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.6/certificate.json",
+          "size": 4707,
+          "digest": "sha256:2488a696c51500213de8b38ba3d01329c7a3ecfb5fe1da9661ffcfa03cc19d35"
+        },
+        {
+          "name": "gian-proxy-zcode-0.4.6-darwin-arm64.tar.gz",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.6/gian-proxy-zcode-0.4.6-darwin-arm64.tar.gz",
+          "size": 143241,
+          "digest": "sha256:9f0e08feb638fd4989f520b2a1bc74dce5b033f32fb1b936b8bb79b9bd9daae1"
+        },
+        {
+          "name": "gian-proxy-zcode-0.4.6-darwin-arm64.tar.gz.manifest.json",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.6/gian-proxy-zcode-0.4.6-darwin-arm64.tar.gz.manifest.json",
+          "size": 801,
+          "digest": "sha256:3e836d6c07a528277f2f394bc60a91f96d74c3336639047b85600ccaa429137d"
+        },
+        {
+          "name": "gian-proxy-zcode-0.4.6-darwin-arm64.tar.gz.sha256",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.6/gian-proxy-zcode-0.4.6-darwin-arm64.tar.gz.sha256",
+          "size": 109,
+          "digest": "sha256:b3933cb01c97e76148e50fd25a219a2ff36c7eed10f50dc9ed9edc895ff09fca"
+        },
+        {
+          "name": "zcode.tar.gz",
+          "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.6/zcode.tar.gz",
+          "size": 83430692,
+          "digest": "sha256:985cd741a28f9c2ffe7b8d4060688c88280180108520b26ad0f8d1165b912c01"
         }
       ]
     }

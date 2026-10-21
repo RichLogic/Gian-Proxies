@@ -70,9 +70,9 @@
     "format": "tar.gz",
     "entryRelativePath": "zcode/agent/zcode.cjs",
     "asset": {
-      "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.5/zcode.tar.gz",
-      "sha256": "fd77c791764cc606f1d850b7fa4eb26acf68e34615997b1eaa1b070035cf176f",
-      "size": 83398781
+      "url": "https://github.com/RichLogic/Gian-Proxies/releases/download/proxy-zcode-v0.4.6/zcode.tar.gz",
+      "sha256": "985cd741a28f9c2ffe7b8d4060688c88280180108520b26ad0f8d1165b912c01",
+      "size": 83430692
     }
   },
   {
